@@ -177,6 +177,7 @@ void CustomizeWebUIHTMLSource(const std::string &name,
         { "clockTitle", IDS_BRAVE_NEW_TAB_CLOCK },
         { "backgroundImageTitle", IDS_BRAVE_NEW_TAB_BACKGROUND_IMAGE },
         { "settingsNavigateBack", IDS_BRAVE_NEW_TAB_SETTINGS_BACK },
+        { "solidColorTitle", IDS_BRAVE_NEW_TAB_SOLID_COLOR},
 
         { "braveTodayTitle", IDS_BRAVE_TODAY_TITLE },
         { "braveTodayIntroTitle", IDS_BRAVE_TODAY_INTRO_TITLE },

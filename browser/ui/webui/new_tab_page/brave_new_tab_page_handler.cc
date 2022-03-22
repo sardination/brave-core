@@ -89,7 +89,16 @@ void BraveNewTabPageHandler::UseBraveBackground() {
   DeleteSanitizedImageFile();
 }
 
-bool BraveNewTabPageHandler::IsCustomBackgroundEnabled() const {
+void BraveNewTabPageHandler::UseSolidColorBackground(const std::string& color) {
+  auto background_pref = NTPBackgroundPref(profile_->GetPrefs());
+  background_pref.SetType(NTPBackgroundPref::Type::kSolidColor);
+  background_pref.SetSelectedValue(color);
+
+  OnCustomBackgroundImageUpdated();
+  DeleteSanitizedImageFile();
+}
+
+bool BraveNewTabPageHandler::IsCustomBackgroundImageEnabled() const {
   auto* prefs = profile_->GetPrefs();
   if (prefs->IsManagedPreference(prefs::kNtpCustomBackgroundDict))
     return false;
@@ -97,17 +106,27 @@ bool BraveNewTabPageHandler::IsCustomBackgroundEnabled() const {
   return NTPBackgroundPref(prefs).IsCustomImageType();
 }
 
+bool BraveNewTabPageHandler::IsSolidColorBackgroundEnabled() const {
+  return NTPBackgroundPref(profile_->GetPrefs()).IsSolidColorType();
+}
+
 void BraveNewTabPageHandler::OnCustomBackgroundImageUpdated() {
   brave_new_tab_page::mojom::CustomBackgroundPtr value =
       brave_new_tab_page::mojom::CustomBackground::New();
   // Pass empty struct when custom background is disabled.
-  if (IsCustomBackgroundEnabled()) {
+  if (IsCustomBackgroundImageEnabled()) {
     // Add a timestamp to the url to prevent the browser from using a cached
     // version when "Upload an image" is used multiple times.
     std::string time_string = std::to_string(base::Time::Now().ToTimeT());
     std::string local_string(ntp_background_images::kCustomWallpaperURL);
     value->url = GURL(local_string + "?ts=" + time_string);
+  } else if (IsSolidColorBackgroundEnabled()) {
+    auto selected_value =
+        NTPBackgroundPref(profile_->GetPrefs()).GetSelectedValue();
+    DCHECK(absl::holds_alternative<std::string>(selected_value));
+    value->solid_color = absl::get<std::string>(selected_value);
   }
+
   page_->OnBackgroundUpdated(std::move(value));
 }
 
