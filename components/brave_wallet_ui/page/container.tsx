@@ -24,8 +24,6 @@ import {
 
 // style
 import 'emptykit.css'
-import '../../../ui/webui/resources/fonts/poppins.css'
-import '../../../ui/webui/resources/fonts/muli.css'
 import { OnboardingWrapper, WalletWidgetStandIn } from '../stories/style'
 
 // components
