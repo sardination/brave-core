@@ -5,9 +5,7 @@
 
 #include "third_party/blink/renderer/core/execution_context/navigator_base.h"
 
-#include "base/compiler_specific.h"
-#include "base/system/sys_info.h"
-#include "third_party/abseil-cpp/absl/random/random.h"
+#include "brave/third_party/blink/renderer/core/brave_session_cache.h"
 #include "third_party/blink/public/platform/web_content_settings_client.h"
 #include "third_party/blink/renderer/core/execution_context/execution_context.h"
 #include "third_party/blink/renderer/core/frame/local_dom_window.h"
