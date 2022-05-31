@@ -325,6 +325,51 @@ void SkusJSHandler::OnCredentialSummary(
   std::ignore = resolver->Resolve(context, local_result);
 }
 
+// window.chrome.braveSkus.submit_receipt
+v8::Local<v8::Promise> SkusJSHandler::SubmitReceipt(v8::Isolate* isolate,
+                                                    std::string order_id,
+                                                    std::string receipt) {
+  if (!EnsureConnected())
+    return v8::Local<v8::Promise>();
+
+  v8::MaybeLocal<v8::Promise::Resolver> resolver =
+      v8::Promise::Resolver::New(isolate->GetCurrentContext());
+  if (resolver.IsEmpty()) {
+    return v8::Local<v8::Promise>();
+  }
+
+  auto promise_resolver(
+      v8::Global<v8::Promise::Resolver>(isolate, resolver.ToLocalChecked()));
+  auto context_old(
+      v8::Global<v8::Context>(isolate, isolate->GetCurrentContext()));
+
+  skus_service_->SubmitReceipt(
+      order_id, receipt,
+      base::BindOnce(&SkusJSHandler::OnSubmitReceipt, base::Unretained(this),
+                     std::move(promise_resolver), isolate,
+                     std::move(context_old)));
+
+  return resolver.ToLocalChecked()->GetPromise();
+}
+void SkusJSHandler::OnSubmitReceipt(
+    v8::Global<v8::Promise::Resolver> promise_resolver,
+    v8::Isolate* isolate,
+    v8::Global<v8::Context> context_old,
+    const std::string& response) {
+  v8::HandleScope handle_scope(isolate);
+  v8::Local<v8::Context> context = context_old.Get(isolate);
+  v8::Context::Scope context_scope(context);
+  v8::MicrotasksScope microtasks(isolate,
+                                 v8::MicrotasksScope::kDoNotRunMicrotasks);
+
+  v8::Local<v8::Promise::Resolver> resolver = promise_resolver.Get(isolate);
+  v8::Local<v8::String> result;
+  result =
+      v8::String::NewFromUtf8(isolate, response.c_str()).ToLocalChecked();
+
+  std::ignore = resolver->Resolve(context, result);
+}
+
 gin::ObjectTemplateBuilder SkusJSHandler::GetObjectTemplateBuilder(
     v8::Isolate* isolate) {
   return gin::Wrappable<SkusJSHandler>::GetObjectTemplateBuilder(isolate)
@@ -333,7 +378,8 @@ gin::ObjectTemplateBuilder SkusJSHandler::GetObjectTemplateBuilder(
                  &SkusJSHandler::FetchOrderCredentials)
       .SetMethod("prepare_credentials_presentation",
                  &SkusJSHandler::PrepareCredentialsPresentation)
-      .SetMethod("credential_summary", &SkusJSHandler::CredentialSummary);
+      .SetMethod("credential_summary", &SkusJSHandler::CredentialSummary)
+      .SetMethod("submit_receipt", &SkusJSHandler::SubmitReceipt);
 }
 
 }  // namespace skus
