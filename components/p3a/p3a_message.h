@@ -14,6 +14,9 @@
 
 namespace brave {
 
+constexpr const char* kP3AMessageStarKeyValueSeparator = "|";
+constexpr const char* kP3AMessageStarLayerSeparator = ";";
+
 struct MessageMetainfo {
   MessageMetainfo();
   ~MessageMetainfo();
@@ -30,6 +33,10 @@ struct MessageMetainfo {
 };
 
 base::Value GenerateP3AMessageDict(base::StringPiece metric_name,
+                                   uint64_t metric_value,
+                                   const MessageMetainfo& meta);
+
+std::string GenerateP3AStarMessage(std::string metric_name,
                                    uint64_t metric_value,
                                    const MessageMetainfo& meta);
 

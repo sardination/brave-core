@@ -5,18 +5,19 @@
 
 #include "brave/components/p3a/p3a_message.h"
 
-#include <vector>
+#include <algorithm>
+#include <array>
 
 #include "base/containers/flat_set.h"
-#include "base/logging.h"
 #include "base/strings/string_number_conversions.h"
-#include "base/trace_event/trace_event.h"
-#include "crypto/sha2.h"
+#include "base/strings/string_util.h"
 
 namespace brave {
 
 MessageMetainfo::MessageMetainfo() = default;
 MessageMetainfo::~MessageMetainfo() = default;
+
+constexpr std::size_t kP3AStarAttributeCount = 8;
 
 base::Value GenerateP3AMessageDict(base::StringPiece metric_name,
                                    uint64_t metric_value,
@@ -46,6 +47,35 @@ base::Value GenerateP3AMessageDict(base::StringPiece metric_name,
   result.SetIntKey("metric_value", metric_value);
 
   return result;
+}
+
+std::string GenerateP3AStarMessage(std::string metric_name,
+                                   uint64_t metric_value,
+                                   const MessageMetainfo& meta) {
+  base::Time::Exploded exploded;
+  meta.date_of_install.LocalExplode(&exploded);
+  DCHECK_GE(exploded.year, 999);
+
+  std::array<std::array<std::string, 2>, kP3AStarAttributeCount> attributes = {{
+      {"metric_name", metric_name},
+      {"metric_value", base::NumberToString(metric_value)},
+      {"version", meta.version},
+      {"yoi", base::NumberToString(exploded.year)},
+      {"channel", meta.channel},
+      {"platform", meta.platform},
+      {"country_code", meta.country_code},
+      {"woi", base::NumberToString(meta.woi)},
+  }};
+
+  std::array<std::string, kP3AStarAttributeCount> serialized_attributes;
+
+  std::transform(attributes.begin(), attributes.end(),
+                 serialized_attributes.begin(), [](auto& attr) -> std::string {
+                   return base::JoinString(attr,
+                                           kP3AMessageStarKeyValueSeparator);
+                 });
+
+  return base::JoinString(serialized_attributes, kP3AMessageStarLayerSeparator);
 }
 
 void MaybeStripRefcodeAndCountry(MessageMetainfo* meta) {
