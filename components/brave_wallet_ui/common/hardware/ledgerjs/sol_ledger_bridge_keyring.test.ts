@@ -15,7 +15,7 @@ class MockApp {
   }
 
   async signTransaction (path: string, txBuffer: Buffer) {
-    return Promise.resolve(this.signature)
+    return { signature: new Buffer.from('signature') }
   }
 }
 
@@ -75,11 +75,31 @@ test('Check locks for device app and device id', () => {
   expect(solanaLedgerHardwareKeyring.isUnlocked()).toStrictEqual(true)
 })
 
-test('Extract accounts from locked device', () => {
+test('Extract accounts from locked device yields unlock error', () => {
   const solanaLedgerHardwareKeyring = new SolanaLedgerKeyring()
   solanaLedgerHardwareKeyring.unlock = async function () {
     return { success: false, error: 'braveWalletUnlockError' }
   }
   return expect(solanaLedgerHardwareKeyring.getAccounts(-2, 1))
     .resolves.toStrictEqual({ error: 'braveWalletUnlockError', success: false })
+})
+
+test('Sign transaction from locked device yields unlock error', () => {
+  const solanaLedgerHardwareKeyring = new SolanaLedgerKeyring()
+  solanaLedgerHardwareKeyring.unlock = async function () {
+    return { success: false, error: 'braveWalletUnlockError' }
+  }
+  return expect(solanaLedgerHardwareKeyring.signTransaction(1, 'message'))
+    .resolves.toStrictEqual({ error: 'braveWalletUnlockError', success: false })
+})
+
+test('Sign transaction unlocked device yields success', async () => {
+  const ledgerHardwareKeyring = new SolanaLedgerKeyring()
+  ledgerHardwareKeyring.unlock = async function () {
+    return { success: true }
+  }
+  ledgerHardwareKeyring.app = new MockApp() as LedgerProvider
+  const result = await ledgerHardwareKeyring.signTransaction(0, 'message');
+  return expect(ledgerHardwareKeyring.signTransaction(0, 'message'))
+    .resolves.toStrictEqual({ success: true, payload: new Buffer.from('signature') })
 })
