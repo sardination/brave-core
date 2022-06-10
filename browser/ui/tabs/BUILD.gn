@@ -1,3 +1,5 @@
+import("//build/config/ui.gni")
+
 source_set("tabs") {
   # Set due to //chrome/browser and //chrome/browser/ui circular dependencies.
   check_includes = false
@@ -16,6 +18,17 @@ source_set("tabs") {
       "//components/prefs",
       "//components/sessions",
       "//content/public/browser",
+    ]
+  }
+
+  if (toolkit_views) {
+    if (!defined(sources)) {
+      sources = []
+    }
+
+    sources += [
+      "features.cc",
+      "features.h",
     ]
   }
 }

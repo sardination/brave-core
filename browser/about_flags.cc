@@ -29,6 +29,7 @@
 #include "brave/components/speedreader/common/buildflags.h"
 #include "brave/components/translate/core/common/brave_translate_features.h"
 #include "brave/components/translate/core/common/buildflags.h"
+#include "build/build_config.h"
 #include "components/translate/core/browser/translate_prefs.h"
 #include "net/base/features.h"
 #include "third_party/blink/public/common/features.h"
@@ -47,6 +48,10 @@
 
 #if BUILDFLAG(ENABLE_PLAYLIST)
 #include "brave/components/playlist/features.h"
+#endif
+
+#if defined(TOOLKIT_VIEWS)
+#include "brave/browser/ui/tabs/features.h"
 #endif
 
 using brave_shields::features::kBraveAdblockCnameUncloaking;
@@ -342,6 +347,11 @@ constexpr char kRestrictWebSocketsPoolDescription[] =
 constexpr char kPlaylistName[] = "Playlist";
 constexpr char kPlaylistDescription[] = "Enables Playlist";
 
+#if defined(TOOLKIT_VIEWS)
+constexpr char kBraveVerticalTabsName[] = "Vertical tabs";
+constexpr char kBraveVerticalTabsDescription[] =
+    "Uses vertical tabs instead of tabstrip";
+#endif
 }  // namespace
 
 }  // namespace flag_descriptions
@@ -486,6 +496,17 @@ constexpr char kPlaylistDescription[] = "Enables Playlist";
 #define PLAYLIST_FEATURE_ENTRIES
 #endif
 
+#if defined(TOOLKIT_VIEWS)
+#define BRAVE_VERTICAL_TABS_FEATURE_ENTRY \
+    {kBraveVerticalTabsFeatureInternalName,  \
+    flag_descriptions::kBraveVerticalTabsName, \
+    flag_descriptions::kBraveVerticalTabsDescription, \
+    kOsWin | kOsMac, \
+    FEATURE_VALUE_TYPE(tabs::features::kBraveVerticalTabs)},
+#else
+#define BRAVE_VERTICAL_TABS_FEATURE_ENTRY
+#endif  // defined(TOOLKIT_VIEWS)
+
 #define BRAVE_ABOUT_FLAGS_FEATURE_ENTRIES                                   \
     {"use-dev-updater-url",                                                 \
      flag_descriptions::kUseDevUpdaterUrlName,                              \
@@ -624,4 +645,5 @@ constexpr char kPlaylistDescription[] = "Enables Playlist";
     SPEEDREADER_FEATURE_ENTRIES                                             \
     BRAVE_TRANSLATE_GO_FEATURE_ENTRIES                                      \
     BRAVE_FEDERATED_FEATURE_ENTRIES                                         \
-    PLAYLIST_FEATURE_ENTRIES
+    PLAYLIST_FEATURE_ENTRIES                                                \
+    BRAVE_VERTICAL_TABS_FEATURE_ENTRY

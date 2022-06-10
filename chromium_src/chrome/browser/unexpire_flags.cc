@@ -18,7 +18,8 @@ namespace flags {
 
 bool IsFlagExpired(const flags_ui::FlagsStorage* storage,
                    const char* internal_name) {
-#if BUILDFLAG(ENABLE_BRAVE_VPN) || BUILDFLAG(ENABLE_PLAYLIST)
+#if BUILDFLAG(ENABLE_BRAVE_VPN) || BUILDFLAG(ENABLE_PLAYLIST) || \
+    defined(TOOLKIT_VIEWS)
   version_info::Channel channel = chrome::GetChannel();
 #endif
 
@@ -34,6 +35,15 @@ bool IsFlagExpired(const flags_ui::FlagsStorage* storage,
 #if BUILDFLAG(ENABLE_PLAYLIST)
   // Enable playlist feature only for nightly/development.
   if (base::EqualsCaseInsensitiveASCII(kPlaylistFeatureInternalName,
+                                       internal_name) &&
+      (channel == version_info::Channel::STABLE ||
+       channel == version_info::Channel::BETA)) {
+    return true;
+  }
+#endif
+
+#if defined(TOOLKIT_VIEWS)
+  if (base::EqualsCaseInsensitiveASCII(kBraveVerticalTabsFeatureInternalName,
                                        internal_name) &&
       (channel == version_info::Channel::STABLE ||
        channel == version_info::Channel::BETA)) {
