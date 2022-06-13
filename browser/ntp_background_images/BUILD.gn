@@ -10,6 +10,8 @@ assert(enable_custom_background)
 source_set("ntp_custom_background_images") {
   sources = [
     "constants.h",
+    "ntp_background_pref.cc",
+    "ntp_background_pref.h",
     "ntp_custom_background_images_service_delegate.cc",
     "ntp_custom_background_images_service_delegate.h",
     "ntp_custom_background_images_service_factory.cc",
@@ -25,8 +27,29 @@ source_set("ntp_custom_background_images") {
     "//chrome/common",
     "//chrome/common:constants",
     "//components/keyed_service/content",
+    "//components/pref_registry:pref_registry",
     "//components/prefs",
     "//components/user_prefs",
     "//url",
   ]
+}
+
+source_set("unit_tests") {
+  testonly = true
+
+  if (!is_android) {
+    sources = [ "ntp_background_pref_unittest.cc" ]
+
+    deps = [
+      "//base",
+      "//base/test:test_support",
+      "//brave/browser/ntp_background_images:ntp_custom_background_images",
+      "//brave/browser/ui",
+      "//brave/components/constants",
+      "//brave/components/ntp_background_images/browser",
+      "//chrome/browser",
+      "//components/sync_preferences:test_support",
+      "//testing/gtest",
+    ]
+  }
 }

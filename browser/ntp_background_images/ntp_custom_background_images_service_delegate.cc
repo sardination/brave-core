@@ -7,6 +7,7 @@
 
 #include "base/files/file_path.h"
 #include "brave/browser/ntp_background_images/constants.h"
+#include "brave/browser/ntp_background_images/ntp_background_pref.h"
 #include "brave/components/constants/pref_names.h"
 #include "chrome/browser/profiles/profile.h"
 #include "chrome/common/pref_names.h"
@@ -28,7 +29,7 @@ bool NTPCustomBackgroundImagesServiceDelegate::IsCustomBackgroundEnabled() {
   if (prefs->IsManagedPreference(prefs::kNtpCustomBackgroundDict))
     return false;
 
-  return prefs->GetBoolean(kNewTabPageCustomBackgroundEnabled);
+  return NTPBackgroundPref(profile_->GetPrefs()).IsCustomImageType();
 }
 
 base::FilePath NTPCustomBackgroundImagesServiceDelegate::

@@ -359,6 +359,7 @@ test("brave_unit_tests") {
     ]
     deps += [
       "//brave/app:brave_generated_resources_grit",
+      "//brave/browser/ntp_background_images:unit_tests",
       "//brave/browser/ui/toolbar:brave_app_menu_unit_test",
       "//brave/components/brave_shields/common:mojom",
       "//brave/components/brave_wallet/browser:pref_names",
@@ -763,6 +764,7 @@ if (!is_android) {
       "//brave/browser/decentralized_dns/test:browser_tests",
       "//brave/browser/farbling:browser_tests",
       "//brave/browser/metrics/buildflags",
+      "//brave/browser/ntp_background_images:ntp_custom_background_images",
       "//brave/browser/permissions:browser_tests",
       "//brave/browser/test:browser_tests",
       "//brave/browser/tor:browser_tests",
@@ -800,6 +802,7 @@ if (!is_android) {
       "//brave/components/debounce/browser",
       "//brave/components/debounce/common",
       "//brave/components/l10n/common",
+      "//brave/components/ntp_background_images/buildflags",
       "//brave/components/resources:strings_grit",
       "//brave/components/skus/common",
       "//brave/components/tor",
@@ -1095,6 +1098,7 @@ if (!is_android) {
       "//brave/components/ipfs",
       "//brave/components/ipfs/buildflags",
       "//brave/components/l10n/browser",
+      "//brave/components/ntp_background_images/buildflags",
       "//brave/components/tor",
       "//brave/components/tor:utils",
       "//brave/components/tor/buildflags",

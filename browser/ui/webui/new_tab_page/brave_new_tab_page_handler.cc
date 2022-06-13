@@ -14,6 +14,7 @@
 #include "base/memory/ref_counted_memory.h"
 #include "base/task/thread_pool.h"
 #include "brave/browser/ntp_background_images/constants.h"
+#include "brave/browser/ntp_background_images/ntp_background_pref.h"
 #include "brave/components/constants/pref_names.h"
 #include "brave/components/l10n/common/locale_util.h"
 #include "brave/components/ntp_background_images/browser/url_constants.h"
@@ -82,7 +83,8 @@ void BraveNewTabPageHandler::ChooseLocalCustomBackground() {
 
 void BraveNewTabPageHandler::UseBraveBackground() {
   // Call ntp custom background images service.
-  profile_->GetPrefs()->SetBoolean(kNewTabPageCustomBackgroundEnabled, false);
+  NTPBackgroundPref(profile_->GetPrefs())
+      .SetType(NTPBackgroundPref::Type::kBrave);
   OnCustomBackgroundImageUpdated();
   DeleteSanitizedImageFile();
 }
@@ -92,7 +94,7 @@ bool BraveNewTabPageHandler::IsCustomBackgroundEnabled() const {
   if (prefs->IsManagedPreference(prefs::kNtpCustomBackgroundDict))
     return false;
 
-  return prefs->GetBoolean(kNewTabPageCustomBackgroundEnabled);
+  return NTPBackgroundPref(prefs).IsCustomImageType();
 }
 
 void BraveNewTabPageHandler::OnCustomBackgroundImageUpdated() {
@@ -174,7 +176,8 @@ void BraveNewTabPageHandler::OnSavedEncodedImage(bool success) {
   if (!success)
     return;
 
-  profile_->GetPrefs()->SetBoolean(kNewTabPageCustomBackgroundEnabled, true);
+  NTPBackgroundPref(profile_->GetPrefs())
+      .SetType(NTPBackgroundPref::Type::kCustomImage);
   OnCustomBackgroundImageUpdated();
 }
 
