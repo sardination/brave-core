@@ -114,7 +114,7 @@ RegisterStyleOverride(
 
         -webkit-background-clip: text !important;;
         -webkit-text-fill-color: transparent !important;
-        font-weight: 600 !important;
+        font-weight: 400 !important;
       }
 
       a:hover, iron-icon:hover {
