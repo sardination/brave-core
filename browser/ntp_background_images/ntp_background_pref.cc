@@ -17,6 +17,7 @@ namespace {
 constexpr char kTypeKey[] = "type";
 constexpr char kRandomKey[] = "random";
 constexpr char kSelectedValueKey[] = "selected_value";
+>>>>>>> 0341a77c6b (Introduce NTPBackgroundPref)
 
 const char* TypeToString(NTPBackgroundPref::Type type) {
   switch (type) {
