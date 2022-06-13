@@ -15,7 +15,7 @@ class MockApp {
   }
 
   async signTransaction (path: string, txBuffer: Buffer) {
-    return { signature: new Buffer.from('signature') }
+    return { signature: Buffer.from('signature') }
   }
 }
 
@@ -99,7 +99,6 @@ test('Sign transaction unlocked device yields success', async () => {
     return { success: true }
   }
   ledgerHardwareKeyring.app = new MockApp() as LedgerProvider
-  const result = await ledgerHardwareKeyring.signTransaction(0, 'message');
   return expect(ledgerHardwareKeyring.signTransaction(0, 'message'))
-    .resolves.toStrictEqual({ success: true, payload: new Buffer.from('signature') })
+    .resolves.toStrictEqual({ success: true, payload: Buffer.from('signature') })
 })

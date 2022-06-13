@@ -88,14 +88,13 @@ export default class SolanaLedgerKeyring implements LedgerSolanaKeyring {
     throw new Error('Method not implemented.')
   }
 
-  signTransaction = async (path: string, rawTxBase64: string): Promise<SignHardwareTransactionOperationResult> => {
+  signTransaction = async (path: string, rawTxBytes: Buffer): Promise<SignHardwareTransactionOperationResult> => {
     try {
       const unlocked = await this.unlock()
       if (!unlocked.success || !this.app) {
         return unlocked
       }
       const sol: Sol = this.app
-      const rawTxBytes = Buffer.from(rawTxBase64, 'base64')
       const signed = await sol.signTransaction(path, rawTxBytes)
       return { success: true, payload: signed.signature }
     } catch (e) {

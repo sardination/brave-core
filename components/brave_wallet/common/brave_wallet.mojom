@@ -905,13 +905,18 @@ interface TxService {
   // Used to retry a transaction
   RetryTransaction(CoinType coin_type, string tx_meta_id) => (bool success, string tx_meta_id, string error_message);
 
-  GetTransactionMessageToSign(CoinType coin_type, string tx_meta_id) => (string? message);
+  GetTransactionMessageToSign(CoinType coin_type, string tx_meta_id) => (MessageToSignUnion message);
 
   // Adds an observer for TxService
   AddObserver(pending_remote<TxServiceObserver> observer);
 
   // Resets the keyring and the related preferences
   Reset();
+};
+
+union MessageToSignUnion {
+  string? message_str;
+  array<uint8>? message_bytes;
 };
 
 // Transaction related APIs specific to EVM.

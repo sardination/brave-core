@@ -332,12 +332,14 @@ class SolanaTxManagerUnitTest : public testing::Test {
 
   void TestGetTransactionMessageToSign(
       const std::string& tx_meta_id,
-      absl::optional<std::string> expected_tx_message) {
+      absl::optional<std::vector<std::uint8_t>> expected_tx_message) {
     base::RunLoop run_loop;
     solana_tx_manager()->GetTransactionMessageToSign(
         tx_meta_id, base::BindLambdaForTesting(
-                        [&](const absl::optional<std::string>& tx_message) {
-                          EXPECT_EQ(expected_tx_message, tx_message);
+                        [&](mojom::MessageToSignUnionPtr tx_message) {
+                          EXPECT_TRUE(tx_message->is_message_bytes());
+                          EXPECT_EQ(expected_tx_message,
+                                    tx_message->get_message_bytes());
                           run_loop.Quit();
                         }));
     run_loop.Run();
@@ -852,23 +854,17 @@ TEST_F(SolanaTxManagerUnitTest, GetTransactionMessageToSign) {
 
   // Valid latest blockhash yields valid transaction message to sign
   SetInterceptor(latest_blockhash1_, last_valid_block_height1_, "");
-  TestGetTransactionMessageToSign(
-      system_transfer_meta_id,
+  absl::optional<std::vector<std::uint8_t>> message = base::Base64Decode(
       "AQABA2odJRVUDnxVZv71pBNy0DZ/"
       "ui6dv1N37VgGEA+"
       "aezhZAMzywrLOSju1o9VJQ5KaB2lsblgqvdjtkDFlmZHz4KQAAAAAAAAAAAAAAAAAAAAAAAA"
       "AAAAAAAAAAAAAAAAAAMxJDpKM0uOHO7ND/"
       "JXaMxecpg9Nv0bCw26RKZ1V1Oa5AQICAAEMAgAAAAEAAAAAAAAA");
+  TestGetTransactionMessageToSign(system_transfer_meta_id, message);
 
   // Valid cached latest blockhash
   SetInterceptor("", 0, "", "");
-  TestGetTransactionMessageToSign(
-      system_transfer_meta_id,
-      "AQABA2odJRVUDnxVZv71pBNy0DZ/"
-      "ui6dv1N37VgGEA+"
-      "aezhZAMzywrLOSju1o9VJQ5KaB2lsblgqvdjtkDFlmZHz4KQAAAAAAAAAAAAAAAAAAAAAAAA"
-      "AAAAAAAAAAAAAAAAAAMxJDpKM0uOHO7ND/"
-      "JXaMxecpg9Nv0bCw26RKZ1V1Oa5AQICAAEMAgAAAAEAAAAAAAAA");
+  TestGetTransactionMessageToSign(system_transfer_meta_id, message);
 }
 
 TEST_F(SolanaTxManagerUnitTest, ProcessSolanaHardwareSignature) {

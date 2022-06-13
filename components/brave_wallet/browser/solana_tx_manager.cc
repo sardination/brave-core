@@ -137,7 +137,8 @@ void SolanaTxManager::OnGetLatestBlockhashHardware(
     mojom::SolanaProviderError error,
     const std::string& error_message) {
   if (error != mojom::SolanaProviderError::kSuccess) {
-    std::move(callback).Run(absl::nullopt);
+    std::move(callback).Run(
+        mojom::MessageToSignUnion::NewMessageBytes(absl::nullopt));
     return;
   }
 
@@ -145,8 +146,9 @@ void SolanaTxManager::OnGetLatestBlockhashHardware(
   meta->tx()->message()->set_last_valid_block_height(last_valid_block_height);
   tx_state_manager_->AddOrUpdateTx(*meta);
 
-  std::string message = meta->tx()->GetBase64EncodedMessage();
-  std::move(callback).Run(message);
+  auto message_bytes = meta->tx()->message()->Serialize(nullptr);
+  std::move(callback).Run(
+      mojom::MessageToSignUnion::NewMessageBytes(message_bytes));
 }
 
 void SolanaTxManager::OnSendSolanaTransaction(
@@ -281,7 +283,8 @@ void SolanaTxManager::GetTransactionMessageToSign(
       GetSolanaTxStateManager()->GetSolanaTx(tx_meta_id);
   if (!meta || !meta->tx()) {
     VLOG(1) << __FUNCTION__ << "No transaction found with id:" << tx_meta_id;
-    std::move(callback).Run(absl::nullopt);
+    std::move(callback).Run(
+        mojom::MessageToSignUnion::NewMessageBytes(absl::nullopt));
     return;
   }
 

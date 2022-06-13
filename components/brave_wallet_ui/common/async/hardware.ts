@@ -100,11 +100,11 @@ export async function signLedgerEthereumTransaction (
     return { success: false, error: getLocale('braveWalletApproveTransactionError') }
   }
   const data = await apiProxy.txService.getTransactionMessageToSign(coin, txInfo.id)
-  if (!data || !data.message) {
+  if (!data || !data.message || !data.message.messageStr) {
     return { success: false, error: getLocale('braveWalletNoMessageToSignError') }
   }
 
-  const signed = await deviceKeyring.signTransaction(path, data.message.replace('0x', ''))
+  const signed = await deviceKeyring.signTransaction(path, data.message.messageStr?.replace('0x', ''))
   if (!signed || !signed.success || !signed.payload) {
     const error = signed?.error ?? getLocale('braveWalletSignOnDeviceError')
     const code = signed?.code ?? ''
@@ -127,11 +127,11 @@ export async function signLedgerFilecoinTransaction (
   coin: BraveWallet.CoinType,
   deviceKeyring: LedgerFilecoinKeyring = getLedgerFilecoinHardwareKeyring()): Promise<SignHardwareTransactionOperationResult> {
   const data = await apiProxy.txService.getTransactionMessageToSign(coin, txInfo.id)
-  if (!data || !data.message) {
+  if (!data || !data.message || !data.message.messageStr) {
     return { success: false, error: getLocale('braveWalletNoMessageToSignError') }
   }
 
-  const signed = await deviceKeyring.signTransaction(data.message)
+  const signed = await deviceKeyring.signTransaction(data.message.messageStr)
   if (!signed || !signed.success || !signed.payload) {
     const error = signed?.error ?? getLocale('braveWalletSignOnDeviceError')
     const code = signed?.code ?? ''
@@ -159,11 +159,10 @@ export async function signLedgerSolanaTransaction (
   coin: BraveWallet.CoinType,
   deviceKeyring: LedgerSolanaKeyring = getLedgerSolanaHardwareKeyring()): Promise<SignHardwareTransactionOperationResult> {
     const data = await apiProxy.txService.getTransactionMessageToSign(coin, txInfo.id)
-    if (!data || !data.message) {
+    if (!data || !data.message || !data.message.messageBytes) {
       return { success: false, error: getLocale('braveWalletNoMessageToSignError') }
     }
-
-    const signed = await deviceKeyring.signTransaction(path, data.message)
+    const signed = await deviceKeyring.signTransaction(path, Buffer.from(data.message.messageBytes))
     if (!signed || !signed.success || !signed.payload) {
       const error = signed?.error ?? getLocale('braveWalletSignOnDeviceError')
       const code = signed?.code ?? ''

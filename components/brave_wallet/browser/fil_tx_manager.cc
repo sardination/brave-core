@@ -263,7 +263,8 @@ void FilTxManager::GetTransactionMessageToSign(
       GetFilTxStateManager()->GetFilTx(tx_meta_id);
   if (!meta || !meta->tx()) {
     VLOG(1) << __FUNCTION__ << "No transaction found with id:" << tx_meta_id;
-    std::move(callback).Run(absl::nullopt);
+    std::move(callback).Run(
+        mojom::MessageToSignUnion::NewMessageStr(absl::nullopt));
     return;
   }
   if (!meta->tx()->nonce()) {
@@ -287,7 +288,7 @@ void FilTxManager::OnGetNextNonceForHardware(
   if (!success) {
     meta->set_status(mojom::TransactionStatus::Error);
     tx_state_manager_->AddOrUpdateTx(*meta);
-    std::move(callback).Run(absl::nullopt);
+    std::move(callback).Run(mojom::MessageToSignUnion::NewMessageStr(absl::nullopt));
     return;
   }
   DCHECK_LE(nonce, static_cast<uint256_t>(UINT64_MAX));
@@ -295,7 +296,8 @@ void FilTxManager::OnGetNextNonceForHardware(
   DCHECK(!keyring_service_->IsLocked());
   meta->set_status(mojom::TransactionStatus::Approved);
   tx_state_manager_->AddOrUpdateTx(*meta);
-  std::move(callback).Run(meta->tx()->GetMessageToSign());
+  std::move(callback).Run(
+      mojom::MessageToSignUnion::NewMessageStr(meta->tx()->GetMessageToSign()));
 }
 
 void FilTxManager::Reset() {
