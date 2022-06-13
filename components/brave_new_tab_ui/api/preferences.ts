@@ -14,74 +14,74 @@ import { addWebUIListener, sendWithPromise } from 'chrome://resources/js/cr.m'
 
 type PreferencesUpdatedHandler = (prefData: NewTab.Preferences) => void
 
-export function getPreferences (): Promise<NewTab.Preferences> {
+export function getPreferences(): Promise<NewTab.Preferences> {
   return sendWithPromise('getNewTabPagePreferences')
 }
 
-function sendSavePref (key: string, value: any) {
+export function sendSavePref(key: string, value: any) {
   chrome.send('saveNewTabPagePref', [key, value])
 }
 
-export function saveShowBackgroundImage (value: boolean): void {
+export function saveShowBackgroundImage(value: boolean): void {
   sendSavePref('showBackgroundImage', value)
 }
 
-export function saveShowClock (value: boolean): void {
+export function saveShowClock(value: boolean): void {
   sendSavePref('showClock', value)
 }
 
-export function saveClockFormat (value: string): void {
+export function saveClockFormat(value: string): void {
   sendSavePref('clockFormat', value)
 }
 
-export function saveShowStats (value: boolean): void {
+export function saveShowStats(value: boolean): void {
   sendSavePref('showStats', value)
 }
 
-export function saveShowToday (value: boolean): void {
+export function saveShowToday(value: boolean): void {
   sendSavePref('showToday', value)
 }
 
-export function saveShowRewards (value: boolean): void {
+export function saveShowRewards(value: boolean): void {
   sendSavePref('showRewards', value)
 }
 
-export function saveShowBraveTalk (value: boolean): void {
+export function saveShowBraveTalk(value: boolean): void {
   sendSavePref('showBraveTalk', value)
 }
 
-export function saveShowBinance (value: boolean): void {
+export function saveShowBinance(value: boolean): void {
   sendSavePref('showBinance', value)
 }
 
-export function saveBrandedWallpaperOptIn (value: boolean): void {
+export function saveBrandedWallpaperOptIn(value: boolean): void {
   sendSavePref('brandedWallpaperOptIn', value)
 }
 
-export function saveIsBrandedWallpaperNotificationDismissed (value: boolean): void {
+export function saveIsBrandedWallpaperNotificationDismissed(value: boolean): void {
   sendSavePref('isBrandedWallpaperNotificationDismissed', value)
 }
 
-export function saveShowGemini (value: boolean): void {
+export function saveShowGemini(value: boolean): void {
   sendSavePref('showGemini', value)
 }
 
-export function saveShowCryptoDotCom (value: boolean): void {
+export function saveShowCryptoDotCom(value: boolean): void {
   sendSavePref('showCryptoDotCom', value)
 }
 
-export function saveShowFTX (value: boolean): void {
+export function saveShowFTX(value: boolean): void {
   sendSavePref('showFTX', value)
 }
 
-export function saveIsBraveTodayOptedIn (value: boolean): void {
+export function saveIsBraveTodayOptedIn(value: boolean): void {
   sendSavePref('isBraveTodayOptedIn', value)
 }
 
-export function saveSetAllStackWidgets (visible: boolean): void {
+export function saveSetAllStackWidgets(visible: boolean): void {
   sendSavePref('hideAllWidgets', !visible)
 }
 
-export function addChangeListener (listener: PreferencesUpdatedHandler): void {
+export function addChangeListener(listener: PreferencesUpdatedHandler): void {
   addWebUIListener('preferences-changed', listener)
 }
