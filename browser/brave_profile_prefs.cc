@@ -150,6 +150,10 @@ using extensions::FeatureSwitch;
 #include "brave/browser/translate/brave_translate_prefs_migration.h"
 #endif
 
+#if BUILDFLAG(ENABLE_CUSTOM_BACKGROUND)
+#include "brave/browser/ntp_background/ntp_background_prefs.h"
+#endif
+
 namespace brave {
 
 void RegisterProfilePrefsForMigration(
@@ -354,7 +358,7 @@ void RegisterProfilePrefs(user_prefs::PrefRegistrySyncable* registry) {
       static_cast<int>(NewTabPageShowsOptions::kDashboard));
 
 #if BUILDFLAG(ENABLE_CUSTOM_BACKGROUND)
-  registry->RegisterBooleanPref(kNewTabPageCustomBackgroundEnabled, false);
+  NTPBackgroundPrefs::RegisterPref(registry);
 #endif
 
 #if BUILDFLAG(ETHEREUM_REMOTE_CLIENT_ENABLED)
