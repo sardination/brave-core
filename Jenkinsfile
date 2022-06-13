@@ -74,9 +74,7 @@ pipeline {
                                                 credentials('brave-builds-github-token-for-pr-builder')
                                                 github('brave/devops', 'https')
                                             }
-
-                                            //branch('${params.DEVOPS_BRANCH}')
-                                            branch('wknapik-sync-instead-of-init')
+                                            branch('wknapik-asan-in-pr-builds-for-linux')
                                         }
                                     }
                                     scriptPath("jenkins/jobs/browser/pr-brave-browser-${PLATFORM}.Jenkinsfile")
