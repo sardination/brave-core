@@ -66,6 +66,7 @@ class BraveBrowserView : public BrowserView {
   gfx::Rect GetShieldsBubbleRect() override;
 
 #if BUILDFLAG(ENABLE_SIDEBAR)
+  // TODO(petemill): Is this needed?
   views::View* sidebar_host_view() { return sidebar_host_view_; }
 #endif
 

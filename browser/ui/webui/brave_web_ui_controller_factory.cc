@@ -22,7 +22,6 @@
 #include "brave/components/constants/webui_url_constants.h"
 #include "brave/components/ipfs/buildflags/buildflags.h"
 #include "brave/components/playlist/buildflags/buildflags.h"
-#include "brave/components/sidebar/buildflags/buildflags.h"
 #include "brave/components/tor/buildflags/buildflags.h"
 #include "build/build_config.h"
 #include "chrome/browser/profiles/profile.h"
@@ -62,11 +61,6 @@
 
 #if BUILDFLAG(ENABLE_TOR)
 #include "brave/browser/ui/webui/tor_internals_ui.h"
-#endif
-
-#if BUILDFLAG(ENABLE_SIDEBAR)
-#include "brave/browser/ui/webui/sidebar/sidebar_bookmarks_ui.h"
-#include "brave/components/sidebar/constants.h"
 #endif
 
 using content::WebUI;
@@ -139,10 +133,6 @@ WebUIController* NewWebUI(WebUI* web_ui, const GURL& url) {
   } else if (host == kTorInternalsHost) {
     return new TorInternalsUI(web_ui, url.host());
 #endif
-#if BUILDFLAG(ENABLE_SIDEBAR)
-  } else if (host == kSidebarBookmarksHost) {
-    return new SidebarBookmarksUI(web_ui);
-#endif
   } else if (host == kFederatedInternalsHost) {
     if (base::FeatureList::IsEnabled(
             brave_federated::features::kFederatedLearning)) {
@@ -162,9 +152,6 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui, const GURL& url) {
       (url.host_piece() == kIPFSWebUIHost &&
        base::FeatureList::IsEnabled(ipfs::features::kIpfsFeature)) ||
 #endif  // BUILDFLAG(ENABLE_IPFS)
-#if BUILDFLAG(ENABLE_SIDEBAR)
-      url.host_piece() == kSidebarBookmarksHost ||
-#endif
 #if !BUILDFLAG(IS_ANDROID)
       url.host_piece() == kWalletPanelHost ||
       url.host_piece() == kWalletPageHost ||

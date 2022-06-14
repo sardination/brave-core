@@ -35,8 +35,7 @@
     "contexts": ["webui"],
     "matches": [
       "chrome://bookmarks/*",
-      "chrome://read-later.top-chrome/*",
-      "chrome://sidebar-bookmarks.top-chrome/*"
+      "chrome://read-later.top-chrome/*"
     ]
   }],
   "bookmarks": [{
@@ -48,8 +47,8 @@
     "contexts": ["webui"],
     "matches": [
       "chrome://bookmarks/*",
-      "chrome://read-later.top-chrome/*",
-      "chrome://sidebar-bookmarks.top-chrome/*"
+      "chrome://bookmarks-side-panel.top-chrome/*",
+      "chrome://read-later.top-chrome/*"
     ],
     "default_parent": true
   }, {
