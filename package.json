@@ -357,7 +357,6 @@
     "array-move": "^2.2.1",
     "bignumber.js": "^9.0.2",
     "bluebird": "^3.5.1",
-    "bs58": "^5.0.0",
     "core-js": "^3.9.1",
     "date-fns": "^2.15.0",
     "fuse.js": "^6.4.6",

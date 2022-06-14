@@ -57,8 +57,12 @@ export enum TrezorDerivationPaths {
 const DerivationSchemeTypes = [LedgerDerivationPaths.LedgerLive, LedgerDerivationPaths.Legacy, LedgerDerivationPaths.Deprecated, TrezorDerivationPaths.Default] as const
 export type HardwareDerivationScheme = typeof DerivationSchemeTypes[number]
 
+type HardwareWalletAccountBytesAddress = BraveWallet.HardwareWalletAccount & {
+  addressBytes?: Buffer
+}
+
 export type GetAccountsHardwareOperationResult = HardwareOperationResult & {
-  payload?: BraveWallet.HardwareWalletAccount[]
+  payload?: HardwareWalletAccountBytesAddress[]
 }
 
 // Batch size of accounts imported from the device in one step.

@@ -80,8 +80,15 @@ export const onConnectHardwareWallet = (opts: HardwareWalletConnectOpts): Promis
         .catch(reject)
     } else if (keyring instanceof SolanaLedgerKeyring && opts.network) {
       keyring.getAccounts(opts.startIndex, opts.stopIndex)
-        .then((result: GetAccountsHardwareOperationResult) => {
+        .then(async (result: GetAccountsHardwareOperationResult) => {
           if (result.payload) {
+            const { braveWalletService } = getAPIProxy()
+            const addressesEncoded = await braveWalletService.base58EncodeAddresses(
+              result.payload.map((hardwareAccount) => [...(hardwareAccount.addressBytes || [])])
+            )
+            for (let i = 0; i < result.payload.length; i++) {
+              result.payload[i].address = addressesEncoded.addresses[i]
+            }
             return resolve(result.payload)
           }
           reject(result.error)
@@ -98,6 +105,7 @@ export const getBalance = (address: string, coin: BraveWallet.CoinType): Promise
 
     if (coin === BraveWallet.CoinType.SOL) {
       const result = await jsonRpcService.getSolanaBalance(address, chainId.chainId)
+      console.log('getBalance result', result)
       if (result.error === BraveWallet.SolanaProviderError.kSuccess) {
         resolve(Amount.normalize(result.balance.toString()))
       } else {

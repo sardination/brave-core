@@ -288,7 +288,8 @@ void FilTxManager::OnGetNextNonceForHardware(
   if (!success) {
     meta->set_status(mojom::TransactionStatus::Error);
     tx_state_manager_->AddOrUpdateTx(*meta);
-    std::move(callback).Run(mojom::MessageToSignUnion::NewMessageStr(absl::nullopt));
+    std::move(callback).Run(
+        mojom::MessageToSignUnion::NewMessageStr(absl::nullopt));
     return;
   }
   DCHECK_LE(nonce, static_cast<uint256_t>(UINT64_MAX));

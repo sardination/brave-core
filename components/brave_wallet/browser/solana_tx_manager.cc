@@ -523,8 +523,7 @@ void SolanaTxManager::ProcessSolanaHardwareSignature(
   tx_state_manager_->AddOrUpdateTx(*meta);
 
   json_rpc_service_->SendSolanaTransaction(
-      base::Base64Encode(*transaction_bytes),
-      meta->tx()->send_options(),
+      base::Base64Encode(*transaction_bytes), meta->tx()->send_options(),
       base::BindOnce(&SolanaTxManager::OnSendSolanaTransaction,
                      weak_ptr_factory_.GetWeakPtr(), meta->id(),
                      std::move(callback)));

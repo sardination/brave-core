@@ -162,6 +162,10 @@ class BraveWalletService : public KeyedService,
       const std::string& key,
       IsBase58EncodedSolanaPubkeyCallback callback) override;
 
+  void Base58EncodeAddresses(
+      const std::vector<std::vector<std::uint8_t>>& addresses,
+      Base58EncodeAddressesCallback callback) override;
+
   // BraveWalletServiceDelegate::Observer:
   void OnActiveOriginChanged(const mojom::OriginInfoPtr& origin_info) override;
 

@@ -5,7 +5,6 @@
 
 import { BraveWallet } from '../../../constants/types'
 import SolanaLedgerKeyring from './sol_ledger_bridge_keyring'
-import * as bs58 from 'bs58'
 
 class MockApp {
   signature: Buffer
@@ -35,7 +34,8 @@ test('Extracting accounts from device', () => {
     .resolves.toStrictEqual({
       payload: [
         {
-          'address': bs58.encode(Buffer.from('address for 44\'/501\'/0\'/0')),
+          'address': '',
+          'addressBytes': Buffer.from('address for 44\'/501\'/0\'/0'),
           'derivationPath': '44\'/501\'/0\'/0',
           'hardwareVendor': 'Ledger',
           'name': 'Ledger',
@@ -43,7 +43,8 @@ test('Extracting accounts from device', () => {
           'coin': BraveWallet.CoinType.SOL
         },
         {
-          'address': bs58.encode(Buffer.from('address for 44\'/501\'/0\'/1')),
+          'address': '',
+          'addressBytes': Buffer.from('address for 44\'/501\'/0\'/1'),
           'derivationPath': '44\'/501\'/0\'/1',
           'hardwareVendor': 'Ledger',
           'name': 'Ledger',

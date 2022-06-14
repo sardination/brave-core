@@ -7,7 +7,6 @@ import { LEDGER_HARDWARE_VENDOR } from 'gen/brave/components/brave_wallet/common
 import TransportWebHID from '@ledgerhq/hw-transport-webhid'
 import Transport from '@ledgerhq/hw-transport'
 import Sol from '@ledgerhq/hw-app-solana'
-import * as bs58 from 'bs58'
 import { BraveWallet } from '../../../constants/types'
 import { LedgerSolanaKeyring } from '../interfaces'
 import { HardwareVendor } from '../../api/hardware_keyrings'
@@ -45,7 +44,8 @@ export default class SolanaLedgerKeyring implements LedgerSolanaKeyring {
       const path = this.getPathForIndex(i)
       const address = await sol.getAddress(path)
       accounts.push({
-        address: bs58.encode(address.address),
+        address: '',
+        addressBytes: address.address,
         derivationPath: path,
         name: this.type(),
         hardwareVendor: this.type(),
@@ -78,7 +78,7 @@ export default class SolanaLedgerKeyring implements LedgerSolanaKeyring {
       const sol: Sol = this.app
       this.transport?.on('disconnect', this.onDisconnected)
       const zeroPath = this.getPathForIndex(0)
-      const address = bs58.encode((await sol.getAddress(zeroPath)).address)
+      const address = (await sol.getAddress(zeroPath)).address
       this.deviceId = await hardwareDeviceIdFromAddress(address)
     }
     return { success: this.isUnlocked() }
