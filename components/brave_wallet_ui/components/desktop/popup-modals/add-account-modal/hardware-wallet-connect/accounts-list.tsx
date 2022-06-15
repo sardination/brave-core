@@ -207,10 +207,13 @@ function AccountListItem (props: AccountListItemProps) {
 
   React.useMemo(() => {
     getBalance(account.address, account.coin).then((result) => {
-      const formattedBalance = new Amount(result)
-        .divideByDecimals(selectedNetwork.decimals)
-        .format()
-      setBalance(formattedBalance)
+      let amount = new Amount(result)
+      if (account.coin === BraveWallet.CoinType.SOL) {
+        amount = amount.divideByDecimals(9)
+      } else {
+        amount = amount.divideByDecimals(selectedNetwork.decimals)
+      }
+      setBalance(amount.format())
     }).catch()
   }, [account])
 
