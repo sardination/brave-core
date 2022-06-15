@@ -54,7 +54,7 @@ void BraveActionIconWithBadgeImageSource::PaintBadge(gfx::Canvas* canvas) {
   // characters which will differ slightly,
   // but vary the width so we cover as little of the icon as possible.
   constexpr int kBadgeHeight = 12;
-  constexpr int kBadgeMaxWidth = 14;
+  constexpr int kBadgeMaxWidth = 16;
   constexpr int kVPadding = 1;
   constexpr int kVMarginTop = 2;
   const int kTextHeightTarget = kBadgeHeight - (kVPadding * 2);
