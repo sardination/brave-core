@@ -75,15 +75,15 @@ class BraveVpnService :
   BraveVpnService& operator=(const BraveVpnService&) = delete;
 
   std::string GetCurrentEnvironment() const;
+  bool is_purchased_user() const {
+    return purchased_state_ == mojom::PurchasedState::PURCHASED;
+  }
 
 #if !BUILDFLAG(IS_ANDROID)
   void ToggleConnection();
   void RemoveVPNConnnection();
   bool is_connected() const {
     return connection_state_ == mojom::ConnectionState::CONNECTED;
-  }
-  bool is_purchased_user() const {
-    return purchased_state_ == mojom::PurchasedState::PURCHASED;
   }
   mojom::ConnectionState connection_state() const { return connection_state_; }
   void ReloadPurchasedState();
@@ -118,6 +118,7 @@ class BraveVpnService :
   void AddObserver(
       mojo::PendingRemote<mojom::ServiceObserver> observer) override;
   void GetPurchasedState(GetPurchasedStateCallback callback) override;
+  void GetPurchaseToken(GetPurchaseTokenCallback callback) override;
   void LoadPurchasedState(const std::string& domain) override;
 
   void GetAllServerRegions(ResponseCallback callback);

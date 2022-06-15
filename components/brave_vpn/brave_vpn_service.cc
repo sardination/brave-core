@@ -8,8 +8,10 @@
 #include <algorithm>
 #include <utility>
 
+#include "base/base64.h"
 #include "base/json/json_reader.h"
 #include "base/json/json_writer.h"
+#include "base/strings/stringprintf.h"
 #include "base/strings/utf_string_conversions.h"
 #include "brave/components/brave_vpn/brave_vpn_utils.h"
 #include "brave/components/brave_vpn/pref_names.h"
@@ -103,7 +105,7 @@ bool IsNetworkAvailable() {
   return net::NetworkChangeNotifier::GetConnectionType() !=
          net::NetworkChangeNotifier::CONNECTION_NONE;
 }
-#endif
+#endif  // !BUILDFLAG(IS_ANDROID)
 }  // namespace
 
 namespace brave_vpn {
@@ -141,7 +143,7 @@ BraveVpnService::BraveVpnService(
     ReloadPurchasedState();
   }
   base::PowerMonitor::AddPowerSuspendObserver(this);
-#endif
+#endif  // !BUILDFLAG(IS_ANDROID)
 }
 
 BraveVpnService::~BraveVpnService() {
@@ -855,6 +857,8 @@ BraveVPNOSConnectionAPI* BraveVpnService::GetBraveVPNConnectionAPI() {
   return BraveVPNOSConnectionAPI::GetInstance();
 }
 
+// NOTE(bsclifton): Desktop uses API to create a ticket.
+// Android and iOS directly send an email.
 void BraveVpnService::OnCreateSupportTicket(
     CreateSupportTicketCallback callback,
     int status,
@@ -874,6 +878,41 @@ void BraveVpnService::OnSuspend() {
 
 void BraveVpnService::OnResume() {}
 #endif  // !BUILDFLAG(IS_ANDROID)
+
+void BraveVpnService::GetPurchaseToken(GetPurchaseTokenCallback callback) {
+  std::string purchase_token_string;
+  auto* purchase_token =
+      prefs_->FindPreference(prefs::kBraveVPNPurchaseTokenAndroid);
+  if (purchase_token && !purchase_token->IsDefaultValue()) {
+    purchase_token_string =
+        prefs_->GetString(prefs::kBraveVPNPurchaseTokenAndroid);
+  }
+
+  // TODO(bsclifton): remove me. This is for testing only
+  if (purchase_token_string.length() == 0) {
+    purchase_token_string =
+        "oohdhbmbebmciddpbcicgnko.AO-J1OxJGS6-"
+        "tNYvzofx7RO2hJSEgQmi6tOrLHEB4zJ2OhsyhX3mhEe4QKS0MVxtJCBNIAlBP5jAgDPqdX"
+        "DNz15JhIXt5QYcIExIxe5H5ifbhAsHILlUXlE";
+  }
+
+  std::string type;
+#if BUILDFLAG(IS_ANDROID)
+  type = "android";
+#else
+  // NOTE(bsclifton): only Android will have a purchase token. But it's still
+  // good to have this code included on desktop so it can be tested.
+  type = "test";
+#endif
+
+  std::string response = base::StringPrintf(
+      "{\"type\": \"%s\", \"raw_receipt\": \"%s\", \"package\":\"%s\", "
+      "\"subscription_id\": \"%s\"}",
+      type.c_str(), purchase_token_string.c_str(), "com.brave.browser",
+      "brave-firewall-vpn-premium");
+  base::Base64Encode(response, &response);
+  std::move(callback).Run(response);
+}
 
 void BraveVpnService::AddObserver(
     mojo::PendingRemote<mojom::ServiceObserver> observer) {
