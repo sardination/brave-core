@@ -404,7 +404,8 @@ void EthTxManager::GetTransactionMessageToSign(
   uint256_t chain_id = 0;
   if (!HexValueToUint256(json_rpc_service_->GetChainId(mojom::CoinType::ETH),
                          &chain_id)) {
-    std::move(callback).Run(nullptr);
+    std::move(callback).Run(
+        mojom::MessageToSignUnion::NewMessageStr(absl::nullopt));
     return;
   }
   auto message = meta->tx()->GetMessageToSign(chain_id, false);
