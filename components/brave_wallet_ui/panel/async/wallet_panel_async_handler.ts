@@ -293,7 +293,6 @@ handler.on(PanelActions.approveHardwareTransaction.getType(), async (store: Stor
   const hardwareAccount: HardwareInfo = found.hardware
   await navigateToConnectHardwareWallet(store)
   const apiProxy = getWalletPanelApiProxy()
-  console.log('approveHardwareTransaction: found.coin - ', found.coin)
   if (hardwareAccount.vendor === BraveWallet.LEDGER_HARDWARE_VENDOR) {
     let success, error, code
     switch (found.coin) {

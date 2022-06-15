@@ -105,7 +105,6 @@ export const getBalance = (address: string, coin: BraveWallet.CoinType): Promise
 
     if (coin === BraveWallet.CoinType.SOL) {
       const result = await jsonRpcService.getSolanaBalance(address, chainId.chainId)
-      console.log('getBalance result', result)
       if (result.error === BraveWallet.SolanaProviderError.kSuccess) {
         resolve(Amount.normalize(result.balance.toString()))
       } else {
@@ -113,7 +112,6 @@ export const getBalance = (address: string, coin: BraveWallet.CoinType): Promise
       }
       return
     }
-
     const result = await jsonRpcService.getBalance(address, coin, chainId.chainId)
     if (result.error === BraveWallet.ProviderError.kSuccess) {
       resolve(Amount.normalize(result.balance))
