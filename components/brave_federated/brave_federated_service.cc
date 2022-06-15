@@ -64,24 +64,8 @@ void BraveFederatedService::Init() {
 
   eligibility_service_.reset(new EligibilityService());
 
-<<<<<<< HEAD
   operational_patterns_.reset(
       new OperationalPatterns(prefs_, url_loader_factory_));
-=======
-  learning_service_.reset(new LearningService(data_store_service_.get(), eligibility_service_.get()));
-
-  if (ShouldStartOperationalPatterns()) {
-    operational_patterns_.reset(
-        new OperationalPatterns(prefs_, url_loader_factory_));
-    operational_patterns_->Start();
-  }
-}
-
-DataStoreService* BraveFederatedService::GetDataStoreService() const {
-  DCHECK(data_store_service_);
-  return data_store_service_.get();
-}
->>>>>>> 1141700a6a (Add client placeholder)
 
   MaybeStartOperationalPatterns();
 }
