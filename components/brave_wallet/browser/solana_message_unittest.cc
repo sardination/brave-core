@@ -319,7 +319,7 @@ TEST(SolanaMessageUnitTest, GetNumberOfSigners) {
 
   SolanaMessage message(kRecentBlockhash, kLastValidBlockHeight, kFromAccount,
                         {instruction_one_signers});
-  ASSERT_EQ(message.GetNumberOfSigners(), 1);
+  EXPECT_EQ(message.GetNumberOfSigners(), 1);
 
   SolanaInstruction instruction_two_signers(
       kSolanaSystemProgramId,
@@ -328,7 +328,7 @@ TEST(SolanaMessageUnitTest, GetNumberOfSigners) {
       {2, 0, 0, 0, 128, 150, 152, 0, 0, 0, 0, 0});
   SolanaMessage message2(kRecentBlockhash, kLastValidBlockHeight, kFromAccount,
                          {instruction_two_signers});
-  ASSERT_EQ(message2.GetNumberOfSigners(), 2);
+  EXPECT_EQ(message2.GetNumberOfSigners(), 2);
 }
 
 }  // namespace brave_wallet
