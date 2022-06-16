@@ -915,8 +915,8 @@ interface TxService {
 };
 
 union MessageToSignUnion {
-  string? message_str;
-  array<uint8>? message_bytes;
+  string message_str;
+  array<uint8> message_bytes;
 };
 
 // Transaction related APIs specific to EVM.

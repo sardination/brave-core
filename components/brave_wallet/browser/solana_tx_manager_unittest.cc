@@ -24,6 +24,7 @@
 #include "brave/components/brave_wallet/common/brave_wallet_constants.h"
 #include "brave/components/brave_wallet/common/brave_wallet_types.h"
 #include "brave/components/brave_wallet/common/features.h"
+#include "brave/components/brave_wallet/common/solana_utils.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "services/data_decoder/public/cpp/test_support/in_process_data_decoder.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
@@ -892,12 +893,11 @@ TEST_F(SolanaTxManagerUnitTest, ProcessSolanaHardwareSignature) {
   ASSERT_FALSE(system_transfer_meta_id.empty());
 
   std::string decoded_signature;
-  base::Base64Decode(
-      "L7D5wwkkgHQvbhpfY7rMovbtKmZpJ8ju7bxoaSCTbdfaJPNR7JXQNveTSrE6Sks94jFmUD7p"
-      "se34kgr1tGuuMfZ",
-      &decoded_signature);
-  std::vector<uint8_t> signature_bytes(decoded_signature.begin(),
-                                       decoded_signature.end());
+  std::string signature =
+      "fJaHU9cDUoLsWLXJSPTgW3bAkhuZL319v2479igQtSp1ZyBjPi923jWkALg48uS75z5fp1JK"
+      "1T4vdWi2D35fFEj";
+  std::vector<uint8_t> signature_bytes;
+  EXPECT_TRUE(Base58Decode(signature, &signature_bytes, kSolanaSignatureSize));
 
   // Blockhash not set is invalid
   TestProcessSolanaHardwareSignature(

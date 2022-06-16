@@ -295,8 +295,13 @@ void FilTxManager::OnGetNextNonceForHardware(
   DCHECK(!keyring_service_->IsLocked());
   meta->set_status(mojom::TransactionStatus::Approved);
   tx_state_manager_->AddOrUpdateTx(*meta);
-  std::move(callback).Run(
-      mojom::MessageToSignUnion::NewMessageStr(meta->tx()->GetMessageToSign()));
+
+  auto message = meta->tx()->GetMessageToSign();
+  if (!message.has_value()) {
+    std::move(callback).Run(nullptr);
+  }
+
+  std::move(callback).Run(mojom::MessageToSignUnion::NewMessageStr(*message));
 }
 
 void FilTxManager::Reset() {

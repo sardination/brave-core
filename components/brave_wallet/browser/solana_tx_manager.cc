@@ -146,8 +146,12 @@ void SolanaTxManager::OnGetLatestBlockhashHardware(
   tx_state_manager_->AddOrUpdateTx(*meta);
 
   auto message_bytes = meta->tx()->message()->Serialize(nullptr);
+  if (!message_bytes) {
+    std::move(callback).Run(nullptr);
+  }
+
   std::move(callback).Run(
-      mojom::MessageToSignUnion::NewMessageBytes(std::move(message_bytes)));
+      mojom::MessageToSignUnion::NewMessageBytes(std::move(*message_bytes)));
 }
 
 void SolanaTxManager::OnSendSolanaTransaction(
@@ -504,10 +508,8 @@ void SolanaTxManager::ProcessSolanaHardwareSignature(
         l10n_util::GetStringUTF8(IDS_BRAVE_WALLET_TRANSACTION_NOT_FOUND));
     return;
   }
-
   absl::optional<std::vector<std::uint8_t>> transaction_bytes =
       meta->tx()->GetSignedTransactionBytes(signature_bytes);
-
   if (!transaction_bytes) {
     std::move(callback).Run(
         false,
