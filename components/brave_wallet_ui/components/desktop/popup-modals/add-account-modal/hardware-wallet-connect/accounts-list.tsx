@@ -108,26 +108,30 @@ export default function (props: Props) {
 
   return (
     <>
-      <SelectRow>
-        <SelectWrapper>
-          {selectedAccountType.coin !== BraveWallet.CoinType.FIL && (
-            <Select value={selectedDerivationScheme} onChange={setSelectedDerivationScheme}>
-              {Object.keys(derivationPathsEnum).map((path, index) => {
-                const pathValue = derivationPathsEnum[path]
-                const pathLocale = HardwareWalletDerivationPathLocaleMapping[pathValue]
-                return (
-                  <div data-value={pathValue} key={index}>
-                    {pathLocale}
-                  </div>
-                )
-              })}
-            </Select>
-          )}
-        </SelectWrapper>
-      </SelectRow>
-      <DisclaimerWrapper>
-        <DisclaimerText>{getLocale('braveWalletSwitchHDPathTextHardwareWallet')}</DisclaimerText>
-      </DisclaimerWrapper>
+      {selectedAccountType.coin !== BraveWallet.CoinType.SOL && (
+        <SelectRow>
+          <SelectWrapper>
+            {selectedAccountType.coin !== BraveWallet.CoinType.FIL && (
+              <Select value={selectedDerivationScheme} onChange={setSelectedDerivationScheme}>
+                {Object.keys(derivationPathsEnum).map((path, index) => {
+                  const pathValue = derivationPathsEnum[path]
+                  const pathLocale = HardwareWalletDerivationPathLocaleMapping[pathValue]
+                  return (
+                    <div data-value={pathValue} key={index}>
+                      {pathLocale}
+                    </div>
+                  )
+                })}
+              </Select>
+            )}
+          </SelectWrapper>
+        </SelectRow>
+      )}
+      {selectedAccountType.coin !== BraveWallet.CoinType.SOL && (
+        <DisclaimerWrapper>
+          <DisclaimerText>{getLocale('braveWalletSwitchHDPathTextHardwareWallet')}</DisclaimerText>
+        </DisclaimerWrapper>
+      )}
       <SearchBar placeholder={getLocale('braveWalletSearchScannedAccounts')} action={filterAccountList} />
       <HardwareWalletAccountsList>
         {
