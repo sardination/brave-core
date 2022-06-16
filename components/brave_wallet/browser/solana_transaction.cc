@@ -217,7 +217,7 @@ SolanaTransaction::GetSignedTransactionBytes(
 absl::optional<std::vector<uint8_t>>
 SolanaTransaction::GetSignedTransactionBytes(
     const std::vector<uint8_t>& signature_bytes) const {
-  if (signature_bytes.size() > kSolanaSignatureSize)
+  if (signature_bytes.size() != kSolanaSignatureSize)
     return absl::nullopt;
 
   // Combine the signature from hardware the message and send
