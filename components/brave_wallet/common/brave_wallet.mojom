@@ -1148,7 +1148,7 @@ interface BraveWalletService {
 
   IsBase58EncodedSolanaPubkey(string key) => (bool result);
 
-  Base58EncodeAddresses(array<array<uint8>> addresses) => (array<string> addresses);
+  Base58Encode(array<array<uint8>> addresses) => (array<string> addresses);
 
   // Resets the keyring and the related preferences
   Reset();

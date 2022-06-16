@@ -83,7 +83,7 @@ export const onConnectHardwareWallet = (opts: HardwareWalletConnectOpts): Promis
         .then(async (result: GetAccountsHardwareOperationResult) => {
           if (result.payload) {
             const { braveWalletService } = getAPIProxy()
-            const addressesEncoded = await braveWalletService.base58EncodeAddresses(
+            const addressesEncoded = await braveWalletService.base58Encode(
               result.payload.map((hardwareAccount) => [...(hardwareAccount.addressBytes || [])])
             )
             for (let i = 0; i < result.payload.length; i++) {
