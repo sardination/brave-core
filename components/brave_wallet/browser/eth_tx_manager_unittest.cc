@@ -1203,8 +1203,7 @@ TEST_F(EthTxManagerUnitTest, GetNonceForHardwareTransactionFail) {
   eth_tx_manager()->GetTransactionMessageToSign(
       std::string(),
       base::BindLambdaForTesting([&](mojom::MessageToSignUnionPtr message) {
-        EXPECT_TRUE(message->is_message_str());
-        ASSERT_FALSE(message->get_message_str());
+        ASSERT_FALSE(message);
         callback_called = true;
       }));
   base::RunLoop().RunUntilIdle();

@@ -138,11 +138,13 @@ class FilTxManagerUnitTest : public testing::Test {
     fil_tx_manager()->GetTransactionMessageToSign(
         tx_meta_id,
         base::BindLambdaForTesting([&](mojom::MessageToSignUnionPtr message) {
-          ASSERT_TRUE(message->is_message_str());
-          absl::optional<std::string> message_str = message->get_message_str();
-          EXPECT_EQ(message_str.has_value(), expected_message.has_value());
+          EXPECT_EQ(!!message, expected_message.has_value());
           if (expected_message.has_value()) {
+            ASSERT_TRUE(message->is_message_str());
+            absl::optional<std::string> message_str =
+                message->get_message_str();
             EqualJSONs(*message_str, *expected_message);
+            EXPECT_EQ(message_str.has_value(), expected_message.has_value());
           }
           run_loop.Quit();
         }));

@@ -335,13 +335,18 @@ class SolanaTxManagerUnitTest : public testing::Test {
       absl::optional<std::vector<std::uint8_t>> expected_tx_message) {
     base::RunLoop run_loop;
     solana_tx_manager()->GetTransactionMessageToSign(
-        tx_meta_id, base::BindLambdaForTesting(
-                        [&](mojom::MessageToSignUnionPtr tx_message) {
-                          EXPECT_TRUE(tx_message->is_message_bytes());
-                          EXPECT_EQ(expected_tx_message,
-                                    tx_message->get_message_bytes());
-                          run_loop.Quit();
-                        }));
+        tx_meta_id,
+        base::BindLambdaForTesting(
+            [&](mojom::MessageToSignUnionPtr tx_message) {
+              EXPECT_EQ(!!tx_message, expected_tx_message.has_value());
+              if (expected_tx_message.has_value()) {
+                ASSERT_TRUE(tx_message->is_message_bytes());
+                absl::optional<std::vector<std::uint8_t>> message_bytes =
+                    tx_message->get_message_bytes();
+                EXPECT_EQ(message_bytes, expected_tx_message);
+              }
+              run_loop.Quit();
+            }));
     run_loop.Run();
   }
 

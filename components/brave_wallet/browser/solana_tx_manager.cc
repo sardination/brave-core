@@ -137,8 +137,7 @@ void SolanaTxManager::OnGetLatestBlockhashHardware(
     mojom::SolanaProviderError error,
     const std::string& error_message) {
   if (error != mojom::SolanaProviderError::kSuccess) {
-    std::move(callback).Run(
-        mojom::MessageToSignUnion::NewMessageBytes(absl::nullopt));
+    std::move(callback).Run(nullptr);
     return;
   }
 
@@ -283,8 +282,7 @@ void SolanaTxManager::GetTransactionMessageToSign(
       GetSolanaTxStateManager()->GetSolanaTx(tx_meta_id);
   if (!meta || !meta->tx()) {
     VLOG(1) << __FUNCTION__ << "No transaction found with id:" << tx_meta_id;
-    std::move(callback).Run(
-        mojom::MessageToSignUnion::NewMessageBytes(absl::nullopt));
+    std::move(callback).Run(nullptr);
     return;
   }
 

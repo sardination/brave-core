@@ -397,15 +397,13 @@ void EthTxManager::GetTransactionMessageToSign(
       GetEthTxStateManager()->GetEthTx(tx_meta_id);
   if (!meta) {
     VLOG(1) << __FUNCTION__ << "No transaction found with id:" << tx_meta_id;
-    std::move(callback).Run(
-        mojom::MessageToSignUnion::NewMessageStr(absl::nullopt));
+    std::move(callback).Run(nullptr);
     return;
   }
   uint256_t chain_id = 0;
   if (!HexValueToUint256(json_rpc_service_->GetChainId(mojom::CoinType::ETH),
                          &chain_id)) {
-    std::move(callback).Run(
-        mojom::MessageToSignUnion::NewMessageStr(absl::nullopt));
+    std::move(callback).Run(nullptr);
     return;
   }
   auto message = meta->tx()->GetMessageToSign(chain_id, false);
