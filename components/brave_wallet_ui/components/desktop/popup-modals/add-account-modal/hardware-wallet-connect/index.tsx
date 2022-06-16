@@ -208,7 +208,7 @@ export const HardwareWalletConnect = ({ onSuccess, selectedAccountType }: Props)
 
   return (
     <>
-      {(selectedAccountType.coin !== BraveWallet.CoinType.FIL) &&
+      {(selectedAccountType.coin !== BraveWallet.CoinType.FIL && selectedAccountType.coin !== BraveWallet.CoinType.SOL) &&
         <>
           <HardwareTitle>{getLocale('braveWalletConnectHardwareTitle')}</HardwareTitle>
           <HardwareButtonRow>
@@ -219,15 +219,14 @@ export const HardwareWalletConnect = ({ onSuccess, selectedAccountType }: Props)
             >
               <LedgerIcon />
             </HardwareButton>
-            {(selectedAccountType.coin === BraveWallet.CoinType.ETH) &&
-              <HardwareButton
-                onClick={onSelectTrezor}
-                isSelected={selectedHardwareWallet === BraveWallet.TREZOR_HARDWARE_VENDOR}
-                disabled={isConnecting && selectedHardwareWallet !== BraveWallet.TREZOR_HARDWARE_VENDOR}
-              >
+
+            <HardwareButton
+              onClick={onSelectTrezor}
+              isSelected={selectedHardwareWallet === BraveWallet.TREZOR_HARDWARE_VENDOR}
+              disabled={isConnecting && selectedHardwareWallet !== BraveWallet.TREZOR_HARDWARE_VENDOR}
+            >
               <TrezorIcon />
-              </HardwareButton>
-            }
+            </HardwareButton>
           </HardwareButtonRow>
         </>
       }
