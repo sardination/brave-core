@@ -271,7 +271,8 @@ void Confirmations::OnDidRedeemUnblindedToken(
   if (ConfirmationsState::Get()->get_unblinded_payment_tokens()->TokenExists(
           unblinded_payment_token)) {
     BLOG(1, "Unblinded payment token is a duplicate");
-    OnFailedToRedeemUnblindedToken(confirmation, /* should_retry */ false);
+    OnFailedToRedeemUnblindedToken(confirmation, /* should_retry */ false,
+                                   /* should_backoff */ false);
     return;
   }
 
@@ -306,7 +307,8 @@ void Confirmations::OnDidRedeemUnblindedToken(
 
 void Confirmations::OnFailedToRedeemUnblindedToken(
     const ConfirmationInfo& confirmation,
-    const bool should_retry) {
+    const bool should_retry,
+    const bool should_backoff) {
   BLOG(1, "Failed to redeem unblinded token for "
               << confirmation.ad_type << " with confirmation id "
               << confirmation.id << ", transaction id "
@@ -324,6 +326,10 @@ void Confirmations::OnFailedToRedeemUnblindedToken(
 
   if (delegate_) {
     delegate_->OnFailedToConfirm(confirmation);
+  }
+
+  if (!should_backoff) {
+    StopRetrying();
   }
 
   ProcessRetryQueue();
