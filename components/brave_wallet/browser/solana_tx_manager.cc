@@ -147,7 +147,7 @@ void SolanaTxManager::OnGetLatestBlockhashHardware(
 
   auto message_bytes = meta->tx()->message()->Serialize(nullptr);
   std::move(callback).Run(
-      mojom::MessageToSignUnion::NewMessageBytes(message_bytes));
+      mojom::MessageToSignUnion::NewMessageBytes(std::move(message_bytes)));
 }
 
 void SolanaTxManager::OnSendSolanaTransaction(
@@ -508,7 +508,7 @@ void SolanaTxManager::ProcessSolanaHardwareSignature(
   absl::optional<std::vector<std::uint8_t>> transaction_bytes =
       meta->tx()->GetSignedTransactionBytes(signature_bytes);
 
-  if (!transaction_bytes.has_value()) {
+  if (!transaction_bytes) {
     std::move(callback).Run(
         false,
         mojom::ProviderErrorUnion::NewSolanaProviderError(
