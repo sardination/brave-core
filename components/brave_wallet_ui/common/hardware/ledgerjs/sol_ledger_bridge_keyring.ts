@@ -111,6 +111,6 @@ export default class SolanaLedgerKeyring implements LedgerSolanaKeyring {
   }
 
   private readonly getPathForIndex = (index: number): string => {
-    return `44'/501'/${index}/0'`
+    return `44'/501'/${index}'/0'`
   }
 }

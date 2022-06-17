@@ -35,8 +35,8 @@ test('Extracting accounts from device', () => {
       payload: [
         {
           'address': '',
-          'addressBytes': Buffer.from('address for 44\'/501\'/0\'/0'),
-          'derivationPath': '44\'/501\'/0\'/0',
+          'addressBytes': Buffer.from('address for 44\'/501\'/0\'/0\''),
+          'derivationPath': '44\'/501\'/0\'/0\'',
           'hardwareVendor': 'Ledger',
           'name': 'Ledger',
           'deviceId': 'device1',
@@ -44,8 +44,8 @@ test('Extracting accounts from device', () => {
         },
         {
           'address': '',
-          'addressBytes': Buffer.from('address for 44\'/501\'/0\'/1'),
-          'derivationPath': '44\'/501\'/0\'/1',
+          'addressBytes': Buffer.from('address for 44\'/501\'/1\'/0\''),
+          'derivationPath': '44\'/501\'/1\'/0\'',
           'hardwareVendor': 'Ledger',
           'name': 'Ledger',
           'deviceId': 'device1',
