@@ -97,14 +97,16 @@ void SolanaMessage::GetUniqueAccountMetas(
       it->is_writable |= account_meta.is_writable;
   }
 }
-
-std::uint8_t SolanaMessage::GetNumberOfSigners() const {
+absl::optional<std::uint8_t> SolanaMessage::GetNumberOfSigners() const {
   std::vector<SolanaAccountMeta> unique_account_metas;
   GetUniqueAccountMetas(&unique_account_metas);
 
   std::uint8_t signers = 0;
   for (auto account_meta : unique_account_metas) {
     if (account_meta.is_signer) {
+      if (signers == UINT8_MAX) {
+        return absl::nullopt;
+      }
       signers += 1;
     }
   }

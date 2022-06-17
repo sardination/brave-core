@@ -31,7 +31,7 @@ class SolanaMessage {
   ~SolanaMessage();
   bool operator==(const SolanaMessage&) const;
 
-  std::uint8_t GetNumberOfSigners() const;
+  absl::optional<std::uint8_t> GetNumberOfSigners() const;
 
   absl::optional<std::vector<uint8_t>> Serialize(
       std::vector<std::string>* signers) const;

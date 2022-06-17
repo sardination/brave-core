@@ -223,8 +223,8 @@ SolanaTransaction::GetSignedTransactionBytes(
   // Combine the signature from hardware the message and send
   std::vector<uint8_t> transaction_bytes;
 
-  std::uint8_t num_signers = message_.GetNumberOfSigners();
-  if (num_signers != 1) {
+  absl::optional<std::uint8_t> num_signers = message_.GetNumberOfSigners();
+  if (!num_signers || num_signers != 1) {
     return absl::nullopt;
   }
 
