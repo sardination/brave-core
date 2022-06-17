@@ -334,13 +334,13 @@ TEST(SolanaMessageUnitTest, GetNumberOfSigners) {
 
   // Greater than UINT8_MAX signers returns absl::nullopt
   std::vector<SolanaAccountMeta> signers;
-  for (auto i=0; i<UINT8_MAX; i++) {
-    signers.push_back(SolanaAccountMeta("pubkey" + std::to_string(i), true, true));
+  for (auto i = 0; i < UINT8_MAX; i++) {
+    signers.push_back(
+        SolanaAccountMeta("pubkey" + std::to_string(i), true, true));
   }
 
   SolanaInstruction instruction_too_many_signers(
-      kSolanaSystemProgramId,
-      std::move(signers),
+      kSolanaSystemProgramId, std::move(signers),
       {2, 0, 0, 0, 128, 150, 152, 0, 0, 0, 0, 0});
   SolanaMessage message3(kRecentBlockhash, kLastValidBlockHeight, kFromAccount,
                          {instruction_too_many_signers});
