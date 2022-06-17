@@ -22,6 +22,7 @@
 #include "brave/components/brave_wallet/common/brave_wallet_constants.h"
 #include "brave/components/brave_wallet/common/brave_wallet_types.h"
 #include "brave/components/brave_wallet/common/features.h"
+#include "brave/components/brave_wallet/common/solana_utils.h"
 #include "components/sync_preferences/testing_pref_service_syncable.h"
 #include "services/network/public/cpp/weak_wrapper_shared_url_loader_factory.h"
 #include "services/network/test/test_url_loader_factory.h"
@@ -513,6 +514,54 @@ TEST_F(SolanaTransactionUnitTest, GetBase64EncodedMessage) {
   serialized_msg = transaction2.message_.Serialize(nullptr);
   ASSERT_TRUE(serialized_msg);
   EXPECT_EQ(result, base::Base64Encode(*serialized_msg));
+}
+
+TEST_F(SolanaTransactionUnitTest, GetSignedTransactionBytes) {
+  // Empty signature is invalid
+  std::vector<uint8_t> signature_bytes;
+  SolanaTransaction transaction("", 0, "", {});
+  EXPECT_EQ(transaction.GetSignedTransactionBytes(signature_bytes),
+            absl::nullopt);
+  signature_bytes.clear();
+
+  // Empty message is invalid
+  std::string signature =
+      "fJaHU9cDUoLsWLXJSPTgW3bAkhuZL319v2479igQtSp1ZyBjPi923jWkALg48uS75z5fp1JK"
+      "1T4vdWi2D35fFEj";
+  EXPECT_TRUE(Base58Decode(signature, &signature_bytes, kSolanaSignatureSize));
+  SolanaTransaction transaction2("", 0, "", {});
+  EXPECT_EQ(transaction2.GetSignedTransactionBytes(signature_bytes),
+            absl::nullopt);
+
+  // Number of signers != 1 is invalid
+  SolanaInstruction instruction_two_signers(
+      kSolanaSystemProgramId,
+      {SolanaAccountMeta("3Lu176FQzbQJCc8iL9PnmALbpMPhZeknoturApnXRDJw", true,
+                         true),
+       SolanaAccountMeta("3QpJ3j1vq1PfqJdvCcHKWuePykqoUYSvxyRb3Cnh79BD", true,
+                         true)},
+      {2, 0, 0, 0, 128, 150, 152, 0, 0, 0, 0, 0});
+  SolanaMessage message("9sHcv6xwn9YkB8nxTUGKDwPwNnmqVp5oAXxU8Fdkm4J6", 0,
+                        "3Lu176FQzbQJCc8iL9PnmALbpMPhZeknoturApnXRDJw",
+                        {instruction_two_signers});
+  SolanaTransaction transaction3(std::move(message));
+  EXPECT_EQ(transaction3.GetSignedTransactionBytes(signature_bytes),
+            absl::nullopt);
+
+  // Valid
+  SolanaInstruction instruction_one_signer(
+      kSolanaSystemProgramId,
+      {SolanaAccountMeta("3Lu176FQzbQJCc8iL9PnmALbpMPhZeknoturApnXRDJw", true,
+                         true),
+       SolanaAccountMeta("3QpJ3j1vq1PfqJdvCcHKWuePykqoUYSvxyRb3Cnh79BD", false,
+                         true)},
+      {2, 0, 0, 0, 128, 150, 152, 0, 0, 0, 0, 0});
+  SolanaMessage message2("9sHcv6xwn9YkB8nxTUGKDwPwNnmqVp5oAXxU8Fdkm4J6", 0,
+                         "3Lu176FQzbQJCc8iL9PnmALbpMPhZeknoturApnXRDJw",
+                         {instruction_one_signer});
+  SolanaTransaction transaction4(std::move(message2));
+  EXPECT_NE(transaction4.GetSignedTransactionBytes(signature_bytes),
+            absl::nullopt);
 }
 
 }  // namespace brave_wallet

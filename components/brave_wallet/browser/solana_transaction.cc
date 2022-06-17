@@ -223,12 +223,19 @@ SolanaTransaction::GetSignedTransactionBytes(
   // Combine the signature from hardware the message and send
   std::vector<uint8_t> transaction_bytes;
 
-  absl::optional<std::uint8_t> num_signers = message_.GetNumberOfSigners();
+  // Add message
+  auto message_bytes = message_.Serialize(nullptr);
+  if (!message_bytes)
+    return absl::nullopt;
+
+  // Get number of signers from message header
+  // absl::optional<std::uint8_t> num_signers = message_.GetNumberOfSigners();
+  uint8_t num_signers = (*message_bytes)[0];
   if (!num_signers || num_signers != 1) {
     return absl::nullopt;
   }
 
-  // 1 signer
+  // Add 1 signer
   CompactU16Encode(1, &transaction_bytes);
 
   // Add signature
@@ -236,10 +243,6 @@ SolanaTransaction::GetSignedTransactionBytes(
                            signature_bytes.end());
 
   // Add message
-  auto message_bytes = message_.Serialize(nullptr);
-  if (!message_bytes)
-    return absl::nullopt;
-
   transaction_bytes.insert(transaction_bytes.end(), message_bytes->begin(),
                            message_bytes->end());
 

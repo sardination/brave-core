@@ -310,41 +310,4 @@ TEST(SolanaMessageUnitTest, FromToValue) {
   }
 }
 
-TEST(SolanaMessageUnitTest, GetNumberOfSigners) {
-  // 1 signer returns 1
-  SolanaInstruction instruction_one_signers(
-      kSolanaSystemProgramId,
-      {SolanaAccountMeta(kFromAccount, true, true),
-       SolanaAccountMeta(kToAccount, false, true)},
-      {2, 0, 0, 0, 128, 150, 152, 0, 0, 0, 0, 0});
-
-  SolanaMessage message(kRecentBlockhash, kLastValidBlockHeight, kFromAccount,
-                        {instruction_one_signers});
-  EXPECT_EQ(message.GetNumberOfSigners(), 1);
-
-  // 2 signers return 2
-  SolanaInstruction instruction_two_signers(
-      kSolanaSystemProgramId,
-      {SolanaAccountMeta(kFromAccount, true, true),
-       SolanaAccountMeta(kToAccount, true, true)},
-      {2, 0, 0, 0, 128, 150, 152, 0, 0, 0, 0, 0});
-  SolanaMessage message2(kRecentBlockhash, kLastValidBlockHeight, kFromAccount,
-                         {instruction_two_signers});
-  EXPECT_EQ(message2.GetNumberOfSigners(), 2);
-
-  // Greater than UINT8_MAX signers returns absl::nullopt
-  std::vector<SolanaAccountMeta> signers;
-  for (auto i = 0; i < UINT8_MAX; i++) {
-    signers.push_back(
-        SolanaAccountMeta("pubkey" + std::to_string(i), true, true));
-  }
-
-  SolanaInstruction instruction_too_many_signers(
-      kSolanaSystemProgramId, std::move(signers),
-      {2, 0, 0, 0, 128, 150, 152, 0, 0, 0, 0, 0});
-  SolanaMessage message3(kRecentBlockhash, kLastValidBlockHeight, kFromAccount,
-                         {instruction_too_many_signers});
-  EXPECT_EQ(message3.GetNumberOfSigners(), absl::nullopt);
-}
-
 }  // namespace brave_wallet
