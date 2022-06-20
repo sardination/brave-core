@@ -113,13 +113,20 @@ Polymer({
     // Clear sync code because user might use the same page to create a new sync
     // chain without reload
     this.syncCode = undefined
-    const router = Router.getInstance();
-    router.navigateTo(router.getRoutes().BRAVE_SYNC);
+    const router = Router.getInstance()
+    router.navigateTo(router.getRoutes().BRAVE_SYNC)
   },
 
   onPermanentlyDeleteSyncAccount_: async function() {
     alert('onPermanentlyDeleteSyncAccount_')
-    await this.browserProxy_.permanentlyDeleteSyncAccount();
+    let error_text = 'SUCCESS'
+    try {
+      error_text = await this.browserProxy_.permanentlyDeleteSyncAccount()
+      alert('Request to delete account succeeded :)')
+    } catch (e) {
+      error_text = e
+      alert('Delete account request failed :( ' + error_text)
+    }
   },
 
   onDeleteDevice_: async function(e) {
