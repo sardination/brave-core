@@ -167,7 +167,9 @@ export async function signLedgerSolanaTransaction (
       const error = signed?.error ?? getLocale('braveWalletSignOnDeviceError')
       const code = signed?.code ?? ''
       if (code === 'DisconnectedDeviceDuringOperation') {
-        await deviceKeyring.makeApp()
+        // TODO
+        return { success: false, error: 'error', code: 'code' }
+        // await deviceKeyring.makeApp()
       }
       return { success: false, error: error, code: code }
     }

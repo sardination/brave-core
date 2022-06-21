@@ -108,7 +108,7 @@ export abstract class MessagingTransport {
 
   protected handlers: Map<string, Function>
 
-  addCommandHandler = (id: string, listener: Function): boolean => {
+    addCommandHandler = (id: string, listener: Function): boolean => {
     if (!this.handlers.size) {
       this.addWindowMessageListener()
       this.handlers.clear()

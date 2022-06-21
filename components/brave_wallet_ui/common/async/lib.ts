@@ -68,7 +68,7 @@ export const onConnectHardwareWallet = (opts: HardwareWalletConnectOpts): Promis
           }
           reject(result.error)
         })
-        .catch(reject)
+        .catch(reject) // probably catching the error having the wrong app open
     } else if (keyring instanceof FilecoinLedgerKeyring && opts.network) {
       keyring.getAccounts(opts.startIndex, opts.stopIndex, opts.network)
         .then((result: GetAccountsHardwareOperationResult) => {

@@ -4,6 +4,7 @@
 // you can obtain one at http://mozilla.org/MPL/2.0/.
 
 import { MessagingTransport, TrezorFrameCommand, TrezorCommand } from './trezor-messages'
+import { LedgerCommand } from '../ledgerjs/ledger-messages'
 
 // Handles commands forwarding to the Trezor library inside the iframe.
 export class TrezorCommandHandler extends MessagingTransport {
@@ -24,7 +25,7 @@ export class TrezorCommandHandler extends MessagingTransport {
 
 let handler: TrezorCommandHandler
 
-export function addTrezorCommandHandler (command: TrezorCommand, listener: Function): Boolean {
+export function addTrezorCommandHandler (command: TrezorCommand | LedgerCommand, listener: Function): Boolean {
   if (!handler) {
     handler = new TrezorCommandHandler()
   }

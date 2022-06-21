@@ -5,6 +5,12 @@
 
 import { kTrezorBridgeUrl, MessagingTransport, TrezorErrorsCodes, TrezorFrameCommand } from './trezor-messages'
 
+import {
+  kLedgerBridgeUrl,
+  // LedgerErrorsCodes,
+  LedgerFrameCommand
+} from '../ledgerjs/ledger-messages'
+
 // Handles sending messages to the Trezor library, creates untrusted iframe,
 // loads library and allows to send commands to the library and subscribe
 // for responses.
@@ -29,8 +35,8 @@ export class TrezorBridgeTransport extends MessagingTransport {
   }
 
   // T is response type, e.g. UnlockResponse. Resolves as `false` if transport error
-  sendCommandToTrezorFrame = <T> (command: TrezorFrameCommand): Promise<T | TrezorErrorsCodes> => {
-    return new Promise<T | TrezorErrorsCodes>(async (resolve) => {
+  sendCommandToTrezorFrame = <T> (command: TrezorFrameCommand | LedgerFrameCommand): Promise<T | TrezorErrorsCodes > => {
+    return new Promise<T | TrezorErrorsCodes >(async (resolve) => {
       if (!this.bridge && !this.hasBridgeCreated()) {
         this.bridge = await this.createBridge()
       }
@@ -72,6 +78,9 @@ export class TrezorBridgeTransport extends MessagingTransport {
       element.id = this.frameId
       element.src = this.bridgeFrameUrl
       element.style.display = 'none'
+      if (this.bridgeFrameUrl == kLedgerBridgeUrl) {
+        element.allow = 'hid'
+      }
       element.onload = () => {
         resolve(element)
       }
@@ -85,9 +94,16 @@ export class TrezorBridgeTransport extends MessagingTransport {
 }
 
 let transport: TrezorBridgeTransport
-export async function sendTrezorCommand<T> (command: TrezorFrameCommand): Promise<T | TrezorErrorsCodes> {
+export async function sendTrezorCommand<T> (command: LedgerFrameCommand | TrezorFrameCommand): Promise<T | TrezorErrorsCodes> {
   if (!transport) {
     transport = new TrezorBridgeTransport(kTrezorBridgeUrl)
+  }
+  return transport.sendCommandToTrezorFrame<T>(command)
+}
+
+export async function sendLedgerCommand<T> (command: LedgerFrameCommand): Promise<T | TrezorErrorsCodes> {
+  if (!transport) {
+    transport = new TrezorBridgeTransport(kLedgerBridgeUrl)
   }
   return transport.sendCommandToTrezorFrame<T>(command)
 }
