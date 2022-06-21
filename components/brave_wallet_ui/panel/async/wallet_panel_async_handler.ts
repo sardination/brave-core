@@ -296,6 +296,9 @@ handler.on(PanelActions.approveHardwareTransaction.getType(), async (store: Stor
   if (hardwareAccount.vendor === BraveWallet.LEDGER_HARDWARE_VENDOR) {
     let success, error, code
     switch (found.coin) {
+      case BraveWallet.CoinType.ETH:
+        ({ success, error, code } = await signLedgerEthereumTransaction(apiProxy, hardwareAccount.path, txInfo, found.coin))
+        break
       case BraveWallet.CoinType.FIL:
         ({ success, error, code } = await signLedgerFilecoinTransaction(apiProxy, txInfo, found.coin))
         break
@@ -303,8 +306,8 @@ handler.on(PanelActions.approveHardwareTransaction.getType(), async (store: Stor
         ({ success, error, code } = await signLedgerSolanaTransaction(apiProxy, hardwareAccount.path, txInfo, found.coin))
         break
       default:
-        ({ success, error, code } = await signLedgerEthereumTransaction(apiProxy, hardwareAccount.path, txInfo, found.coin))
-        break
+        await store.dispatch(PanelActions.navigateToMain())
+        return
     }
     if (success) {
       refreshTransactionHistory(txInfo.fromAddress)
