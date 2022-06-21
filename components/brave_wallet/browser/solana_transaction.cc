@@ -224,16 +224,11 @@ SolanaTransaction::GetSignedTransactionBytes(
   std::vector<uint8_t> transaction_bytes;
 
   // Add message
-  auto message_bytes = message_.Serialize(nullptr);
-  if (!message_bytes)
+  std::vector<std::string> signers;
+  auto message_bytes = message_.Serialize(&signers);
+  // if ((!message_bytes) || (!(signers.size() == 1)))
+  if (!message_bytes || !(signers.size() == 1))
     return absl::nullopt;
-
-  // Get number of signers from message header
-  // absl::optional<std::uint8_t> num_signers = message_.GetNumberOfSigners();
-  uint8_t num_signers = (*message_bytes)[0];
-  if (!num_signers || num_signers != 1) {
-    return absl::nullopt;
-  }
 
   // Add 1 signer
   CompactU16Encode(1, &transaction_bytes);
