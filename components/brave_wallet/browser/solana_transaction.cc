@@ -226,8 +226,7 @@ SolanaTransaction::GetSignedTransactionBytes(
   // Add message
   std::vector<std::string> signers;
   auto message_bytes = message_.Serialize(&signers);
-  // if ((!message_bytes) || (!(signers.size() == 1)))
-  if (!message_bytes || !(signers.size() == 1))
+  if (!message_bytes || signers.size() != 1)
     return absl::nullopt;
 
   // Add 1 signer
