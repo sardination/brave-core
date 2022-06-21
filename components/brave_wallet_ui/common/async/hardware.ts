@@ -157,7 +157,7 @@ export async function signLedgerSolanaTransaction (
   path: string,
   txInfo: BraveWallet.TransactionInfo,
   coin: BraveWallet.CoinType,
-  deviceKeyring: LedgerSolanaKeyring = getLedgerSolanaHardwareKeyring()): Promise<SignHardwareTransactionOperationResult> {
+  deviceKeyring: LedgerSolanaKeyring = getLedgerSolanaHardwareKeyring()): Promise<SignHardwareTransactionOperationResult> { // TODO should we pass an onAuthorize function?
     const data = await apiProxy.txService.getTransactionMessageToSign(coin, txInfo.id)
     if (!data || !data.message || !data.message.messageBytes) {
       return { success: false, error: getLocale('braveWalletNoMessageToSignError') }
@@ -167,8 +167,10 @@ export async function signLedgerSolanaTransaction (
       const error = signed?.error ?? getLocale('braveWalletSignOnDeviceError')
       const code = signed?.code ?? ''
       if (code === 'DisconnectedDeviceDuringOperation') {
-        await deviceKeyring.makeApp()
+        // await deviceKeyring.makeApp()
+        return { success: false, error: 'error', code: 'code' } // TODO handle this case correctly now that makeApp was removed
       }
+
       return { success: false, error: error, code: code }
     }
 

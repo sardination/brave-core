@@ -99,7 +99,8 @@ const defaultState: WalletState = {
   defaultNetworks: [] as BraveWallet.NetworkInfo[],
   defaultAccounts: [] as BraveWallet.AccountInfo[],
   selectedNetworkFilter: AllNetworksOption,
-  solFeeEstimates: undefined
+  solFeeEstimates: undefined,
+  hardwareAuthorizationNeeded: false
 }
 
 const getAccountType = (info: AccountInfo) => {

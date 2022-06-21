@@ -318,6 +318,15 @@ handler.on(PanelActions.approveHardwareTransaction.getType(), async (store: Stor
     }
 
     if (code) {
+      // TODO resolve: 'code' is an overloaded term right now. In some places it refers to the
+      // codes received from the hardware device itself.  In other places they refer to 
+      // transport errors (e.g. BridgeNotReady).  I'm adding a third case here - when
+      // the user is not authorized which is not a device code, or related to transport.
+      if (code === 'unauthorized') {
+        await store.dispatch(PanelActions.setHardwareWalletInteractionError(code))
+        return
+      }
+
       const deviceError = dialogErrorFromLedgerErrorCode(code)
       if (deviceError === 'transactionRejected') {
         await store.dispatch(WalletActions.rejectTransaction(txInfo))
@@ -514,6 +523,7 @@ handler.on(PanelActions.signMessageHardware.getType(), async (store, messageData
   const info = hardwareAccount.hardware
   const signed = await signMessageWithHardwareKeyring(info.vendor as HardwareVendor, info.path, messageData)
   if (!signed.success && signed.code) {
+    // todo handle unauthorized here, dispatch event
     const deviceError = (info.vendor === BraveWallet.TREZOR_HARDWARE_VENDOR)
       ? dialogErrorFromTrezorErrorCode(signed.code) : dialogErrorFromLedgerErrorCode(signed.code)
     if (deviceError !== 'transactionRejected') {

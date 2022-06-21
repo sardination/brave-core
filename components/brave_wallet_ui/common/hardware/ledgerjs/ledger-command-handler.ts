@@ -3,16 +3,20 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
 // you can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { TrezorFrameCommand, TrezorCommand } from './trezor-messages'
+import { LedgerFrameCommand, LedgerCommand } from './ledger-messages'
 import { MessagingTransport } from '../messaging-transport'
 
-// Handles commands forwarding to the Trezor library inside the iframe.
-export class TrezorCommandHandler extends MessagingTransport {
+// Handles commands forwarding to the Ledger library inside the iframe.
+export class LedgerCommandHandler extends MessagingTransport {
+  sendAuthorizationResultToParent = () => {
+    window.parent.postMessage('authorize success', window.parent.origin)
+  }
+
   protected onMessageReceived = async (event: MessageEvent) => {
     if (event.origin !== event.data.origin || event.type !== 'message' || !event.source) {
       return
     }
-    const message = event.data as TrezorFrameCommand
+    const message = event.data as LedgerFrameCommand
     if (!message || !this.handlers.has(message.command)) {
       return
     }
@@ -23,11 +27,12 @@ export class TrezorCommandHandler extends MessagingTransport {
   }
 }
 
-let handler: TrezorCommandHandler
+let handler: LedgerCommandHandler
 
-export function addTrezorCommandHandler (command: TrezorCommand, listener: Function): Boolean {
+export function addLedgerCommandHandler (command: LedgerCommand, listener: Function): Boolean {
   if (!handler) {
-    handler = new TrezorCommandHandler()
+    handler = new LedgerCommandHandler()
   }
   return handler.addCommandHandler(command, listener)
 }
+

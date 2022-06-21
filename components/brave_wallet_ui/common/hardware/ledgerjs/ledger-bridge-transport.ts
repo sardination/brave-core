@@ -3,20 +3,29 @@
 // License, v. 2.0. If a copy of the MPL was not distributed with this file,
 // you can obtain one at http://mozilla.org/MPL/2.0/.
 
-import { kTrezorBridgeUrl, TrezorErrorsCodes, TrezorFrameCommand } from './trezor-messages'
 import { MessagingTransport } from '../messaging-transport'
 
-// Handles sending messages to the Trezor library, creates untrusted iframe,
-// loads library and allows to send commands to the library and subscribe
+import {
+  kLedgerBridgeUrl,
+  LedgerErrorsCodes,
+  LedgerFrameCommand
+} from '../ledgerjs/ledger-messages'
+
+// Handles sending messages to the Ledger library. It creates untrusted iframe
+// with origin chrome-untrusted://trezor-bridge where Ledger library is isolated and run.
+// It send commands to the iframe via postMessage and subscribes
 // for responses.
-export class TrezorBridgeTransport extends MessagingTransport {
-  constructor (bridgeFrameUrl: string) {
+export class LedgerBridgeTransport extends MessagingTransport {
+  // constructor (bridgeFrameUrl: string) {
+  constructor (bridgeFrameUrl: string, onAuthorize?: Function) {
     super()
     this.bridgeFrameUrl = bridgeFrameUrl
     // @ts-expect-error
     this.frameId = crypto.randomUUID()
+    this.onAuthorize = onAuthorize
   }
 
+  private onAuthorize?: Function
   private readonly frameId: string
   private readonly bridgeFrameUrl: string
   private bridge?: HTMLIFrameElement
@@ -30,17 +39,17 @@ export class TrezorBridgeTransport extends MessagingTransport {
   }
 
   // T is response type, e.g. UnlockResponse. Resolves as `false` if transport error
-  sendCommandToTrezorFrame = <T> (command: TrezorFrameCommand): Promise<T | TrezorErrorsCodes> => {
-    return new Promise<T | TrezorErrorsCodes>(async (resolve) => {
+  sendCommandToLedgerFrame = <T> (command: LedgerFrameCommand): Promise<T | LedgerErrorsCodes > => {
+    return new Promise<T | LedgerErrorsCodes >(async (resolve) => {
       if (!this.bridge && !this.hasBridgeCreated()) {
         this.bridge = await this.createBridge()
       }
       if (!this.bridge || !this.bridge.contentWindow) {
-        resolve(TrezorErrorsCodes.BridgeNotReady)
+        resolve(LedgerErrorsCodes.BridgeNotReady)
         return
       }
       if (!this.addCommandHandler(command.id, resolve)) {
-        resolve(TrezorErrorsCodes.CommandInProgress)
+        resolve(LedgerErrorsCodes.CommandInProgress)
         return
       }
       this.bridge.contentWindow.postMessage(command, this.bridgeFrameUrl)
@@ -48,13 +57,20 @@ export class TrezorBridgeTransport extends MessagingTransport {
   }
 
   protected onMessageReceived = (event: MessageEvent) => {
-    if (event.origin !== this.getTrezorBridgeOrigin() ||
+    // todo pass a message with better typing
+    if (event.data === 'authorize success') {
+      if (this.onAuthorize) { 
+        this.onAuthorize()
+      }
+    }
+
+    if (event.origin !== this.getLedgerBridgeOrigin() ||
         event.type !== 'message' ||
         !this.handlers.size) {
       return
     }
 
-    const message = event.data as TrezorFrameCommand
+    const message = event.data as LedgerFrameCommand
     if (!message || !this.handlers.has(message.id)) {
       return
     }
@@ -63,7 +79,7 @@ export class TrezorBridgeTransport extends MessagingTransport {
     this.removeCommandHandler(event.data.id)
   }
 
-  private readonly getTrezorBridgeOrigin = () => {
+  private readonly getLedgerBridgeOrigin = () => {
     return (new URL(this.bridgeFrameUrl)).origin
   }
 
@@ -73,6 +89,9 @@ export class TrezorBridgeTransport extends MessagingTransport {
       element.id = this.frameId
       element.src = this.bridgeFrameUrl
       element.style.display = 'none'
+      if (this.bridgeFrameUrl == kLedgerBridgeUrl) {
+        element.allow = 'hid'
+      }
       element.onload = () => {
         resolve(element)
       }
@@ -85,15 +104,16 @@ export class TrezorBridgeTransport extends MessagingTransport {
   }
 }
 
-let transport: TrezorBridgeTransport
-export async function sendTrezorCommand<T> (command: TrezorFrameCommand): Promise<T | TrezorErrorsCodes> {
+let transport: LedgerBridgeTransport
+
+export async function sendLedgerCommand<T> (command: LedgerFrameCommand, onAuthorize?: Function): Promise<T | LedgerErrorsCodes> {
   if (!transport) {
-    transport = new TrezorBridgeTransport(kTrezorBridgeUrl)
+    transport = new LedgerBridgeTransport(kLedgerBridgeUrl, onAuthorize)
   }
-  return transport.sendCommandToTrezorFrame<T>(command)
+  return transport.sendCommandToLedgerFrame<T>(command)
 }
 
-export async function closeTrezorBridge () {
+export async function closeLedgerBridge () {
   if (!transport) {
     return
   }

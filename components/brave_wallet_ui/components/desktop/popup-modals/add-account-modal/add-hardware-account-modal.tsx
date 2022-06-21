@@ -43,6 +43,7 @@ export const AddHardwareAccountModal = () => {
   const dispatch = useDispatch()
   const isFilecoinEnabled = useSelector(({ wallet }: { wallet: WalletState }) => wallet.isFilecoinEnabled)
   const isSolanaEnabled = useSelector(({ wallet }: { wallet: WalletState }) => wallet.isSolanaEnabled)
+  const hardwareAuthorizationNeeded = useSelector(({ wallet }: { wallet: WalletState }) => wallet.hardwareAuthorizationNeeded)
 
   // memos
   const createAccountOptions = React.useMemo(
@@ -83,6 +84,7 @@ export const AddHardwareAccountModal = () => {
         <StyledWrapper>
           <HardwareWalletConnect
             selectedAccountType={selectedAccountType}
+            hardwareAuthorizationNeeded={hardwareAuthorizationNeeded}
             onSuccess={closeModal}
           />
         </StyledWrapper>

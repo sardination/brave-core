@@ -29,6 +29,7 @@ import Amount from '../../utils/amount'
 import getAPIProxy from './bridge'
 import { Dispatch, State, Store } from './types'
 import { getHardwareKeyring } from '../api/hardware_keyrings'
+// import { getPageHardwareKeyring } from '../api/hardware_keyrings'
 import { GetAccountsHardwareOperationResult } from '../hardware/types'
 import LedgerBridgeKeyring from '../hardware/ledgerjs/eth_ledger_bridge_keyring'
 import TrezorBridgeKeyring from '../hardware/trezor/trezor_bridge_keyring'
@@ -59,7 +60,7 @@ export const getERC20Allowance = (
 
 export const onConnectHardwareWallet = (opts: HardwareWalletConnectOpts): Promise<BraveWallet.HardwareWalletAccount[]> => {
   return new Promise(async (resolve, reject) => {
-    const keyring = getHardwareKeyring(opts.hardware, opts.coin)
+    const keyring = getHardwareKeyring(opts.hardware, opts.coin, opts.onAuthorize)
     if ((keyring instanceof LedgerBridgeKeyring || keyring instanceof TrezorBridgeKeyring) && opts.scheme) {
       keyring.getAccounts(opts.startIndex, opts.stopIndex, opts.scheme)
         .then((result: GetAccountsHardwareOperationResult) => {
@@ -68,7 +69,7 @@ export const onConnectHardwareWallet = (opts: HardwareWalletConnectOpts): Promis
           }
           reject(result.error)
         })
-        .catch(reject)
+        .catch(reject) // probably catching the error having the wrong app open
     } else if (keyring instanceof FilecoinLedgerKeyring && opts.network) {
       keyring.getAccounts(opts.startIndex, opts.stopIndex, opts.network)
         .then((result: GetAccountsHardwareOperationResult) => {

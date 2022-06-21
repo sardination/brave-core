@@ -12,6 +12,7 @@ export type HardwareWalletResponseCodeType =
   | 'deviceBusy'
   | 'openLedgerApp'
   | 'transactionRejected'
+  | 'unauthorized'
 
 export interface SignHardwareTransactionType {
   success: boolean
@@ -32,6 +33,10 @@ export type HardwareOperationResult = {
 
 export type SignHardwareTransactionOperationResult = HardwareOperationResult & {
   payload?: EthereumSignedTx | SignedLotusMessage | Buffer
+}
+
+export type GetAccountOperationResult = HardwareOperationResult & {
+  payload?: Buffer
 }
 
 export type SignHardwareMessageOperationResult = HardwareOperationResult & {

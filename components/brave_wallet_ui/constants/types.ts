@@ -204,6 +204,7 @@ export interface WalletState {
   isTestNetworksEnabled: boolean
   isWalletCreated: boolean
   isWalletLocked: boolean
+  hardwareAuthorizationNeeded: boolean
   favoriteApps: BraveWallet.AppItem[]
   isWalletBackedUp: boolean
   hasIncorrectPassword: boolean
