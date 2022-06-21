@@ -43,9 +43,9 @@ TEST_F(BatAdsCatalogPermissionRuleIntegrationTest, AllowAd) {
 }
 
 TEST_F(BatAdsCatalogPermissionRuleIntegrationTest,
-       AllowAdIfCatalogWasLastUpdated23HoursAnd59MinutesAgo) {
+       AllowAdIfCatalogWasLastUpdatedOnOrBeforeCatalogPing) {
   // Arrange
-  AdvanceClockBy(base::Days(1) - base::Seconds(1));
+  AdvanceClockBy(GetCatalogPing() - base::Seconds(1));
 
   // Act
   CatalogPermissionRule permission_rule;
@@ -56,9 +56,9 @@ TEST_F(BatAdsCatalogPermissionRuleIntegrationTest,
 }
 
 TEST_F(BatAdsCatalogPermissionRuleIntegrationTest,
-       DoNotAllowAdIfCatalogWasLastUpdated1DayAgo) {
+       DoNotAllowAdIfCatalogWasNotUpdatedAfterCatalogPing) {
   // Arrange
-  AdvanceClockBy(base::Days(1));
+  AdvanceClockBy(GetCatalogPing());
 
   // Act
   CatalogPermissionRule permission_rule;
