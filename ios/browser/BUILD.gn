@@ -39,7 +39,7 @@ source_set("browser") {
     "//components/metrics_services_manager",
     "//components/variations",
     "//components/variations/service",
-    "//ios/chrome/browser",
+    "//ios/chrome/browser:chrome_url_constants",
     "//ios/chrome/browser:browser_impl",
     "//ios/chrome/browser:chrome_paths",
     "//ios/chrome/browser/browser_state",

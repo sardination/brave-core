@@ -54,7 +54,18 @@ source_set("app") {
     "//components/password_manager/core/browser",
     "//components/sync/base",
     "//components/sync/driver",
-    "//ios/chrome/app:app_internal",
+
+    #"//ios/chrome/app:app_internal",
+    #"//ios/chrome/browser/prerender",
+    #"//ios/chrome/browser/policy",
+    #"//ios/chrome/browser/ui/authentication:authentication",
+    #"//ios/chrome/browser/ui/omnibox/keyboard_assist:keyboard_assist",
+    #"//ios/chrome/browser/tabs:tabs_internal",
+    #"//ios/chrome/browser/ui/settings:settings",
+    #"//ios/chrome/browser/ui/main:main",
+    "//ios/chrome/browser:application_context",
+    "//ios/chrome/browser:utils",
+
     "//ios/chrome/app:tests_fake_hook",
     "//ios/chrome/app/startup:startup",
     "//ios/chrome/app/startup:startup_basic",
@@ -86,5 +97,8 @@ source_set("app") {
   frameworks = [
     "Foundation.framework",
     "UIKit.framework",
+    "AuthenticationServices.framework",
+    "MessageUI.framework",
+    "ScreenTime.framework",
   ]
 }

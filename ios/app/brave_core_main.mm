@@ -43,7 +43,7 @@
 #include "components/password_manager/core/browser/password_store.h"
 #include "components/sync/base/command_line_switches.h"
 #include "ios/chrome/app/startup/provider_registration.h"
-#include "ios/chrome/app/startup_tasks.h"
+//#include "ios/chrome/app/startup_tasks.h"
 #include "ios/chrome/browser/application_context.h"
 #include "ios/chrome/browser/bookmarks/bookmark_model_factory.h"
 #include "ios/chrome/browser/browser_state/chrome_browser_state.h"
@@ -59,6 +59,16 @@
 #include "ios/public/provider/chrome/browser/ui_utils/ui_utils_api.h"
 #include "ios/web/public/init/web_main.h"
 #include "ui/base/resource/resource_bundle.h"
+
+#include "ios/chrome/browser/ui/main/scene_state_browser_agent.mm"
+#include "ios/chrome/browser/tabs/tab_helper_util.mm"
+#include "ios/chrome/browser/tabs/ios_synced_window_delegate_getter.mm"
+#include "ios/chrome/browser/tabs/synced_window_delegate_browser_agent.mm"
+#include "ios/chrome/browser/ui/settings/settings_navigation_controller.mm"
+#include "ios/chrome/browser/tabs/tab_title_util.mm"
+#include "ios/chrome/browser/tabs/closing_web_state_observer_browser_agent.mm"
+#include "ios/chrome/browser/ui/omnibox/keyboard_assist/omnibox_assistive_keyboard_views.mm"
+#import "ios/chrome/browser/ui/omnibox/keyboard_assist/omnibox_assistive_keyboard_delegate.mm"
 
 // Chromium logging is global, therefore we cannot link this to the instance in
 // question
@@ -211,7 +221,7 @@ const BraveCoreSwitch BraveCoreSwitchSkusEnvironment =
 }
 
 - (void)scheduleLowPriorityStartupTasks {
-  [StartupTasks scheduleDeferredBrowserStateInitialization:_mainBrowserState];
+//  [StartupTasks scheduleDeferredBrowserStateInitialization:_mainBrowserState];
 }
 
 - (void)registerComponentsForUpdate {
