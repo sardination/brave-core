@@ -3,11 +3,7 @@
 // found in the LICENSE file.
 
 #import "ios/chrome/app/first_run_app_state_agent.h"
-
-#import "ios/chrome/app/application_delegate/app_state.h"
 #import "ios/chrome/browser/policy/policy_watcher_browser_agent.h"
-#import "ios/chrome/browser/policy/policy_watcher_browser_agent_observer_bridge.h"
-#import "ios/chrome/browser/ui/main/browser_interface_provider.h"
 #import "ios/chrome/browser/ui/main/scene_state.h"
 
 #if !defined(__has_feature) || !__has_feature(objc_arc)
