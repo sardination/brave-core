@@ -10,6 +10,7 @@
  */
 
 import './brave_sync_code_dialog.js';
+import './brave_sync_delete_account_dialog.js';
 
 import {Polymer, html} from 'chrome://resources/polymer/v3_0/polymer/polymer_bundled.min.js';
 import {I18nBehavior} from 'chrome://resources/js/i18n_behavior.m.js';
@@ -52,6 +53,14 @@ Polymer({
      * @private
      */
     syncCodeDialogType_: String,
+
+    /**
+     * Displaying delete account dialog when true
+     */
+    syncDoingDeleteAccount_: {
+      type: Boolean,
+      value: false
+    },
   },
 
   /** @private {?SyncBrowserProxy} */
@@ -118,15 +127,7 @@ Polymer({
   },
 
   onPermanentlyDeleteSyncAccount_: async function() {
-    alert('onPermanentlyDeleteSyncAccount_')
-    let error_text = 'SUCCESS'
-    try {
-      error_text = await this.browserProxy_.permanentlyDeleteSyncAccount()
-      alert('Request to delete account succeeded :)')
-    } catch (e) {
-      error_text = e
-      alert('Delete account request failed :( ' + error_text)
-    }
+    this.syncDoingDeleteAccount_ = true;
   },
 
   onDeleteDevice_: async function(e) {

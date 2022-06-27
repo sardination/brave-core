@@ -159,6 +159,7 @@ preprocess_if_expr("preprocess_generated") {
     "brave_search_engines_page/brave_search_engines_page_browser_proxy.m.js",
     "brave_sync_page/brave_sync_code_dialog.js",
     "brave_sync_page/brave_sync_configure.js",
+    "brave_sync_page/brave_sync_delete_account_dialog.js",
     "brave_sync_page/brave_sync_page.js",
     "brave_sync_page/brave_sync_setup.js",
     "brave_sync_page/brave_sync_subpage.js",

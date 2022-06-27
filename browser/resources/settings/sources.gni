@@ -64,6 +64,7 @@ brave_deps_chrome_browser_resources_settings_in_files = [
   "brave_sync_page/brave_sync_browser_proxy.js",
   "brave_sync_page/brave_sync_code_dialog.js",
   "brave_sync_page/brave_sync_configure.js",
+  "brave_sync_page/brave_sync_delete_account_dialog.js",
   "brave_sync_page/brave_sync_page.js",
   "brave_sync_page/brave_sync_setup.js",
   "brave_sync_page/brave_sync_subpage.js",

@@ -6,15 +6,14 @@
 import("//tools/polymer/html_to_js.gni")
 
 group("web_modules") {
-  public_deps = [
-    ":templatize",
-  ]
+  public_deps = [ ":templatize" ]
 }
 
 html_to_js("templatize") {
   js_files = [
     "brave_sync_code_dialog.js",
     "brave_sync_configure.js",
+    "brave_sync_delete_account_dialog.js",
     "brave_sync_page.js",
     "brave_sync_subpage.js",
     "brave_sync_setup.js",
