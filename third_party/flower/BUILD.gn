@@ -16,7 +16,7 @@ static_library("flower") {
     "//brave/third_party/flower/src/proto/flwr/proto:transport_grpc_proto",
     "//third_party/grpc:grpc++",
     "//third_party/grpc:grpc_cpp_plugin",
-    "//third_party/protobuf:protobuf_full",
+    "//third_party/protobuf:protobuf_lite",
   ]
 
   configs -= [ "//build/config/compiler:chromium_code" ]
