@@ -1204,38 +1204,8 @@ void BraveVpnService::OnGetResponse(
     const base::flat_map<std::string, std::string>& headers) {
   std::string json_response;
   bool success = status == 200;
-  if (success) {
-    // Give sanitized json response on success.
-    json_response = body;
-    data_decoder::JsonSanitizer::Sanitize(
-        json_response,
-        base::BindOnce(&BraveVpnService::OnGetSanitizedJsonResponse,
-                       weak_ptr_factory_.GetWeakPtr(), std::move(callback)));
-  } else {
-    // Give empty response on failure.
-    std::move(callback).Run(json_response, success);
-  }
-}
-
-void BraveVpnService::OnGetSanitizedJsonResponse(
-    ResponseCallback callback,
-    data_decoder::JsonSanitizer::Result sanitized_json_response) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-
-  std::string json_response;
-  bool success = true;
-  if (sanitized_json_response.error) {
-    VLOG(1) << "Response validation error: " << *sanitized_json_response.error;
-    success = false;
-  }
-
-  if (success && !sanitized_json_response.value.has_value()) {
-    VLOG(1) << "Empty response";
-    success = false;
-  }
-
   if (success)
-    json_response = sanitized_json_response.value.value();
+    json_response = body;
   std::move(callback).Run(json_response, success);
 }
 
