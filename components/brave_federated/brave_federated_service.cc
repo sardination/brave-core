@@ -64,6 +64,9 @@ void BraveFederatedService::Init() {
 
   eligibility_service_.reset(new EligibilityService());
 
+  learning_service_.reset(new LearningService(data_store_service_.get(), 
+      eligibility_service_.get()));
+      
   operational_patterns_.reset(
       new OperationalPatterns(prefs_, url_loader_factory_));
 

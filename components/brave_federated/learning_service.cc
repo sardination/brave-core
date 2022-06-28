@@ -27,6 +27,7 @@ LearningService::LearningService(DataStoreService* data_store_service,
                                  EligibilityService* eligibility_service)
     : data_store_service_(data_store_service),
       eligibility_service_(eligibility_service) {
+  std::cerr << "Learning Service instantiated." << std::endl;
   auto* ad_timing_data_store =
       data_store_service_->GetAdNotificationTimingDataStore();
 
@@ -47,10 +48,10 @@ LearningService::LearningService(DataStoreService* data_store_service,
   b[1] = 1.12165;
 
   SyntheticDataset local_training_data = SyntheticDataset(W, b, 32, 5500);
-  std::cout << "Training set generated." << std::endl;
+  std::cerr << "Training set generated." << std::endl;
   
   SyntheticDataset local_test_data = local_training_data.SeparateTestData(5000);
-  std::cout << "Test set generated." << std::endl;
+  std::cerr << "Test set generated." << std::endl;
 
   local_training_data.DumpToCSV("training_data_");
   local_test_data.DumpToCSV("test_data_");
