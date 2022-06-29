@@ -27,6 +27,9 @@ const char kSyncV1MetaInfoCleared[] = "brave_sync_v2.v1_meta_info_cleared";
 // Has dismissed message about migration to sync v2
 const char kSyncV2MigrateNoticeDismissed[] =
     "brave_sync_v2.migrate_notice_dismissed";
+const char kSyncAccountDeletedNoticePending[] =
+    "brave_sync_v2.account_deleted_notice_pending";
+
 // Deprecated
 // ============================================================================
 const char kSyncSeed[] = "brave_sync.seed";
@@ -69,9 +72,14 @@ void Prefs::RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterBooleanPref(kSyncV1Migrated, false);
   registry->RegisterBooleanPref(kSyncV1MetaInfoCleared, false);
   registry->RegisterBooleanPref(kSyncV2MigrateNoticeDismissed, false);
+  // TODO(alexeybarabash) Comment the below out to reproduce the weird state at
+  // brave://settings/braveSync
+  // Manage your synced devices
+  //   Sync is disabled by your administrator.
+  registry->RegisterBooleanPref(kSyncAccountDeletedNoticePending, false);
 
-// Deprecated
-// ============================================================================
+  // Deprecated
+  // ============================================================================
   registry->RegisterStringPref(kSyncSeed, std::string());
   registry->RegisterBooleanPref(kSyncEnabled, false);
   registry->RegisterStringPref(kSyncDeviceId, std::string());
@@ -139,6 +147,7 @@ bool Prefs::SetSeed(const std::string& seed) {
   std::string encoded_seed;
   base::Base64Encode(encrypted_seed, &encoded_seed);
   pref_service_->SetString(kSyncV2Seed, encoded_seed);
+  SetSyncAccountDeletedNoticePending(false);
   return true;
 }
 
@@ -174,6 +183,14 @@ bool Prefs::IsSyncMigrateNoticeDismissed() const {
 
 void Prefs::SetDismissSyncMigrateNotice(bool is_dismissed) {
   pref_service_->SetBoolean(kSyncV2MigrateNoticeDismissed, is_dismissed);
+}
+
+bool Prefs::IsSyncAccountDeletedNoticePending() const {
+  return pref_service_->GetBoolean(kSyncAccountDeletedNoticePending);
+}
+
+void Prefs::SetSyncAccountDeletedNoticePending(bool is_pending) {
+  pref_service_->SetBoolean(kSyncAccountDeletedNoticePending, is_pending);
 }
 
 void Prefs::Clear() {

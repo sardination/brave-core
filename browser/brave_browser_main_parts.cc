@@ -44,6 +44,7 @@
 
 #if !BUILDFLAG(IS_ANDROID)
 #include "brave/browser/infobars/brave_confirm_p3a_infobar_delegate.h"
+#include "brave/browser/infobars/brave_sync_account_deleted_infobar_delegate.h"
 #include "chrome/browser/ui/browser.h"
 #include "chrome/browser/ui/browser_finder.h"
 #include "components/infobars/content/content_infobar_manager.h"
@@ -144,6 +145,8 @@ void BraveBrowserMainParts::PostBrowserStart() {
             sync_service->GetUserSettings()->IsFirstSetupComplete();
         SyncV2MigrateInfoBarDelegate::Create(infobar_manager, is_v2_user,
                                              profile, browser);
+        BraveSyncAccountDeletedInfoBarDelegate::Create(infobar_manager, profile,
+                                                       browser);
       }
     }
   }
