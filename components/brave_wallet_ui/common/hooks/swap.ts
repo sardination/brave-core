@@ -821,8 +821,6 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
   React.useEffect(() => setIsLoading(false), [swapQuote, swapError])
 
   return {
-    allowance,
-    clearPreset,
     customSlippageTolerance,
     exchangeRate,
     filteredAssetList,
@@ -833,16 +831,12 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
     isFetchingSwapQuote: isLoading,
     isSwapButtonDisabled,
     isSwapSupported: isSupported,
-    nativeAssetBalance,
     onCustomSlippageToleranceChange,
     onFilterAssetList,
     setOrderExpiration,
     onSelectPresetAmount,
     onSelectSlippageTolerance,
     onSelectTransactAsset,
-    setExchangeRate,
-    onSetFromAmount,
-    onSetToAmount,
     onSubmitSwap,
     onSwapInputChange,
     onSwapQuoteRefresh,
@@ -850,22 +844,20 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
     orderExpiration,
     orderType,
     selectedPreset,
-    setAllowance,
-    setFromAmount,
-    setFromAsset,
     setSelectedPreset,
-    setSwapError,
-    setSwapQuote,
     setSwapToOrFrom,
-    setToAmount,
-    setToAsset,
     slippageTolerance,
     swapAssetOptions,
-    swapQuote,
     swapToOrFrom,
     swapValidationError,
     toAmount,
     toAsset,
-    toAssetBalance
+    toAssetBalance,
+
+    // For use in unit-tests
+    setSwapError,
+    setSwapQuote,
+    allowance,
+    setAllowance
   }
 }
