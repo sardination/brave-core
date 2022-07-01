@@ -88,15 +88,6 @@ class SkusJSHandler : public gin::Wrappable<SkusJSHandler> {
                            v8::Global<v8::Context> context_old,
                            const std::string& response);
 
-  // window.chrome.braveSkus.submit_receipt
-  v8::Local<v8::Promise> SubmitReceipt(v8::Isolate* isolate,
-                                       std::string order_id,
-                                       std::string receipt);
-  void OnSubmitReceipt(v8::Global<v8::Promise::Resolver> promise_resolver,
-                       v8::Isolate* isolate,
-                       v8::Global<v8::Context> context_old,
-                       const std::string& response);
-
   content::RenderFrame* render_frame_;
   mojo::Remote<skus::mojom::SkusService> skus_service_;
   mojo::Remote<brave_vpn::mojom::ServiceHandler> vpn_service_;

@@ -158,13 +158,16 @@ void SkusServiceImpl::OnCredentialSummary(
   }
 }
 
-void SkusServiceImpl::SubmitReceipt(const std::string& order_id,
-                   const std::string& receipt,
-                   skus::mojom::SkusService::SubmitReceiptCallback callback) {
+void SkusServiceImpl::SubmitReceipt(
+    const std::string& domain,
+    const std::string& order_id,
+    const std::string& receipt,
+    skus::mojom::SkusService::SubmitReceiptCallback callback) {
   std::unique_ptr<skus::SubmitReceiptCallbackState> cbs(
       new skus::SubmitReceiptCallbackState);
   cbs->cb = std::move(callback);
-  sdk_->submit_receipt(OnSubmitReceipt, std::move(cbs), order_id, receipt);
+  GetOrCreateSDK(domain)->submit_receipt(OnSubmitReceipt, std::move(cbs),
+                                         order_id, receipt);
 }
 
 }  // namespace skus
