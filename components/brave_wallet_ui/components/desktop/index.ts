@@ -39,6 +39,7 @@ import {
   OnboardingRestore,
   OnboardingImportMetaMaskOrLegacy
 } from './wallet-onboarding'
+import AssetsFilterDropdown from './assets-filter-dropdown'
 
 export {
   SideNavButton,
@@ -76,5 +77,6 @@ export {
   TransactionPopup,
   SwapTooltip,
   WithHideBalancePlaceholder,
-  NetworkFilterSelector
+  NetworkFilterSelector,
+  AssetsFilterDropdown
 }

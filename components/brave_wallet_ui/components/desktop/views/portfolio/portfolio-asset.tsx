@@ -23,6 +23,7 @@ import Amount from '../../../../utils/amount'
 import { mojoTimeDeltaToJSDate } from '../../../../../common/mojomUtils'
 import { sortTransactionByDate } from '../../../../utils/tx-utils'
 import { getTokensNetwork, getTokensCoinType } from '../../../../utils/network-utils'
+import { getLocale } from '../../../../../common/locale'
 
 // actions
 import { WalletPageActions } from '../../../../page/actions'
@@ -60,13 +61,25 @@ import {
   ArrowIcon,
   BalanceRow,
   ShowBalanceButton,
-  NetworkDescription
+  NetworkDescription,
+  SubDivider,
+  NotSupportedText
 } from './style'
 import { Skeleton } from '../../../shared/loading-skeleton/styles'
+import { CoinStats } from './components/coin-stats/coin-stats'
 
 const AssetIconWithPlaceholder = withPlaceholderIcon(AssetIcon, { size: 'big', marginLeft: 0, marginRight: 12 })
 
-export const PortfolioAsset = () => {
+interface Props {
+  isShowingMarketData?: boolean
+}
+
+export const PortfolioAsset = (props: Props) => {
+  const { isShowingMarketData } = props
+
+  // state
+  const [isTokenSupported, setIsTokenSupported] = React.useState<boolean>()
+
   // routing
   const history = useHistory()
   const { id: assetId } = useParams<{ id?: string }>()
@@ -84,16 +97,18 @@ export const PortfolioAsset = () => {
     transactions,
     isFetchingPortfolioPriceHistory,
     transactionSpotPrices,
-    selectedNetworkFilter
+    selectedNetworkFilter,
+    coinMarketData,
+    fullTokenList
   } = useSelector(({ wallet }: { wallet: WalletState }) => wallet)
-
   const {
     isFetchingPriceHistory: isLoading,
     selectedAsset,
     selectedAssetCryptoPrice,
     selectedAssetFiatPrice,
     selectedAssetPriceHistory,
-    selectedTimeline
+    selectedTimeline,
+    selectedCoinMarket
   } = useSelector(({ page }: { page: PageState }) => page)
 
   // custom hooks
@@ -118,6 +133,10 @@ export const PortfolioAsset = () => {
         : ''
     })
   }, [accounts, networkList, getAccountBalance])
+
+  const tokensWithCoingeckoId = React.useMemo(() => {
+    return fullTokenList.filter(token => token.coingeckoId !== '')
+  }, [fullTokenList])
 
   // This looks at the users asset list and returns the full balance for each asset
   const userAssetList = React.useMemo(() => {
@@ -163,9 +182,27 @@ export const PortfolioAsset = () => {
     }
 
     // If the id length is greater than 15 assumes it's a contractAddress
-    return assetId.length > 15
+    let token = assetId.length > 15
       ? userVisibleTokensInfo.find((token) => token.contractAddress === assetId)
       : userVisibleTokensInfo.find((token) => token.symbol.toLowerCase() === assetId?.toLowerCase())
+
+    if (!token && assetId.length < 15) {
+      const coinMarket = coinMarketData.find(token => token.symbol.toLowerCase() === assetId?.toLowerCase())
+      if (coinMarket) {
+        token = new BraveWallet.BlockchainToken()
+        token.coingeckoId = coinMarket.id
+        token.name = coinMarket.name
+        token.contractAddress = ''
+        token.symbol = coinMarket.symbol.toUpperCase()
+        token.logo = coinMarket.image
+      }
+      const foundToken = tokensWithCoingeckoId?.find(token => token.coingeckoId.toLowerCase() === coinMarket?.id?.toLowerCase())
+      setIsTokenSupported(foundToken !== undefined)
+    } else {
+      setIsTokenSupported(true)
+    }
+
+    return token
   }, [assetId, userVisibleTokensInfo, selectedTimeline])
 
   // This will scrape all of the user's accounts and combine the fiat value for every asset
@@ -272,8 +309,13 @@ export const PortfolioAsset = () => {
 
   const goBack = React.useCallback(() => {
     dispatch(WalletPageActions.selectAsset({ asset: undefined, timeFrame: selectedTimeline }))
-    history.push(WalletRoutes.Portfolio)
+    dispatch(WalletPageActions.selectCoinMarket(undefined))
     setfilteredAssetList(userAssetList)
+    if (isShowingMarketData) {
+      history.push(WalletRoutes.Market)
+    } else {
+      history.push(WalletRoutes.Portfolio)
+    }
   }, [
     userAssetList,
     selectedTimeline
@@ -338,7 +380,7 @@ export const PortfolioAsset = () => {
             <AssetIconWithPlaceholder asset={selectedAsset} network={selectedAssetsNetwork} />
             <AssetColumn>
               <AssetNameText>{selectedAssetFromParams.name}</AssetNameText>
-              <NetworkDescription>{selectedAssetFromParams.symbol} on {selectedAssetsNetwork?.chainName ?? ''}</NetworkDescription>
+              <NetworkDescription>{selectedAssetFromParams.symbol} { selectedAssetsNetwork?.chainName && `on ${selectedAssetsNetwork?.chainName}`}</NetworkDescription>
             </AssetColumn>
           </AssetRow>
 
@@ -387,15 +429,29 @@ export const PortfolioAsset = () => {
         />
       } */}
 
-      <AccountsAndTransactionsList
-        formattedFullAssetBalance={formattedFullAssetBalance}
-        fullAssetFiatBalance={fullAssetFiatBalance}
-        selectedAsset={selectedAsset}
-        selectedAssetTransactions={selectedAssetTransactions}
-        onClickAddAccount={onClickAddAccount}
-        hideBalances={hideBalances}
-        networkList={networkList}
-      />
+      {isTokenSupported
+        ? <AccountsAndTransactionsList
+            formattedFullAssetBalance={formattedFullAssetBalance}
+            fullAssetFiatBalance={fullAssetFiatBalance}
+            selectedAsset={selectedAsset}
+            selectedAssetTransactions={selectedAssetTransactions}
+            onClickAddAccount={onClickAddAccount}
+            hideBalances={hideBalances}
+            networkList={networkList}
+          />
+        : <>
+          <SubDivider />
+          <NotSupportedText>{getLocale('braveWalletMarketDataCoinNotSupported')}</NotSupportedText>
+        </>
+      }
+
+      {isShowingMarketData && selectedCoinMarket &&
+        <CoinStats
+          marketCapRank={selectedCoinMarket.marketCapRank}
+          volume={selectedCoinMarket.totalVolume}
+          marketCap={selectedCoinMarket.marketCap}
+        />
+      }
     </StyledWrapper>
   )
 }

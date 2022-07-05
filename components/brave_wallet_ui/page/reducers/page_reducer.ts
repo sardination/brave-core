@@ -34,7 +34,8 @@ const defaultState: PageState = {
   showIsRestoring: false,
   setupStillInProgress: false,
   isCryptoWalletsInitialized: false,
-  isMetaMaskInitialized: false
+  isMetaMaskInitialized: false,
+  selectedCoinMarket: undefined
 }
 
 export const createPageReducer = (initialState: PageState) => {
@@ -164,6 +165,13 @@ export const createPageReducer = (initialState: PageState) => {
     return {
       ...state,
       isMetaMaskInitialized: payload
+    }
+  })
+
+  reducer.on(Actions.selectCoinMarket, (state: PageState, payload: BraveWallet.CoinMarket) => {
+    return {
+      ...state,
+      selectedCoinMarket: payload
     }
   })
   return reducer

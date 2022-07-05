@@ -253,3 +253,14 @@ export const FilterTokenRow = styled.div`
   flex-direction: row;
   width: 100%;
 `
+
+export const NotSupportedText = styled.span`
+  font-family: Poppins;
+  font-size: 13px;
+  line-height: 20px;
+  letter-spacing: 0.01em;
+  font-weight: 600;
+  color: ${(p) => p.theme.color.text03};
+  margin-left: 10px;
+  padding: 28px 0 40px;
+`
