@@ -32,6 +32,9 @@ class CaptchaDelegate
 
   bool ShowScheduledCaptcha(const std::string& payment_id,
                             const std::string& captcha_id) override {
+    LOG(ERROR) << "BraveCaptcha"
+               << "Captcha Id : " << captcha_id
+               << "payment Id : " << payment_id;
     // Because this is triggered from the adaptive captcha tooltip, this call
     // isn't associated with any particular `Browser` instance and we can use
     // the last active browser for this profile.

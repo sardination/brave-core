@@ -120,6 +120,8 @@ import org.chromium.chrome.browser.onboarding.v2.HighlightView;
 import org.chromium.chrome.browser.preferences.BravePrefServiceBridge;
 import org.chromium.chrome.browser.preferences.BravePreferenceKeys;
 import org.chromium.chrome.browser.preferences.Pref;
+import org.chromium.chrome.browser.preferences.PrefChangeRegistrar;
+import org.chromium.chrome.browser.preferences.PrefChangeRegistrar.PrefObserver;
 import org.chromium.chrome.browser.preferences.SharedPreferencesManager;
 import org.chromium.chrome.browser.preferences.website.BraveShieldsContentSettings;
 import org.chromium.chrome.browser.prefetch.settings.PreloadPagesSettingsBridge;
@@ -186,7 +188,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 @JNINamespace("chrome::android")
 public abstract class BraveActivity<C extends ChromeActivityComponent> extends ChromeActivity
         implements BrowsingDataBridge.OnClearBrowsingDataListener, BraveVpnObserver,
-                   OnBraveSetDefaultBrowserListener, ConnectionErrorHandler {
+                   OnBraveSetDefaultBrowserListener, ConnectionErrorHandler, PrefObserver {
     public static final String ADD_FUNDS_URL = "brave://rewards/#add-funds";
     public static final String BRAVE_REWARDS_SETTINGS_URL = "brave://rewards/";
     private static final String BRAVE_TALK_URL = "https://talk.brave.com/";
@@ -722,10 +724,19 @@ public abstract class BraveActivity<C extends ChromeActivityComponent> extends C
     }
 
     @Override
+    public void onPreferenceChange() {
+        Log.e("BraveCaptcha", "Pref changed");
+        Log.e("BraveCaptcha", BravePrefServiceBridge.getInstance().getCaptchaId());
+    }
+
+    @Override
     public void finishNativeInitialization() {
         super.finishNativeInitialization();
 
         BraveHelper.maybeMigrateSettings();
+
+        PrefChangeRegistrar mPrefChangeRegistrar = new PrefChangeRegistrar();
+        mPrefChangeRegistrar.addObserver("brave.rewards.scheduled_captcha.id", this);
 
         if (SharedPreferencesManager.getInstance().readBoolean(
                     BravePreferenceKeys.BRAVE_DOUBLE_RESTART, false)) {
