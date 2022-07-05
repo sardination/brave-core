@@ -142,7 +142,14 @@ impl JSSDK {
             }
 
             let order = sdk.refresh_order(&order_id).await.map_err(|e| e.to_string())?;
-            Ok(JsValue::from_serde(&order).unwrap())
+            match JsValue::from_serde(&order) {
+                Ok(value) => Ok(JsValue::from(value)),
+                Err(err) => {
+                    let js_error =
+                        js_sys::Error::new(&format!("failed to serialize result: {:?}", err));
+                    Err(JsValue::from(js_error))
+                }
+            }
         };
 
         future_to_promise(future)
@@ -154,7 +161,14 @@ impl JSSDK {
 
         let future = async move {
             let resp = sdk.submit_receipt(&order_id, &receipt).await.map_err(|e| e.to_string())?;
-            Ok(JsValue::from_serde(&resp).unwrap())
+            match JsValue::from_serde(&resp) {
+                Ok(value) => Ok(JsValue::from(value)),
+                Err(err) => {
+                    let js_error =
+                        js_sys::Error::new(&format!("failed to serialize result: {:?}", err));
+                    Err(JsValue::from(js_error))
+                }
+            }
         };
 
         future_to_promise(future)
@@ -167,7 +181,14 @@ impl JSSDK {
         let future = async move {
             let order =
                 sdk.submit_order_credentials_to_sign(&order_id).await.map_err(|e| e.to_string())?;
-            Ok(JsValue::from_serde(&order).unwrap())
+            match JsValue::from_serde(&order) {
+                Ok(value) => Ok(JsValue::from(value)),
+                Err(err) => {
+                    let js_error =
+                        js_sys::Error::new(&format!("failed to serialize result: {:?}", err));
+                    Err(JsValue::from(js_error))
+                }
+            }
         };
 
         future_to_promise(future)
@@ -187,7 +208,14 @@ impl JSSDK {
             }
 
             let order = sdk.fetch_order_credentials(&order_id).await.map_err(|e| e.to_string())?;
-            Ok(JsValue::from_serde(&order).unwrap())
+            match JsValue::from_serde(&order) {
+                Ok(value) => Ok(JsValue::from(value)),
+                Err(err) => {
+                    let js_error =
+                        js_sys::Error::new(&format!("failed to serialize result: {:?}", err));
+                    Err(JsValue::from(js_error))
+                }
+            }
         };
 
         future_to_promise(future)
@@ -199,7 +227,14 @@ impl JSSDK {
 
         let future = async move {
             let order = sdk.delete_order_credentials(&order_id).await.map_err(|e| e.to_string())?;
-            Ok(JsValue::from_serde(&order).unwrap())
+            match JsValue::from_serde(&order) {
+                Ok(value) => Ok(JsValue::from(value)),
+                Err(err) => {
+                    let js_error =
+                        js_sys::Error::new(&format!("failed to serialize result: {:?}", err));
+                    Err(JsValue::from(js_error))
+                }
+            }
         };
 
         future_to_promise(future)
@@ -224,7 +259,14 @@ impl JSSDK {
             if let Some(credential_summary) =
                 sdk.matching_credential_summary(&subdomain).await.map_err(|e| e.to_string())?
             {
-                return Ok(JsValue::from_serde(&credential_summary).unwrap());
+                return match JsValue::from_serde(&credential_summary) {
+                    Ok(value) => Ok(JsValue::from(value)),
+                    Err(err) => {
+                        let js_error =
+                            js_sys::Error::new(&format!("failed to serialize result: {:?}", err));
+                        Err(JsValue::from(js_error))
+                    }
+                };
             }
 
             Ok(JsValue::UNDEFINED)
@@ -250,7 +292,14 @@ impl JSSDK {
                 .await
                 .map_err(|e| e.to_string())?
             {
-                return Ok(JsValue::from_serde(&credential_summary).unwrap());
+                return match JsValue::from_serde(&credential_summary) {
+                    Ok(value) => Ok(JsValue::from(value)),
+                    Err(err) => {
+                        let js_error =
+                            js_sys::Error::new(&format!("failed to serialize result: {:?}", err));
+                        Err(JsValue::from(js_error))
+                    }
+                };
             }
 
             Ok(JsValue::UNDEFINED)
@@ -272,7 +321,14 @@ impl JSSDK {
                 .prepare_credentials_presentation(&origin, &path.unwrap_or_else(|| "/".to_string()))
                 .await
                 .map_err(|e| e.to_string())?;
-            Ok(JsValue::from_serde(&presentation).unwrap())
+            return match JsValue::from_serde(&presentation) {
+                Ok(value) => Ok(JsValue::from(value)),
+                Err(err) => {
+                    let js_error =
+                        js_sys::Error::new(&format!("failed to serialize result: {:?}", err));
+                    Err(JsValue::from(js_error))
+                }
+            };
         };
 
         future_to_promise(future)
