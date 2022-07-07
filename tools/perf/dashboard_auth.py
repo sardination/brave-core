@@ -65,7 +65,7 @@ def _GetDashboardCredentials(can_be_interactive=False):
 
 def GetDashboardToken(can_be_interactive=False):
   credentials = _GetDashboardCredentials(can_be_interactive)
-  if credentials == None:
+  if credentials is None:
     raise RuntimeError('Error generating authentication token')
   return credentials.token
 

@@ -26,7 +26,7 @@ def DownloadFromGoogleStorage(sha1, output_path):
   gsutil = download_from_google_storage.Gsutil(
       download_from_google_storage.GSUTIL_DEFAULT_PATH)
   gs_path = 'gs://' + path_util.BRAVE_PERF_BUCKET + '/' + sha1
-  logging.info(f'Download profile from {gs_path} to {output_path}')
+  logging.info('Download profile from %s to %s', gs_path, output_path)
   exit_code = gsutil.call('cp', gs_path, output_path)
   if exit_code:
     raise RuntimeError(f'Failed to download: {gs_path}')
@@ -36,12 +36,8 @@ def GetProfilePath(profile, binary, work_directory):
   if profile == 'clean':
     return None
 
-  if os.path.isdir(profile):
-    return profile
-
   binary_path_hash = hashlib.sha1(binary.encode("utf-8")).hexdigest()[:6]
   profile_id = profile + '-' + binary_path_hash
-
 
   if not hasattr(GetProfilePath, 'profiles'):
     GetProfilePath.profiles = {}
@@ -49,17 +45,18 @@ def GetProfilePath(profile, binary, work_directory):
   if profile in GetProfilePath.profiles:
     return GetProfilePath.profiles[profile_id]
 
-  dir = None
+  profile_dir = None
   if os.path.isdir(profile):  # local profile
-    dir = os.path.join(work_directory, 'profiles',
-                       uuid.uuid4().hex.upper()[0:6])
-    shutil.copytree(profile, dir)
-    if not RebaseProfile(binary, dir):
-      raise RuntimeError(f'Failed to rebase {dir}')
+    profile_dir = os.path.join(work_directory, 'profiles',
+                               uuid.uuid4().hex.upper()[0:6])
+    logging.debug('Copy %s to %s ', profile, profile_dir)
+    shutil.copytree(profile, profile_dir)
+    if not RebaseProfile(binary, profile_dir, []):
+      raise RuntimeError(f'Failed to rebase {profile_dir}')
   else:
     zip_path = os.path.join(path_util.BRAVE_PERF_PROFILE_DIR, profile + '.zip')
     zip_path_sha1 = os.path.join(path_util.BRAVE_PERF_PROFILE_DIR,
-                               profile + '.zip.sha1')
+                                 profile + '.zip.sha1')
 
     if not os.path.isfile(zip_path_sha1):
       raise RuntimeError(f'Unknown profile, file {zip_path_sha1} not found')
@@ -67,7 +64,7 @@ def GetProfilePath(profile, binary, work_directory):
     sha1 = None
     with open(zip_path_sha1, 'r') as sha1_file:
       sha1 = sha1_file.read().rstrip()
-    logging.debug(f'Expected hash {sha1} for profile {profile}')
+    logging.debug('Expected hash %s for profile %s', sha1, profile)
     if not sha1:
       raise RuntimeError(f'Bad sha1 in {zip_path_sha1}')
 
@@ -76,25 +73,29 @@ def GetProfilePath(profile, binary, work_directory):
     else:
       current_sha1 = download_from_google_storage.get_sha1(zip_path)
       if current_sha1 != sha1:
-        logging.info(f'Profile needs to be updated. Current hash {current_sha1}, expected {sha1}')
+        logging.info(
+            'Profile needs to be updated. Current hash %s, expected %s',
+            current_sha1, sha1)
         DownloadFromGoogleStorage(sha1, zip_path)
-    dir = os.path.join(work_directory, 'profiles', profile_id + '-' + sha1)
+    profile_dir = os.path.join(work_directory, 'profiles',
+                               profile_id + '-' + sha1)
 
-    if not os.path.isdir(dir):
-      os.makedirs(dir)
-      logging.info(f'Create temp profile dir {dir} for profile {profile}')
+    if not os.path.isdir(profile_dir):
+      os.makedirs(profile_dir)
+      logging.info('Create temp profile dir %s for profile %s', profile_dir,
+                   profile)
       zipfile = ZipFile(zip_path)
-      zipfile.extractall(dir)
-      if not RebaseProfile(binary, dir):
-        raise RuntimeError(f'Failed to rebase {dir}')
+      zipfile.extractall(profile_dir)
+      if not RebaseProfile(binary, profile_dir, []):
+        raise RuntimeError(f'Failed to rebase {profile_dir}')
 
-  logging.info(f'Use temp profile dir {dir} for profile {profile}')
-  GetProfilePath.profiles[profile_id] = dir
-  return dir
+  logging.info('Use temp profile dir %s for profile %s', profile_dir, profile)
+  GetProfilePath.profiles[profile_id] = profile_dir
+  return profile_dir
 
 
-def RebaseProfile(binary, profile_directory, extra_browser_args=[]):
-  logging.info(f'Rebasing dir {profile_directory} using binary {binary}')
+def RebaseProfile(binary, profile_directory, extra_browser_args):
+  logging.info('Rebasing dir %s using binary %s', profile_directory, binary)
   args = [
       sys.executable,
       os.path.join(path_util.SRC_DIR, 'tools', 'perf', 'run_benchmark'),
@@ -103,29 +104,29 @@ def RebaseProfile(binary, profile_directory, extra_browser_args=[]):
   args.append('--story=BraveSearch_cold')
   args.append('--browser=exact')
   args.append(f'--browser-executable={binary}')
-  args.append(f'--pageset-repeat=1')
+  args.append('--pageset-repeat=1')
 
   args.append(f'--profile-dir={profile_directory}')
 
-  # See third_party/catapult/telemetry/telemetry/internal/backends/chrome/desktop_browser_finder.py
+  # See chromium desktop_browser_finder.py
   extra_browser_args.append('--update-source-profile')
-  # TODO: add  is_chromium, see _GetVariationsBrowserArgs
+  # TODO_perf: add  is_chromium, see _GetVariationsBrowserArgs
   extra_browser_args.append('--use-brave-field-trial-config')
 
   args.append('--extra-browser-args=' + shlex.join(extra_browser_args))
 
   args.append('--output-format=none')
-  #TODO: add output
+  #TODO_perf: add output
 
-  logging.debug('Run binary:' + ' '.join(args))
+  logging.debug('Run binary: %s', ' '.join(args))
 
-  result = subprocess.run(args,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT,
-                          cwd=os.path.join(path_util.SRC_DIR, 'tools', 'perf'))
-  if result.returncode != 0:
-    logging.error(result.stdout.decode('utf-8'))
-    return False
-  else:
-    logging.debug(result.stdout.decode('utf-8'))
+  try:
+    output = subprocess.check_output(args,
+                                     stderr=subprocess.STDOUT,
+                                     cwd=os.path.join(path_util.SRC_DIR,
+                                                      'tools', 'perf'))
+    logging.debug(output)
     return True
+  except subprocess.CalledProcessError as e:
+    logging.error(e.output.decode())
+    return False

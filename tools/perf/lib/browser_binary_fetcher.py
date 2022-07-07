@@ -8,6 +8,7 @@ import logging
 import json
 import os
 import shutil
+import sys
 import re
 from urllib.request import urlopen
 from io import BytesIO
@@ -36,13 +37,13 @@ def GetNearestChromiumVersionAndUrl(tag):
     chrome_versions = json.load(config_file)
 
   args = ['git', 'fetch', 'origin', (f'refs/tags/{tag}')]
-  logging.debug('Run binary:' + ' '.join(args))
+  logging.debug('Run binary: %s', ' '.join(args))
   subprocess.check_call(args, cwd=path_util.BRAVE_SRC_DIR)
   package_json = json.loads(
       subprocess.check_output(['git', 'show', 'FETCH_HEAD:package.json'],
                               cwd=path_util.BRAVE_SRC_DIR))
   requested_version = package_json['config']['projects']['chrome']['tag']
-  logging.debug(f'Got requested_version: {requested_version}')
+  logging.debug('Got requested_version: %s', requested_version)
 
   parsed_requested_version = ParseVersion(requested_version)
   best_candidate = None
@@ -55,17 +56,16 @@ def GetNearestChromiumVersionAndUrl(tag):
 
   if best_candidate:
     string_version = '.'.join(map(str, best_candidate))
-    logging.info(
-        f'Use chromium version {best_candidate} for requested {requested_version}'
-    )
+    logging.info('Use chromium version %s for requested %s', best_candidate,
+                 requested_version)
     return string_version, chrome_versions[string_version]['url']
 
-  logging.error(f'No chromium version found for {requested_version}')
+  logging.error('No chromium version found for %s', requested_version)
   return None, None
 
 
 def DownloadArchiveAndUnpack(output_directory, url):
-  logging.info(f'Downloading archive {url}')
+  logging.info('Downloading archive %s', url)
   resp = urlopen(url)
   zipfile = ZipFile(BytesIO(resp.read()))
   zipfile.extractall(output_directory)
@@ -77,35 +77,35 @@ def DownloadWinInstallerAndExtract(out_dir, url, expected_install_path, binary):
   if not os.path.exists(out_dir):
     os.makedirs(out_dir)
   installer_filename = os.path.join(out_dir, os.pardir, 'temp_installer.exe')
-  logging.info(f'Downloading {url}')
+  logging.info('Downloading %s', url)
   f = urlopen(url)
   data = f.read()
   with open(installer_filename, 'wb') as output_file:
     output_file.write(data)
-  logging.info(f'Run installer {installer_filename}')
+  logging.info('Run installer %s', installer_filename)
   subprocess.check_call(
       [installer_filename, '--chrome-sxs', '--do-not-launch-chrome'])
   try:
     subprocess.check_call(['taskkill.exe', '/f', '/im', binary])
   except subprocess.CalledProcessError:
-    logging.info(f'failed to kill {binary}')
+    logging.info('failed to kill %s', binary)
 
   if not os.path.exists(expected_install_path):
     raise RuntimeError(f'No files found in {expected_install_path}')
 
   full_version = None
-  logging.info(f'Copy files to {out_dir}')
+  logging.info('Copy files to %s', out_dir)
   copy_tree(expected_install_path, out_dir)
   for file in os.listdir(expected_install_path):
-    #TODO: check brave tag? file.endswith(tag[2:])
-    if re.match('\d+\.\d+\.\d+.\d+', file):
-      assert (full_version == None)
+    #TODO_perf: check brave tag? file.endswith(tag[2:])
+    if re.match(r'\d+\.\d+\.\d+.\d+', file):
+      assert (full_version is None)
       full_version = file
-  assert (full_version != None)
-  logging.info(f'Detected version {full_version}')
+  assert (full_version is not None)
+  logging.info('Detected version %s', full_version)
   setup_filename = os.path.join(expected_install_path, full_version,
                                 'Installer', 'setup.exe')
-  logging.info(f'Run uninstall {setup_filename}')
+  logging.info('Run uninstall %s', setup_filename)
   try:
     subprocess.check_call(
         [setup_filename, '--uninstall', '--force-uninstall', '--chrome-sxs'])
@@ -124,19 +124,17 @@ def PrepareBinaryByUrl(out_dir, url, is_chromium):
                                 'Google', 'Chrome SxS', 'Application')
     return DownloadWinInstallerAndExtract(out_dir, url, install_path,
                                           'chrome.exe')
-  else:
-    install_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Local',
-                                'BraveSoftware', 'Brave-Browser-Nightly',
-                                'Application')
-    return DownloadWinInstallerAndExtract(out_dir, url, install_path,
-                                          'brave.exe')
+  install_path = os.path.join(os.path.expanduser('~'), 'AppData', 'Local',
+                              'BraveSoftware', 'Brave-Browser-Nightly',
+                              'Application')
+  return DownloadWinInstallerAndExtract(out_dir, url, install_path, 'brave.exe')
 
 
 def ParseTarget(target):
-  m = re.match('^(v\d+\.\d+\.\d+)(?::(.+)|$)', target)
+  m = re.match(r'^(v\d+\.\d+\.\d+)(?::(.+)|$)', target)
   if not m:
     return None, target
-  logging.debug(f'Parsed tag: {m.group(1)}, location : {m.group(2)}')
+  logging.debug('Parsed tag: %s, location : %s}', m.group(1), m.group(2))
   return m.group(1), m.group(2)
 
 
@@ -147,33 +145,29 @@ def PrepareBinaryByTag(out_dir, tag, is_chromium):
       raise RuntimeError('Failed to find nearest chromium binary for %s' % tag)
     return PrepareBinaryByUrl(out_dir, url, True)
 
-  else:  #is_brave
-    m = re.match('^v(\d+)\.(\d+)\.\d+$', tag)
-    if not m:
-      raise RuntimeError(f'Failed to parse tag "{tag}"')
+  m = re.match(r'^v(\d+)\.(\d+)\.\d+$', tag)
+  if not m:
+    raise RuntimeError(f'Failed to parse tag "{tag}"')
 
-    # nightly < v1.35 has a broken .zip archive
-    if int(m.group(1)) == 1 and int(m.group(2)) < 35:
-      return PrepareBinaryByUrl(out_dir, BRAVE_NIGHTLY_WIN_INSTALLER_URL % tag,
+  # nightly < v1.35 has a broken .zip archive
+  if int(m.group(1)) == 1 and int(m.group(2)) < 35:
+    return PrepareBinaryByUrl(out_dir, BRAVE_NIGHTLY_WIN_INSTALLER_URL % tag,
                                 False)
-    else:
-      import sys
-      if sys.platform == 'win32':
-        platform = 'win32-x64'
-      if sys.platform == 'darwin':
-        platform = 'darwin-arm64'
-      #hdiutil attach -nobrowse -noautoopen
-      return PrepareBinaryByUrl(out_dir,
-                                BRAVE_NIGHTLY_URL % (tag, tag, platform), False)
+  if sys.platform == 'win32':
+    platform = 'win32-x64'
+  if sys.platform == 'darwin':
+    platform = 'darwin-arm64'
+  # TODO_perf
+  #hdiutil attach -nobrowse -noautoopen
+  return PrepareBinaryByUrl(out_dir, BRAVE_NIGHTLY_URL % (tag, tag, platform),
+                            False)
 
 
 def PrepareBinary(out_dir, tag, location, is_chromium):
   if location:  # local binary
     if os.path.exists(location):
       return location
-    else:
-      raise RuntimeError(f'{location} doesn\'t exist')
-  elif location and location.startswith('http'):  # url
+    raise RuntimeError(f'{location} doesn\'t exist')
+  if location and location.startswith('http'):  # url
     return PrepareBinaryByUrl(out_dir, location, is_chromium)
-  else:
-    return PrepareBinaryByTag(out_dir, tag, is_chromium)
+  return PrepareBinaryByTag(out_dir, tag, is_chromium)

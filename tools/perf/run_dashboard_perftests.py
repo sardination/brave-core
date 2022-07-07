@@ -3,7 +3,7 @@
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # you can obtain one at http://mozilla.org/MPL/2.0/.
-"""A tool run telemetry perftests and report the results to dashboard
+r"""A tool run telemetry perftests and report the results to dashboard
 
 
 The tool:
@@ -22,8 +22,9 @@ from __future__ import annotations
 
 import sys
 import logging
-from lib import perf_test_utils, perf_config
 import argparse
+
+from lib import perf_test_utils, perf_config
 
 
 def main():

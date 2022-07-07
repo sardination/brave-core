@@ -5,10 +5,11 @@
 # you can obtain one at http://mozilla.org/MPL/2.0/.
 from __future__ import annotations
 
+import argparse
 import sys
 import logging
+
 from lib import perf_test_utils
-import argparse
 
 
 def main():

@@ -18,6 +18,9 @@ from copy import deepcopy
 from lib import path_util, browser_binary_fetcher, perf_profile
 from lib.perf_config import PerfConfiguration
 
+PYJSON5_DIR = os.path.join(path_util.SRC_DIR, 'third_party', 'pyjson5', 'src')
+sys.path.insert(0, PYJSON5_DIR)
+import json5  # pylint: disable=import-error
 
 # Returns pair [revision_number, sha1]. revision_number is a number "primary"
 # commits from the begging to `revision`.
@@ -30,15 +33,15 @@ def GetRevisionNumberAndHash(revision: str) -> tuple[str, str]:
                         cwd=brave_dir,
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
-  hash = subprocess.check_output(['git', 'rev-parse', 'FETCH_HEAD'],
+  git_hash = subprocess.check_output(['git', 'rev-parse', 'FETCH_HEAD'],
                                  cwd=brave_dir).rstrip()
   rev_number_args = [
       'git', 'rev-list', '--topo-order', '--first-parent', '--count',
       'FETCH_HEAD'
   ]
-  logging.debug('Run binary:' + ' '.join(rev_number_args))
+  logging.debug('Run binary: %s', ' '.join(rev_number_args))
   rev_number = subprocess.check_output(rev_number_args, cwd=brave_dir).rstrip()
-  return rev_number.decode('utf-8'), hash.decode('utf-8')
+  return (rev_number.decode('utf-8'), git_hash.decode('utf-8'))
 
 
 def RunSingleTest(binary,
@@ -62,7 +65,7 @@ def RunSingleTest(binary,
 
   logs: list[str] = []
   if is_local_run:
-    assert (local_run_label != None)
+    assert (local_run_label is not None)
     args.append(benchmark)
 
     args.append('--results-label=' + local_run_label)
@@ -83,7 +86,7 @@ def RunSingleTest(binary,
     for story in config['stories']:
       args.append(f'--story={story}')
 
-  if not is_ref:  # TODO: should be is_chromium, see _GetVariationsBrowserArgs
+  if not is_ref:  # TODO_perf: should be is_chromium, see _GetVariationsBrowserArgs
     extra_browser_args.append('--use-brave-field-trial-config')
 
   args.extend(extra_benchmark_args)
@@ -93,18 +96,17 @@ def RunSingleTest(binary,
 
   args.append('--extra-browser-args=' + shlex.join(extra_browser_args))
 
-  logging.debug('Run binary:' + ' '.join(args))
+  logging.debug('Run binary: %s', ' '.join(args))
 
-  result = subprocess.run(args,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT,
-                          cwd=os.path.join(path_util.SRC_DIR, 'tools', 'perf'))
-  if result.returncode != 0:
-    logging.error(result.stdout.decode('utf-8'))
-    return False, []
-  else:
-    logging.debug(result.stdout.decode('utf-8'))
+  try:
+    output = subprocess.check_output(args,
+                            stderr=subprocess.STDOUT,
+                            cwd=os.path.join(path_util.SRC_DIR, 'tools', 'perf'))
+    logging.debug(output)
     return True, logs
+  except subprocess.CalledProcessError as e:
+    logging.error(e.output.decode())
+    return False, []
 
 
 def ReportToDashboard(is_ref, configuration_name, revision, output_dir):
@@ -118,7 +120,7 @@ def ReportToDashboard(is_ref, configuration_name, revision, output_dir):
   args.append('--output-json=' + os.path.join(output_dir, 'results.json'))
 
   revision_number, git_hash = GetRevisionNumberAndHash(revision)
-  logging.debug(f'Got revision {revision_number} git_hash {git_hash}')
+  logging.debug('Got revision %s git_hash %s', revision_number, git_hash)
 
   build_properties = {}
   build_properties['bot_id'] = 'test_bot'
@@ -142,17 +144,15 @@ def ReportToDashboard(is_ref, configuration_name, revision, output_dir):
   build_properties_serialized = json.dumps(build_properties)
   args.append('--build-properties=' + build_properties_serialized)
 
-  logging.debug('Run binary:' + ' '.join(args))
-  result = subprocess.run(args,
-                          stdout=subprocess.PIPE,
-                          stderr=subprocess.STDOUT)
-  if result.returncode != 0:
-    logging.error(result.stdout.decode('utf-8'))
-    return False, ['Reporting ' + revision + ' failed'], None
-  else:
-    logging.debug(result.stdout.decode('utf-8'))
+  logging.debug('Run binary: %s', ' '.join(args))
+  try:
+    output = subprocess.check_output(args,
+                            stderr=subprocess.STDOUT)
+    logging.debug(output)
     return True, [], revision_number
-
+  except subprocess.CalledProcessError as e:
+    logging.error(e.output.decode())
+    return False, ['Reporting ' + revision + ' failed'], None
 
 def GetConfigPath(config_path):
   if os.path.isfile(config_path):
@@ -166,10 +166,6 @@ def GetConfigPath(config_path):
 
 
 def LoadConfig(config: str) -> dict:
-  PYJSON5_DIR = os.path.join(path_util.SRC_DIR, 'third_party', 'pyjson5', 'src')
-  sys.path.insert(0, PYJSON5_DIR)
-  import json5  # pylint: disable=import-error
-
   config_path = GetConfigPath(config)
   with open(config_path, 'r') as config_file:
     return json5.load(config_file)
@@ -235,7 +231,7 @@ class RunableConfiguration:
         test_out_dir = os.path.join(self.out_dir, os.pardir, benchmark)
       else:
         test_out_dir = os.path.join(self.out_dir, 'results')
-      logging.info(f'Running test {benchmark}')
+      logging.info('Running test %s', benchmark)
 
       test_success, test_logs = RunSingleTest(
           self.binary_path, test_config, test_out_dir, self.profile_dir,
@@ -249,7 +245,6 @@ class RunableConfiguration:
         error = f'Test case {benchmark} failed on binary {self.binary_path}'
         error += '\nLogs: ' + os.path.join(test_out_dir, benchmark, benchmark,
                                            'benchmark_log.txt')
-        logging.error(error)
         self.logs.append(error)
 
     spent_time = time.time() - start_time
@@ -258,9 +253,9 @@ class RunableConfiguration:
     return not has_failure
 
   def ReportToDashboard(self) -> bool:
-    logging.info(f'Reporting to dashboard {self.config.label}...')
+    logging.info('Reporting to dashboard %s...', self.config.label)
     start_time = time.time()
-    assert (self.config.dashboard_bot_name != None)
+    assert (self.config.dashboard_bot_name is not None)
     report_success, report_failed_logs, revision_number = ReportToDashboard(
         self.config.chromium, self.config.dashboard_bot_name,
         'refs/tags/' + self.config.tag, os.path.join(self.out_dir, 'results'))
@@ -281,7 +276,7 @@ class RunableConfiguration:
         shutil.rmtree(artifacts_dir)
 
   def Run(self, common_options: CommonOptions) -> bool:
-    logging.info(f'##Label: {self.config.label} binary {self.binary_path}')
+    logging.info('##Label: %s binary %s', self.config.label, self.binary_path)
     run_tests_ok = True
     report_ok = True
 
@@ -313,7 +308,7 @@ def PrepareBinariesAndDirectories(
       shutil.rmtree(out_dir, True)
       binary_path = browser_binary_fetcher.PrepareBinary(
           out_dir, config.tag, config.location, config.chromium)
-      logging.info(f'{description} : {binary_path} directory {out_dir}')
+      logging.info('%s : %s directory %s', description, binary_path, out_dir)
     runable_configurations.append(
         RunableConfiguration(config, binary_path, out_dir))
   return runable_configurations
@@ -327,7 +322,7 @@ def SpawnConfigurationsFromTargetList(
     config = deepcopy(base_configuration)
     config.tag, config.location = browser_binary_fetcher.ParseTarget(
         target_string)
-    #TODO: add more early validation?
+    #TODO_perf: add more early validation?
     if not config.tag:
       raise RuntimeError(f'Can get the tag from target {target_string}')
     config.label = config.tag
@@ -340,12 +335,12 @@ def ParseConfigurations(
   configurations: list[PerfConfiguration] = []
   for serialized_config in configurations_list:
     config = PerfConfiguration(serialized_config)
-    #TODO: add more early validation?
+    #TODO_perf: add more early validation?
     if config.tag:
       if not config.label:
         config.label = config.tag
     elif config.label:
-      config.tag = config.label #TODO: do we need this?
+      config.tag = config.label #TODO_perf: do we need this?
     else:
       raise RuntimeError(
           f'label or tag should be specified {serialized_config}')
@@ -378,6 +373,6 @@ def RunConfigurations(configurations: list[PerfConfiguration],
       logging.info(item)
 
   if has_failure:
-    logging.error(f'Summary: not ok')
+    logging.error('Summary: not ok')
   else:
     logging.info('Summary: OK')
