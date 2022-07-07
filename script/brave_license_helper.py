@@ -33,7 +33,7 @@ def AddBraveCredits(prune_paths, special_cases, prune_dirs, additional_paths):
         os.path.join('brave', 'vendor', 'depot_tools'),
         os.path.join('brave', 'vendor', 'gn-project-generators'),
 
-
+        # TODO_perf
         os.path.join('brave', 'patches')
     ])
 
