@@ -1056,7 +1056,7 @@ interface SolanaTxManagerProxy {
   // transaction will have one instruction which is the transfer instruction.
   // If the receiving associated token account is not created yet, the created
   // transaction will have two instructions, the first one is the instruction
-  // to create the associated token account for the receipient, and the second
+  // to create the associated token account for the recipient, and the second
   // instruction is the transfer instruction. Note that sender will fund the
   // creation (an additional cost) with the minimum balance for the new account
   // to be rent exempt.
