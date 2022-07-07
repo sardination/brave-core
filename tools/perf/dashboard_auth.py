@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# Copyright (c) 2021 The Brave Authors. All rights reserved.
+#!/usr/bin/env vpython
+# Copyright (c) 2022 The Brave Authors. All rights reserved.
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # you can obtain one at http://mozilla.org/MPL/2.0/.
@@ -14,6 +14,7 @@ import os.path
 import sys
 
 try:
+  # TODO_perf
   from google.auth.transport.requests import Request
   from google.oauth2.credentials import Credentials
   from google_auth_oauthlib.flow import InstalledAppFlow
@@ -35,7 +36,8 @@ CLIENT_ID_FILE = os.path.join(os.path.expanduser("~"),
 PERF_CREDENTIAL_FILE = os.path.join(os.path.expanduser("~"),
                                     '.perf_dashboard_credentials.json')
 
-def GetDashboardCredentials(can_be_interactive=False):
+
+def _GetDashboardCredentials(can_be_interactive=False):
   credentials = None
   should_store_new_credentials = False
 
@@ -61,8 +63,8 @@ def GetDashboardCredentials(can_be_interactive=False):
   return credentials
 
 
-def GetDashboardToken(can_be_interactive = False):
-  credentials = GetDashboardCredentials(can_be_interactive)
+def GetDashboardToken(can_be_interactive=False):
+  credentials = _GetDashboardCredentials(can_be_interactive)
   if credentials == None:
     raise RuntimeError('Error generating authentication token')
   return credentials.token
@@ -70,10 +72,10 @@ def GetDashboardToken(can_be_interactive = False):
 
 def main():
   try:
-    token = GetDashboardToken(can_be_interactive = True)
+    token = GetDashboardToken(can_be_interactive=True)
     print(token)
   except Exception as e:
-    logging.error(e)
+    logging.fatal(e)
     return 1
   return 0
 

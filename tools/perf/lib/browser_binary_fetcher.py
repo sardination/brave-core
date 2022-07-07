@@ -18,7 +18,6 @@ from lib import path_util
 
 BRAVE_NIGHTLY_WIN_INSTALLER_URL = 'https://github.com/brave/brave-browser/releases/download/%s/BraveBrowserStandaloneSilentNightlySetup.exe'
 BRAVE_NIGHTLY_URL = 'https://github.com/brave/brave-browser/releases/download/%s/brave-%s-%s.zip'
-
 CHROME_RELEASES_JSON = os.path.join(path_util.BRAVE_PERF_DIR,
                                     'chrome_releases.json')
 
@@ -56,7 +55,9 @@ def GetNearestChromiumVersionAndUrl(tag):
 
   if best_candidate:
     string_version = '.'.join(map(str, best_candidate))
-    logging.info(f'Use chromium version {best_candidate} for requested {requested_version}')
+    logging.info(
+        f'Use chromium version {best_candidate} for requested {requested_version}'
+    )
     return string_version, chrome_versions[string_version]['url']
 
   logging.error(f'No chromium version found for {requested_version}')
@@ -68,7 +69,8 @@ def DownloadArchiveAndUnpack(output_directory, url):
   resp = urlopen(url)
   zipfile = ZipFile(BytesIO(resp.read()))
   zipfile.extractall(output_directory)
-  return os.path.join(output_directory, path_util.GetBinaryPath(output_directory))
+  return os.path.join(output_directory,
+                      path_util.GetBinaryPath(output_directory))
 
 
 def DownloadWinInstallerAndExtract(out_dir, url, expected_install_path, binary):
@@ -140,7 +142,7 @@ def ParseTarget(target):
 
 def PrepareBinaryByTag(out_dir, tag, is_chromium):
   if is_chromium:
-    [chromium_version, url] = GetNearestChromiumVersionAndUrl(tag)
+    [_, url] = GetNearestChromiumVersionAndUrl(tag)
     if not url:
       raise RuntimeError('Failed to find nearest chromium binary for %s' % tag)
     return PrepareBinaryByUrl(out_dir, url, True)

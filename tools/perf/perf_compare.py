@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env vpython3
 # Copyright (c) 2022 The Brave Authors. All rights reserved.
 # This Source Code Form is subject to the terms of the Mozilla Public
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
@@ -7,13 +7,11 @@ from __future__ import annotations
 
 import sys
 import logging
-from lib import perf_test_utils, perf_config
+from lib import perf_test_utils
 import argparse
 
 
 def main():
-  perf_test_utils.FixUpWPRs()
-
   parser = argparse.ArgumentParser()
   parser.add_argument('--working-directory', required=True, type=str)
   parser.add_argument('--config', required=True, type=str)

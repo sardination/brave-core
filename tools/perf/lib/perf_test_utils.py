@@ -19,17 +19,6 @@ from lib import path_util, browser_binary_fetcher, perf_profile
 from lib.perf_config import PerfConfiguration
 
 
-# Workaround to add our wpr files
-def FixUpWPRs():
-  page_set_data_dir = os.path.join(path_util.BRAVE_PERF_DIR, 'page_sets_data')
-  chromium_page_set_data_dir = os.path.join(path_util.SRC_DIR, 'tools', 'perf',
-                                            'page_sets', 'data')
-  for item in os.listdir(page_set_data_dir):
-    if os.path.isfile(item):
-      shutil.copy(os.path.join(page_set_data_dir, item),
-                  chromium_page_set_data_dir)
-
-
 # Returns pair [revision_number, sha1]. revision_number is a number "primary"
 # commits from the begging to `revision`.
 # Use this to get the commit from a revision number:
