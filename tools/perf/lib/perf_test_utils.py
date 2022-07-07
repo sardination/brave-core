@@ -34,7 +34,7 @@ def GetRevisionNumberAndHash(revision: str) -> tuple[str, str]:
                         stdout=subprocess.PIPE,
                         stderr=subprocess.PIPE)
   git_hash = subprocess.check_output(['git', 'rev-parse', 'FETCH_HEAD'],
-                                 cwd=brave_dir).rstrip()
+                                     cwd=brave_dir).rstrip()
   rev_number_args = [
       'git', 'rev-list', '--topo-order', '--first-parent', '--count',
       'FETCH_HEAD'
@@ -100,8 +100,9 @@ def RunSingleTest(binary,
 
   try:
     output = subprocess.check_output(args,
-                            stderr=subprocess.STDOUT,
-                            cwd=os.path.join(path_util.SRC_DIR, 'tools', 'perf'))
+                                     stderr=subprocess.STDOUT,
+                                     cwd=os.path.join(path_util.SRC_DIR,
+                                                      'tools', 'perf'))
     logging.debug(output)
     return True, logs
   except subprocess.CalledProcessError as e:
@@ -146,13 +147,13 @@ def ReportToDashboard(is_ref, configuration_name, revision, output_dir):
 
   logging.debug('Run binary: %s', ' '.join(args))
   try:
-    output = subprocess.check_output(args,
-                            stderr=subprocess.STDOUT)
+    output = subprocess.check_output(args, stderr=subprocess.STDOUT)
     logging.debug(output)
     return True, [], revision_number
   except subprocess.CalledProcessError as e:
     logging.error(e.output.decode())
     return False, ['Reporting ' + revision + ' failed'], None
+
 
 def GetConfigPath(config_path):
   if os.path.isfile(config_path):
@@ -340,7 +341,7 @@ def ParseConfigurations(
       if not config.label:
         config.label = config.tag
     elif config.label:
-      config.tag = config.label #TODO_perf: do we need this?
+      config.tag = config.label  #TODO_perf: do we need this?
     else:
       raise RuntimeError(
           f'label or tag should be specified {serialized_config}')

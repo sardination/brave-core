@@ -152,7 +152,7 @@ def PrepareBinaryByTag(out_dir, tag, is_chromium):
   # nightly < v1.35 has a broken .zip archive
   if int(m.group(1)) == 1 and int(m.group(2)) < 35:
     return PrepareBinaryByUrl(out_dir, BRAVE_NIGHTLY_WIN_INSTALLER_URL % tag,
-                                False)
+                              False)
   if sys.platform == 'win32':
     platform = 'win32-x64'
   if sys.platform == 'darwin':
