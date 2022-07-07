@@ -36,6 +36,9 @@ def GetProfilePath(profile, binary, work_directory):
   if profile == 'clean':
     return None
 
+  if os.path.isdir(profile):
+    return profile
+
   binary_path_hash = hashlib.sha1(binary.encode("utf-8")).hexdigest()[:6]
   profile_id = profile + '-' + binary_path_hash
 
