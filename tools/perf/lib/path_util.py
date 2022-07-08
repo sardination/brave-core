@@ -28,7 +28,7 @@ VPYTHON_2_PATH = os.path.join(
 def GetBinaryPath(browser_dir):
   if sys.platform == 'win32':
     return os.path.join(browser_dir, 'brave.exe')
-  elif sys.platform == 'darwin':
+  if sys.platform == 'darwin':
     binary_dir = os.path.join(browser_dir, 'Contents', 'MacOS')
     for file in os.listdir(binary_dir):
       if file.startswith('Brave Browser'):
