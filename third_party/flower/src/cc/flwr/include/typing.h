@@ -1,4 +1,5 @@
 /***********************************************************************************************************
+ * Copyright (c) 2022 The Flower Authors.
  *
  * @file typing.h
  *
@@ -12,10 +13,13 @@
  *
  * ********************************************************************************************************/
 
-#pragma once
-#include <list>
-#include <map>
+#ifndef BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_TYPING_H_
+#define BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_TYPING_H_
+
 #include <optional>
+
+#include <map>
+#include <list>
 #include <string>
 
 namespace flwr {
@@ -84,7 +88,7 @@ class Parameters {
  */
 class ParametersRes {
  public:
-  ParametersRes(Parameters parameters) : parameters(parameters) {}
+  explicit ParametersRes(Parameters parameters) : parameters(parameters) {}
 
   Parameters getParameters() { return parameters; }
   void setParameters(Parameters p) { parameters = p; }
@@ -238,3 +242,5 @@ class PropertiesRes {
 };
 
 }  // namespace flwr
+
+#endif  // BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_TYPING_H_

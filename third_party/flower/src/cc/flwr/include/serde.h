@@ -1,4 +1,5 @@
 /***********************************************************************************************************
+ * Copyright (c) 2022 The Flower Authors.
  *
  * @file serde.h
  *
@@ -12,9 +13,14 @@
  *
  * ********************************************************************************************************/
 
-#pragma once
+#ifndef BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_SERDE_H_
+#define BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_SERDE_H_
+
+#include <string>
+
 #include "brave/third_party/flower/src/proto/flwr/proto/transport.grpc.pb.h"
-#include "typing.h"
+#include "brave/third_party/flower/src/cc/flwr/include/typing.h"
+
 using flower::transport::ClientMessage;
 using flower::transport::ServerMessage;
 using MessageParameters = flower::transport::Parameters;
@@ -84,3 +90,5 @@ flwr::EvaluateIns evaluate_ins_from_proto(ServerMessage_EvaluateIns msg);
  * Serialize client EvaluateRes type to protobuf EvaluateRes type
  */
 ClientMessage_EvaluateRes evaluate_res_to_proto(flwr::EvaluateRes res);
+
+#endif  // BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_SERDE_H_

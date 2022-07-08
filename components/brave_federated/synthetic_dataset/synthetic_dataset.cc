@@ -1,12 +1,16 @@
+/* Copyright (c) 2022 The Brave Authors. All rights reserved.
+ * This Source Code Form is subject to the terms of the Mozilla Public
+ * License, v. 2.0. If a copy of the MPL was not distributed with this file,
+ * You can obtain one at http://mozilla.org/MPL/2.0/. */
+
 #include "brave/components/brave_federated/synthetic_dataset/synthetic_dataset.h"
 
 #include <algorithm>
 #include <cmath>
-#include <iostream>
-#include <random>
 #include <fstream>
-#include <chrono>
+#include <random>
 
+#include "base/time/time.h"
 #include "brave/components/brave_federated/linear_algebra_util/linear_algebra_util.h"
 
 namespace brave_federated {
@@ -17,32 +21,26 @@ SyntheticDataset::SyntheticDataset(std::vector<float> ms,
   std::random_device rd;
   std::mt19937 mt(rd());
   std::uniform_int_distribution<> distr(-10.0, 10.0);
-  std::cout << "True parameters: " << std::endl;
-  for (int i = 0; i < (int)ms.size(); i++) {
-    std::cout << std::fixed << "  m" << i << " = " << ms[i] << std::endl;
-  }
-
-  std::cout << "  b = " << std::fixed << b << std::endl;
 
   std::vector<std::vector<float>> xs(size, std::vector<float>(ms.size()));
   std::vector<float> ys(size, 0);
-  for (int m_ind = 0; m_ind < (int)ms.size(); m_ind++) {
+  for (size_t m_ind = 0; m_ind < ms.size(); m_ind++) {
     std::uniform_real_distribution<float> distx(-10.0, 10.0);
 
-    for (int i = 0; i < (int)size; i++) {
+    for (size_t i = 0; i < size; i++) {
       xs[i][m_ind] = distx(mt);
     }
   }
 
-  for (int i = 0; i < (int)size; i++) {
+  for (size_t i = 0; i < size; i++) {
     ys[i] = b;
-    for (int m_ind = 0; m_ind < (int)ms.size(); m_ind++) {
+    for (size_t m_ind = 0; m_ind < ms.size(); m_ind++) {
       ys[i] += ms[m_ind] * xs[i][m_ind];
     }
   }
 
   std::vector<std::vector<float>> data_points;
-  for (int i = 0; i < (int)size; i++) {
+  for (size_t i = 0; i < size; i++) {
     std::vector<float> data_point;
     data_point.insert(data_point.end(), xs[i].begin(), xs[i].end());
     if (ys[i] >= 0.0) {
@@ -61,15 +59,12 @@ SyntheticDataset::SyntheticDataset(float alpha,
                                    float beta,
                                    int num_features,
                                    size_t size) {
-  
   // Generate time of day and day of week uniformly.
   std::uniform_int_distribution<> distrday(0, 7);
   std::uniform_int_distribution<> distrtime(0, 144);
 
-
-  std::default_random_engine generator;  
-  generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
-  std::cout <<"SEED" << std::chrono::system_clock::now().time_since_epoch().count() << "\n";
+  std::default_random_engine generator;
+  generator.seed(base::Time::Now().time_since_epoch().count());
 
   std::normal_distribution<float> normal_zero_alpha(0.0, alpha);
   std::normal_distribution<float> normal_zero_beta(0.0, beta);
@@ -99,8 +94,8 @@ SyntheticDataset::SyntheticDataset(float alpha,
 
   std::vector<std::vector<float>> xs(size,
                                      std::vector<float>(num_features, 0.0));
-  
-  for (int j = 0; j < (int) size; j++) {
+
+  for (size_t j = 0; j < size; j++) {
     int day_index = distrday(generator);
     int time_index = distrtime(generator);
 
@@ -111,25 +106,24 @@ SyntheticDataset::SyntheticDataset(float alpha,
     xs[j][3] = cos(time_index * 2.0 * M_PI / 144.0);
   }
 
-  for (int i = 4; i < (int)num_features; i++) {
+  for (int i = 4; i < num_features; i++) {
     std::normal_distribution<float> normal_i(mean_x[i], cov_x[i]);
-    for (int j = 0; j < (int) size; j++) {
+    for (size_t j = 0; j < size; j++) {
       xs[j][i] = normal_i(generator);
     }
   }
 
   std::vector<std::vector<float>> data_points;
-  for (int i = 0; i < (int) size; i++) {
+  for (size_t i = 0; i < size; i++) {
     std::vector<float> tmp = LinearAlgebraUtil::AddVectors(
         LinearAlgebraUtil::MultiplyMatrixVector(W, xs[i]), b);
 
     float ymax = 0.0;
     // float val_ymax = -100.0;
-    
+
     if (Softmax(tmp[0]) >= Softmax(tmp[1])) {
       ymax = 1.0;
-    }
-    else {
+    } else {
       ymax = 0.0;
     }
 
@@ -147,14 +141,12 @@ SyntheticDataset::SyntheticDataset(std::vector<std::vector<float>> W,
                                    std::vector<float> b,
                                    int num_features,
                                    size_t size) {
-  
   // Generate time of day and day of week uniformly.
   std::uniform_int_distribution<> distrday(0, 7);
   std::uniform_int_distribution<> distrtime(0, 144);
 
-  std::default_random_engine generator;  
-  generator.seed(std::chrono::system_clock::now().time_since_epoch().count());
-  std::cout <<"SEED" << std::chrono::system_clock::now().time_since_epoch().count() << "\n";
+  std::default_random_engine generator;
+  generator.seed(base::Time::Now().time_since_epoch().count());
 
   std::vector<float> cov_x(num_features, 0.0);
   for (int j = 0; j < num_features; j++) {
@@ -165,8 +157,8 @@ SyntheticDataset::SyntheticDataset(std::vector<std::vector<float>> W,
 
   std::vector<std::vector<float>> xs(size,
                                      std::vector<float>(num_features, 0.0));
-  
-  for (int j = 0; j < (int) size; j++) {
+
+  for (size_t j = 0; j < size; j++) {
     int day_index = distrday(generator);
     int time_index = distrtime(generator);
 
@@ -177,25 +169,24 @@ SyntheticDataset::SyntheticDataset(std::vector<std::vector<float>> W,
     xs[j][3] = cos(time_index * 2.0 * M_PI / 144.0);
   }
 
-  for (int i = 4; i < (int)num_features; i++) {
+  for (int i = 4; i < num_features; i++) {
     std::normal_distribution<float> normal_i(mean_x[i], cov_x[i]);
-    for (int j = 0; j < (int) size; j++) {
+    for (size_t j = 0; j < size; j++) {
       xs[j][i] = normal_i(generator);
     }
   }
 
   std::vector<std::vector<float>> data_points;
-  for (int i = 0; i < (int) size; i++) {
+  for (size_t i = 0; i < size; i++) {
     std::vector<float> tmp = LinearAlgebraUtil::AddVectors(
         LinearAlgebraUtil::MultiplyMatrixVector(W, xs[i]), b);
 
     float ymax = 0.0;
     // float val_ymax = -100.0;
-    
+
     if (Softmax(tmp[0]) >= Softmax(tmp[1])) {
       ymax = 1.0;
-    }
-    else {
+    } else {
       ymax = 0.0;
     }
 
@@ -209,8 +200,8 @@ SyntheticDataset::SyntheticDataset(std::vector<std::vector<float>> W,
   this->data_points_ = data_points;
 }
 
-
-SyntheticDataset::SyntheticDataset(std::vector<std::vector<float>> data_points) : data_points_(data_points) {}
+SyntheticDataset::SyntheticDataset(std::vector<std::vector<float>> data_points)
+    : data_points_(data_points) {}
 
 SyntheticDataset::~SyntheticDataset() {}
 
@@ -222,35 +213,39 @@ int SyntheticDataset::get_features_count() {
   return this->data_points_[0].size() - 1;
 }
 
-std::vector<std::vector<float>> SyntheticDataset::DataPoints() {
+std::vector<std::vector<float>> SyntheticDataset::GetDataPoints() {
   return this->data_points_;
 }
 
 SyntheticDataset SyntheticDataset::SeparateTestData(int num_training) {
-  std::vector<std::vector<float>> split_lo(this->data_points_.begin(), this->data_points_.begin() + num_training);
-  std::vector<std::vector<float>> split_hi(this->data_points_.begin() + num_training, this->data_points_.end());
+  std::vector<std::vector<float>> split_lo(
+      this->data_points_.begin(), this->data_points_.begin() + num_training);
+  std::vector<std::vector<float>> split_hi(
+      this->data_points_.begin() + num_training, this->data_points_.end());
 
   this->data_points_ = split_lo;
   return SyntheticDataset(split_hi);
 }
 
-float SyntheticDataset::Softmax(float z) {
-  return 1.0 / (1 + exp(-1.0 * z));
-}
-
 void SyntheticDataset::DumpToCSV(std::string prefix) {
   std::fstream csv_data;
 
-  std::string csv_name = prefix + std::to_string(std::chrono::system_clock::now().time_since_epoch().count()) + ".csv";
+  std::string csv_name =
+      prefix + std::to_string(base::Time::Now().time_since_epoch().count()) +
+      ".csv";
   csv_data.open(csv_name, std::ios::out);
 
-  for (int i = 0; i < (int) data_points_.size(); i++) {
-    for (int j = 0; j < (int) data_points_[i].size(); j++) {
+  for (size_t i = 0; i < data_points_.size(); i++) {
+    for (size_t j = 0; j < data_points_[i].size(); j++) {
       csv_data << data_points_[i][j] << ",";
     }
     csv_data << "\n";
   }
   csv_data.close();
+}
+
+float SyntheticDataset::Softmax(float z) {
+  return 1.0 / (1 + exp(-1.0 * z));
 }
 
 }  // namespace brave_federated

@@ -5,12 +5,12 @@
 
 #include "brave/components/brave_federated/client/federated_client.h"
 
-#include <thread>
-
-#include <iostream>
+#include <list>
+#include <map>
 #include <memory>
 #include <sstream>
 #include <string>
+#include <tuple>
 #include <vector>
 
 #include "base/task/sequenced_task_runner.h"
@@ -23,6 +23,8 @@
 #include "brave/components/brave_federated/synthetic_dataset/synthetic_dataset.h"
 
 #include "brave/third_party/flower/src/cc/flwr/include/start.h"
+#include "brave/third_party/flower/src/cc/flwr/include/typing.h"
+
 namespace brave_federated {
 
 FederatedClient::FederatedClient(const std::string& task_name, Model* model)
@@ -37,16 +39,11 @@ void FederatedClient::Start() {
       base::ThreadPool::CreateSequencedTaskRunner(
           {base::MayBlock(), base::TaskPriority::BEST_EFFORT,
            base::TaskShutdownBehavior::CONTINUE_ON_SHUTDOWN}));
-
-  // Define a server address
   std::string server_add = "localhost:56102";
-  std::cout << "Starting the client..." << std::endl;
 
   this->communication_in_progress_ = true;
-  
   flwr_communication.AsyncCall(&start::start_client)
       .WithArgs(server_add, this, 536870912);
-
 }
 
 void FederatedClient::Stop() {
@@ -69,18 +66,14 @@ void FederatedClient::SetTestData(std::vector<std::vector<float>> test_data) {
 bool FederatedClient::is_communicating() {
   return this->communication_in_progress_;
 }
-/**
- * Return the current local model parameters
- * Simple string are used for now to test communication, needs updates in the
- * future
- */
+
 flwr::ParametersRes FederatedClient::get_parameters() {
   // Serialize
   std::vector<float> pred_weights = this->model_->PredWeights();
   float pred_b = this->model_->Bias();
+
   std::list<std::string> tensors;
-  
-  std::ostringstream oss1, oss2;  // Possibly unnecessary
+  std::ostringstream oss1, oss2;
   oss1.write(reinterpret_cast<const char*>(pred_weights.data()),
              pred_weights.size() * sizeof(float));
   tensors.push_back(oss1.str());
@@ -89,13 +82,11 @@ flwr::ParametersRes FederatedClient::get_parameters() {
   tensors.push_back(oss2.str());
 
   std::string tensor_str = "cpp_float";
-  std::cout << tensors.size() << std::endl;
-  return flwr::Parameters(tensors, tensor_str);
+  return flwr::ParametersRes(flwr::Parameters(tensors, tensor_str));
 }
 
 void FederatedClient::set_parameters(flwr::Parameters params) {
   std::list<std::string> s = params.getTensors();
-  std::cout << "Received " << s.size() << " Layers from server:" << std::endl;
 
   if (s.empty() == 0) {
     // Layer 1
@@ -122,16 +113,9 @@ flwr::PropertiesRes FederatedClient::get_properties(flwr::PropertiesIns ins) {
   return p;
 }
 
-/**
- * Refine the provided weights using the locally held dataset
- * Simple settings are used for testing, needs updates in the future
- */
 flwr::FitRes FederatedClient::fit(flwr::FitIns ins) {
-  std::cout << "Fitting..." << std::endl;
   auto config = ins.getConfig();
-  
   flwr::FitRes resp;
-
   flwr::Parameters p = ins.getParameters();
   this->set_parameters(p);
 
@@ -144,12 +128,7 @@ flwr::FitRes FederatedClient::fit(flwr::FitIns ins) {
   return resp;
 }
 
-/**
- * Evaluate the provided weights using the locally held dataset
- * Needs updates in the future
- */
 flwr::EvaluateRes FederatedClient::evaluate(flwr::EvaluateIns ins) {
-  std::cout << "Evaluating..." << std::endl;
   flwr::EvaluateRes resp;
   flwr::Parameters p = ins.getParameters();
   this->set_parameters(p);
@@ -162,8 +141,10 @@ flwr::EvaluateRes FederatedClient::evaluate(flwr::EvaluateIns ins) {
   resp.setLoss(std::get<1>(result));
 
   flwr::Scalar accuracy = flwr::Scalar();
-  accuracy.setDouble((double)std::get<2>(result));
-  std::map<std::string, flwr::Scalar> metric = {{"accuracy", accuracy}, };
+  accuracy.setDouble(static_cast<double>(std::get<2>(result)));
+  std::map<std::string, flwr::Scalar> metric = {
+      {"accuracy", accuracy},
+  };
   resp.setMetrics(metric);
   auto m = resp.getMetrics();
   return resp;

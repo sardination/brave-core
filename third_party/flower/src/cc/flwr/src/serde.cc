@@ -1,4 +1,6 @@
-#include "serde.h"
+/* Copyright (c) 2022 The Flower Authors. */
+
+#include "brave/third_party/flower/src/cc/flwr/include/serde.h"
 
 /**
  * Serialize client parameters to protobuf parameters message
@@ -136,12 +138,12 @@ ClientMessage_FitRes fit_res_to_proto(flwr::FitRes res) {
   ClientMessage_FitRes cres;
 
   MessageParameters parameters_proto = parameters_to_proto(res.getParameters());
-  google::protobuf::Map< ::std::string, ::flower::transport::Scalar>*
+  google::protobuf::Map<::std::string, ::flower::transport::Scalar>*
       metrics_msg;
   if (res.getMetrics() == std::nullopt) {
     metrics_msg = NULL;
   } else {
-    google::protobuf::Map< ::std::string, ::flower::transport::Scalar> proto =
+    google::protobuf::Map<::std::string, ::flower::transport::Scalar> proto =
         metrics_to_proto(res.getMetrics().value());
     metrics_msg = &proto;
   }
@@ -169,9 +171,9 @@ flwr::EvaluateIns evaluate_ins_from_proto(ServerMessage_EvaluateIns msg) {
  */
 ClientMessage_EvaluateRes evaluate_res_to_proto(flwr::EvaluateRes res) {
   ClientMessage_EvaluateRes cres;
-  google::protobuf::Map< ::std::string, ::flower::transport::Scalar>*
+  google::protobuf::Map<::std::string, ::flower::transport::Scalar>*
       metrics_msg;
-  google::protobuf::Map< ::std::string, ::flower::transport::Scalar> proto;
+  google::protobuf::Map<::std::string, ::flower::transport::Scalar> proto;
   if (res.getMetrics() == std::nullopt) {
     metrics_msg = NULL;
   } else {
@@ -189,6 +191,6 @@ ClientMessage_EvaluateRes evaluate_res_to_proto(flwr::EvaluateRes res) {
       map[key] = value;
     }
   }
-  
+
   return cres;
 }

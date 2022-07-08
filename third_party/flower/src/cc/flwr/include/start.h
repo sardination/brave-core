@@ -1,4 +1,5 @@
 /*************************************************************************************************
+ * Copyright (c) 2022 The Flower Authors.
  *
  * @file start.h
  *
@@ -13,12 +14,14 @@
  *
  *************************************************************************************************/
 
-#ifndef START_H
-#define START_H
-#pragma once
+#ifndef BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_START_H_
+#define BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_START_H_
+
 #include <grpcpp/grpcpp.h>
-#include "client.h"
-#include "message_handler.h"
+#include <string>
+
+#include "brave/third_party/flower/src/cc/flwr/include/client.h"
+#include "brave/third_party/flower/src/cc/flwr/include/message_handler.h"
 
 using flower::transport::ClientMessage;
 using flower::transport::FlowerService;
@@ -56,10 +59,9 @@ class start {
  public:
   start();
 
-  void start_client(
-      std::string server_address,
-      flwr::Client* client,
-      int grpc_max_message_length = GRPC_MAX_MESSAGE_LENGTH);
+  void start_client(std::string server_address,
+                    flwr::Client* client,
+                    int grpc_max_message_length = GRPC_MAX_MESSAGE_LENGTH);
 };
 
-#endif
+#endif  // BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_START_H_

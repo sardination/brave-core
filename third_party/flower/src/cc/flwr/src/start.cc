@@ -1,7 +1,8 @@
-#include "start.h"
+/* Copyright (c) 2022 The Flower Authors. */
 
-#include <chrono>
-#include <thread>
+#include "brave/third_party/flower/src/cc/flwr/include/start.h"
+
+#include "base/time/time.h"
 
 start::start() {}
 
@@ -20,7 +21,7 @@ void start::start_client(std::string server_address,
     // Establish an insecure gRPC connection to a gRPC server
     std::shared_ptr<Channel> channel = grpc::CreateCustomChannel(
         server_address, grpc::InsecureChannelCredentials(), args);
-    std::cout << "Created channel on " << server_address << std::endl;
+    // std::cout << "Created channel on " << server_address << std::endl;
     // Create stub
     std::unique_ptr<FlowerService::Stub> stub_ =
         FlowerService::NewStub(channel);
@@ -48,7 +49,7 @@ void start::start_client(std::string server_address,
     } else {
       std::cout << "Disconnect, then re-establish connection after"
                 << sleep_duration << "second(s)" << std::endl;
-      std::this_thread::sleep_for(std::chrono::milliseconds(sleep_duration * 1000));
+      std::this_thread::sleep_for(base::Time::Milliseconds());
     }
   }
 

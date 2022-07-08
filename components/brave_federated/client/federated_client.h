@@ -18,8 +18,7 @@ class Model;
 
 class FederatedClient : public flwr::Client {
  public:
-  FederatedClient(const std::string& task_name,
-                  Model* model);
+  FederatedClient(const std::string& task_name, Model* model);
   ~FederatedClient();
 
   Model* GetModel();
@@ -39,9 +38,6 @@ class FederatedClient : public flwr::Client {
   flwr::FitRes fit(flwr::FitIns ins) override;
 
  private:
-  // TODO() : Constraints: 1. Bound number of participations
-  //                       2. Min batch size
-  //                       3. Gradient clipping
   bool communication_in_progress_;
   std::string client_id_;
   std::string task_name_ = "";

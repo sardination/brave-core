@@ -1,4 +1,5 @@
 /*************************************************************************************************
+ * Copyright (c) 2022 The Flower Authors.
  *
  * @file message_handler.h
  *
@@ -12,9 +13,14 @@
  *
  *************************************************************************************************/
 
-#pragma once
-#include "client.h"
-#include "serde.h"
+#ifndef BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_MESSAGE_HANDLER_H_
+#define BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_MESSAGE_HANDLER_H_
+
+#include <tuple>
+
+#include "brave/third_party/flower/src/cc/flwr/include/client.h"
+#include "brave/third_party/flower/src/cc/flwr/include/serde.h"
+
 using flower::transport::ClientMessage;
 using flower::transport::ClientMessage_Disconnect;
 using flower::transport::ClientMessage_EvaluateRes;
@@ -37,3 +43,5 @@ ClientMessage _evaluate(flwr::Client* client,
 
 std::tuple<ClientMessage, int, bool> handle(flwr::Client* client,
                                             ServerMessage server_msg);
+
+#endif  // BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_MESSAGE_HANDLER_H_

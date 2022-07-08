@@ -8,6 +8,7 @@
 #include <algorithm>
 #include <cmath>
 #include <random>
+#include <tuple>
 #include <vector>
 
 #include "brave/components/brave_federated/linear_algebra_util/linear_algebra_util.h"
@@ -52,9 +53,9 @@ size_t Model::ModelSize() {
 
 std::vector<float> Model::Predict(std::vector<std::vector<float>> X) {
   std::vector<float> prediction(X.size(), 0.0);
-  for (int i = 0; i < (int)X.size(); i++) {
+  for (size_t i = 0; i < X.size(); i++) {
     float z = 0.0;
-    for (int j = 0; j < (int)X[i].size(); j++) {
+    for (size_t j = 0; j < X[i].size(); j++) {
       z += this->pred_weights_[j] * X[i][j];
     }
     z += this->pred_b_;
@@ -65,11 +66,11 @@ std::vector<float> Model::Predict(std::vector<std::vector<float>> X) {
 }
 
 std::tuple<size_t, float, float> Model::Train(
-    std::vector<std::vector<float>>& dataset) {
+    const std::vector<std::vector<float>>& dataset) {
   int features = dataset[0].size() - 1;
 
   std::vector<float> data_indices(dataset.size());
-  for (int i = 0; i < (int)dataset.size(); i++) {
+  for (size_t i = 0; i < dataset.size(); i++) {
     data_indices.push_back(i);
   }
 
@@ -125,8 +126,9 @@ std::tuple<size_t, float, float> Model::Train(
 float Model::ComputeNLL(std::vector<float> true_y, std::vector<float> pred) {
   float error = 0.0;
 
-  for (int i = 0; i < (int) true_y.size(); i++) {
-    error += (true_y[i] * log(Activation(pred[i])) + (1.0 - true_y[i]) * log(1 - Activation(pred[i])));
+  for (size_t i = 0; i < true_y.size(); i++) {
+    error += (true_y[i] * log(Activation(pred[i])) +
+              (1.0 - true_y[i]) * log(1 - Activation(pred[i])));
   }
 
   return -error;
@@ -137,13 +139,13 @@ float Model::Activation(float z) {
 }
 
 std::tuple<size_t, float, float> Model::Evaluate(
-    std::vector<std::vector<float>>& test_dataset) {
+    const std::vector<std::vector<float>>& test_dataset) {
   int num_features = test_dataset[0].size();
   std::vector<std::vector<float>> X(test_dataset.size(),
                                     std::vector<float>(num_features));
   std::vector<float> y(test_dataset.size());
 
-  for (int i = 0; i < (int)test_dataset.size(); i++) {
+  for (size_t i = 0; i < test_dataset.size(); i++) {
     std::vector<float> point = test_dataset[i];
     y[i] = point.back();
     point.pop_back();
@@ -152,7 +154,7 @@ std::tuple<size_t, float, float> Model::Evaluate(
 
   std::vector<float> predicted_value = Predict(X);
   int total_correct = 0;
-  for (int i = 0; i < (int)test_dataset.size(); i++) {
+  for (size_t i = 0; i < test_dataset.size(); i++) {
     if (predicted_value[i] >= this->threshold_) {
       predicted_value[i] = 1.0;
     } else {

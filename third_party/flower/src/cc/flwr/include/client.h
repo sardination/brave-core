@@ -1,4 +1,5 @@
 /*************************************************************************************************
+ * Copyright (c) 2022 The Flower Authors.
  *
  * @file client.h
  *
@@ -12,8 +13,10 @@
  *
  *************************************************************************************************/
 
-#pragma once
-#include "typing.h"
+#ifndef BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_CLIENT_H_
+#define BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_CLIENT_H_
+
+#include "brave/third_party/flower/src/cc/flwr/include/typing.h"
 
 namespace flwr {
 /**
@@ -62,4 +65,7 @@ class Client {
    */
   virtual EvaluateRes evaluate(EvaluateIns ins) = 0;
 };
+
 }  // namespace flwr
+
+#endif  // BRAVE_THIRD_PARTY_FLOWER_SRC_CC_FLWR_INCLUDE_CLIENT_H_

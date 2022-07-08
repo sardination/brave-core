@@ -1,4 +1,6 @@
-#include "message_handler.h"
+/* Copyright (c) 2022 The Flower Authors. */
+
+#include "brave/third_party/flower/src/cc/flwr/include/message_handler.h"
 
 std::tuple<ClientMessage, int> _reconnect(
     ServerMessage_Reconnect reconnect_msg) {

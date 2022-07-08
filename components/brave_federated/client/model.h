@@ -7,6 +7,7 @@
 #define BRAVE_COMPONENTS_BRAVE_FEDERATED_CLIENT_MODEL_H_
 
 #include <memory>
+#include <tuple>
 #include <vector>
 
 namespace brave_federated {
@@ -20,10 +21,10 @@ class Model {
   std::vector<float> Predict(std::vector<std::vector<float>> X);
 
   std::tuple<size_t, float, float> Train(
-      std::vector<std::vector<float>>& dataset);
+      const std::vector<std::vector<float>>& dataset);
 
   std::tuple<size_t, float, float> Evaluate(
-      std::vector<std::vector<float>>& test_dataset);
+      const std::vector<std::vector<float>>& test_dataset);
 
   std::vector<float> PredWeights();
 
