@@ -53,7 +53,6 @@ export interface Props {
   onClearTodayPrefs: () => any
   toggleShowBackgroundImage: () => void
   toggleShowClock: () => void
-  toggleShowStats: () => void
   toggleShowToday: () => any
   toggleShowTopSites: () => void
   setMostVisitedSettings: (show: boolean, customize: boolean) => void
@@ -67,7 +66,6 @@ export interface Props {
   toggleCards: (show: boolean) => void
   useCustomBackgroundImage: (useCustom: boolean) => void
   showBackgroundImage: boolean
-  showStats: boolean
   showToday: boolean
   showClock: boolean
   clockFormat: string
@@ -256,7 +254,6 @@ export default class Settings extends React.PureComponent<Props, State> {
       textDirection,
       showSettingsMenu,
       toggleShowClock,
-      toggleShowStats,
       toggleShowTopSites,
       setMostVisitedSettings,
       toggleShowRewards,
@@ -264,7 +261,6 @@ export default class Settings extends React.PureComponent<Props, State> {
       toggleBrandedWallpaperOptIn,
       showBackgroundImage,
       featureCustomBackgroundEnabled,
-      showStats,
       showClock,
       clockFormat,
       showTopSites,
@@ -356,8 +352,6 @@ export default class Settings extends React.PureComponent<Props, State> {
                 activeTab === TabType.BraveStats
                   ? (
                     <BraveStatsSettings
-                      toggleShowStats={toggleShowStats}
-                      showStats={showStats}
                     />
                   ) : null
               }

@@ -52,7 +52,6 @@ function DefaultPage (props: Props) {
         ftx={props.ftx}
         actions={actions}
         saveShowBackgroundImage={PreferencesAPI.saveShowBackgroundImage}
-        saveShowStats={PreferencesAPI.saveShowStats}
         saveShowToday={PreferencesAPI.saveShowToday}
         saveShowRewards={PreferencesAPI.saveShowRewards}
         saveShowBraveTalk={PreferencesAPI.saveShowBraveTalk}
