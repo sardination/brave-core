@@ -766,6 +766,9 @@ until they verify, or until 90 days have passed.
       <message name="IDS_BRAVE_SYNC_CATEGORIES_TEXT" desc="Text for button to show data types to sync. Renamed from Categories">
   Data Preferences
       </message>
+      <message name="IDS_BRAVE_SYNC_DELETE_ACCOUNT_TEXT" desc="Text for button which deletes all sync chain data on the server">
+  Delete Sync account
+      </message>
       <message name="IDS_BRAVE_SYNC_REMOVE_DEVICE_TEXT" desc="Text for Brave Sync remove device message.">
 	Remove device
       </message>
