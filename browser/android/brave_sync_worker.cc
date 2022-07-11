@@ -44,6 +44,9 @@
 //    setFirstSetupComplete
 //    isFirstSetupComplete
 
+using base::android::ConvertUTF8ToJavaString;
+using content::BrowserThread;
+
 namespace {
 static const size_t SEED_BYTES_COUNT = 32u;
 }  // namespace
@@ -81,7 +84,7 @@ static void JNI_BraveSyncWorker_DestroyV1LevelDb(JNIEnv* env) {
 }
 
 static void JNI_BraveSyncWorker_MarkSyncV1WasEnabledAndMigrated(JNIEnv* env) {
-  DCHECK_CURRENTLY_ON(content::BrowserThread::UI);
+  DCHECK_CURRENTLY_ON(BrowserThread::UI);
   Profile* profile =
       ProfileManager::GetActiveUserProfile()->GetOriginalProfile();
   brave_sync::Prefs brave_sync_prefs(profile->GetPrefs());
@@ -99,7 +102,7 @@ base::android::ScopedJavaLocalRef<jstring> BraveSyncWorker::GetSyncCodeWords(
 
   CHECK(brave_sync::crypto::IsPassphraseValid(sync_code));
 
-  return base::android::ConvertUTF8ToJavaString(env, sync_code);
+  return ConvertUTF8ToJavaString(env, sync_code);
 }
 
 void BraveSyncWorker::SaveCodeWords(
@@ -271,6 +274,31 @@ void BraveSyncWorker::OnStateChanged(syncer::SyncService* service) {
   }
 }
 
+namespace {
+void NativePermanentlyDeleteAccountCallback(
+    JNIEnv* env,
+    const base::android::ScopedJavaGlobalRef<jobject>& callback,
+    const syncer::SyncProtocolError& sync_protocol_error) {
+  Java_BraveSyncWorker_onPermanentlyDeleteAccountResult(
+      env, callback,
+      ConvertUTF8ToJavaString(env, sync_protocol_error.error_description));
+}
+}  // namespace
+
+void BraveSyncWorker::PermanentlyDeleteAccount(
+    JNIEnv* env,
+    const base::android::JavaParamRef<jobject>& callback) {
+  DCHECK_CURRENTLY_ON(BrowserThread::UI);
+  auto* sync_service = GetSyncService();
+  CHECK_NE(sync_service, nullptr);
+
+  base::android::ScopedJavaGlobalRef<jobject> java_callback;
+  java_callback.Reset(env, callback);
+
+  sync_service->PermanentlyDeleteAccount(base::BindOnce(
+      &NativePermanentlyDeleteAccountCallback, env, java_callback));
+}
+
 static void JNI_BraveSyncWorker_Init(
     JNIEnv* env,
     const base::android::JavaParamRef<jobject>& jcaller) {
@@ -294,7 +322,7 @@ JNI_BraveSyncWorker_GetSeedHexFromWords(
     VLOG(1) << __func__ << " PassphraseToBytes32 failed for " << str_seed_words;
   }
 
-  return base::android::ConvertUTF8ToJavaString(env, sync_code_hex);
+  return ConvertUTF8ToJavaString(env, sync_code_hex);
 }
 
 std::string GetWordsFromSeedHex(const std::string& str_seed_hex) {
@@ -327,7 +355,7 @@ JNI_BraveSyncWorker_GetWordsFromSeedHex(
     const base::android::JavaParamRef<jstring>& seed_hex) {
   std::string str_seed_hex = base::android::ConvertJavaStringToUTF8(seed_hex);
   std::string sync_code_words = GetWordsFromSeedHex(str_seed_hex);
-  return base::android::ConvertUTF8ToJavaString(env, sync_code_words);
+  return ConvertUTF8ToJavaString(env, sync_code_words);
 }
 
 static base::android::ScopedJavaLocalRef<jstring>
@@ -340,7 +368,7 @@ JNI_BraveSyncWorker_GetQrDataJson(
   const std::string qr_code_string =
       brave_sync::QrCodeData::CreateWithActualDate(str_seed_hex)->ToJson();
 
-  return base::android::ConvertUTF8ToJavaString(env, qr_code_string);
+  return ConvertUTF8ToJavaString(env, qr_code_string);
 }
 
 int JNI_BraveSyncWorker_GetQrCodeValidationResult(
@@ -379,8 +407,8 @@ JNI_BraveSyncWorker_GetPureWordsFromTimeLimited(
             brave_sync::WordsValidationStatus::kValid);
   DCHECK(pure_words_with_status.pure_words.has_value());
 
-  return base::android::ConvertUTF8ToJavaString(
-      env, pure_words_with_status.pure_words.value());
+  return ConvertUTF8ToJavaString(env,
+                                 pure_words_with_status.pure_words.value());
 }
 
 static base::android::ScopedJavaLocalRef<jstring>
@@ -394,7 +422,7 @@ JNI_BraveSyncWorker_GetTimeLimitedWordsFromPure(
   std::string time_limited_words =
       brave_sync::TimeLimitedWords::GenerateForNow(str_pure_words);
 
-  return base::android::ConvertUTF8ToJavaString(env, time_limited_words);
+  return ConvertUTF8ToJavaString(env, time_limited_words);
 }
 
 static base::android::ScopedJavaLocalRef<jstring>
@@ -415,7 +443,7 @@ JNI_BraveSyncWorker_GetSeedHexFromQrJson(
 
   DCHECK(!GetWordsFromSeedHex(result).empty());
 
-  return base::android::ConvertUTF8ToJavaString(env, result);
+  return ConvertUTF8ToJavaString(env, result);
 }
 
 }  // namespace android

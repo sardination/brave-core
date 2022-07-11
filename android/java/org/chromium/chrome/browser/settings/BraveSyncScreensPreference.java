@@ -1140,9 +1140,36 @@ public class BraveSyncScreensPreference extends BravePreferenceFragment
     }
 
     private void permanentlyDeleteAccount() {
-        Toast.makeText(getActivity().getApplicationContext(), "permanentlyDeleteAccount()",
-                     Toast.LENGTH_LONG)
-                .show();
+        AlertDialog.Builder alert =
+                new AlertDialog.Builder(getActivity(), R.style.ThemeOverlay_BrowserUI_AlertDialog);
+        if (null == alert) {
+            return;
+        }
+        DialogInterface.OnClickListener onClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int button) {
+                if (button == AlertDialog.BUTTON_POSITIVE) {
+                    permanentlyDeleteAccountImpl();
+                }
+            }
+        };
+
+        AlertDialog alertDialog =
+                alert.setTitle(getResources().getString(R.string.brave_sync_delete_account_text))
+                        .setMessage(getString(R.string.brave_sync_delete_account_message))
+                        .setPositiveButton(
+                                R.string.brave_sync_delete_account_button, onClickListener)
+                        .setNegativeButton(R.string.cancel, onClickListener)
+                        .create();
+        alertDialog.getDelegate().setHandleNativeActionModesEnabled(false);
+        alertDialog.show();
+    }
+
+    private void permanentlyDeleteAccountImpl() {
+        getBraveSyncWorker().permanentlyDeleteAccount((String result) -> {
+            // TODO(alexeybarabash): show toast with error text on failure
+            Log.i(TAG, "[BraveSync] permanentlyDeleteAccount result is <" + result + ">");
+        });
     }
 
     private boolean mLeaveSyncChainInProgress;
