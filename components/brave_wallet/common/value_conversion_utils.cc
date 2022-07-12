@@ -7,6 +7,7 @@
 #include <utility>
 #include <vector>
 
+#include "base/containers/contains.h"
 #include "base/guid.h"
 #include "base/values.h"
 #include "brave/components/brave_wallet/common/brave_wallet.mojom.h"
@@ -59,8 +60,17 @@ mojom::NetworkInfoPtr ValueToEthNetworkInfo(const base::Value& value) {
   const base::Value* rpcUrlsValue = params_dict->FindListKey("rpcUrls");
   if (rpcUrlsValue) {
     for (const auto& entry : rpcUrlsValue->GetList())
-      chain.rpc_urls.push_back(entry.GetString());
+      chain.rpc_endpoints.emplace_back(entry.GetString());
   }
+
+  if (const auto& endpoint_index =
+          params_dict->FindIntKey("activeRpcEndpointIndex")) {
+    chain.active_rpc_endpoint_index = endpoint_index.value();
+  } else {
+    chain.active_rpc_endpoint_index =
+        GetFirstValidChainURLIndex(chain.rpc_endpoints);
+  }
+
   const base::Value* nativeCurrencyValue =
       params_dict->FindDictKey("nativeCurrency");
   chain.decimals = 0;
@@ -79,6 +89,67 @@ mojom::NetworkInfoPtr ValueToEthNetworkInfo(const base::Value& value) {
     }
   }
   chain.is_eip1559 = params_dict->FindBoolKey("is_eip1559").value_or(false);
+
+  chain.coin = mojom::CoinType::ETH;
+
+  return chain.Clone();
+}
+
+mojom::NetworkInfoPtr ParseEip3085Payload(const base::Value& value) {
+  mojom::NetworkInfo chain;
+  const base::DictionaryValue* params_dict = nullptr;
+  if (!value.GetAsDictionary(&params_dict) || !params_dict)
+    return nullptr;
+
+  const std::string* chain_id = params_dict->FindStringKey("chainId");
+  if (!chain_id) {
+    return nullptr;
+  }
+  chain.chain_id = *chain_id;
+
+  const std::string* chain_name = params_dict->FindStringKey("chainName");
+  if (chain_name) {
+    chain.chain_name = *chain_name;
+  }
+
+  const base::Value* explorerUrlsListValue =
+      params_dict->FindListKey("blockExplorerUrls");
+  if (explorerUrlsListValue) {
+    for (const auto& entry : explorerUrlsListValue->GetList())
+      chain.block_explorer_urls.push_back(entry.GetString());
+  }
+
+  const base::Value* iconUrlsValue = params_dict->FindListKey("iconUrls");
+  if (iconUrlsValue) {
+    for (const auto& entry : iconUrlsValue->GetList())
+      chain.icon_urls.push_back(entry.GetString());
+  }
+
+  const base::Value* rpcUrlsValue = params_dict->FindListKey("rpcUrls");
+  if (rpcUrlsValue) {
+    for (const auto& entry : rpcUrlsValue->GetList())
+      chain.rpc_endpoints.emplace_back(entry.GetString());
+  }
+  chain.active_rpc_endpoint_index =
+      GetFirstValidChainURLIndex(chain.rpc_endpoints);
+
+  const base::Value* nativeCurrencyValue =
+      params_dict->FindDictKey("nativeCurrency");
+  chain.decimals = 0;
+  if (nativeCurrencyValue) {
+    const std::string* symbol_name = nativeCurrencyValue->FindStringKey("name");
+    if (symbol_name) {
+      chain.symbol_name = *symbol_name;
+    }
+    const std::string* symbol = nativeCurrencyValue->FindStringKey("symbol");
+    if (symbol) {
+      chain.symbol = *symbol;
+    }
+    absl::optional<int> decimals = nativeCurrencyValue->FindIntKey("decimals");
+    if (decimals) {
+      chain.decimals = decimals.value();
+    }
+  }
 
   chain.coin = mojom::CoinType::ETH;
 
@@ -109,10 +180,14 @@ base::Value EthNetworkInfoToValue(const mojom::NetworkInfo& chain) {
   dict.SetKey("iconUrls", std::move(iconUrlsValue));
 
   base::ListValue rpcUrlsValue;
-  for (const auto& url : chain.rpc_urls) {
-    rpcUrlsValue.Append(url);
+  for (const auto& url : chain.rpc_endpoints) {
+    rpcUrlsValue.Append(url.spec());
   }
   dict.SetKey("rpcUrls", std::move(rpcUrlsValue));
+  DCHECK_GE(chain.active_rpc_endpoint_index, 0);
+  DCHECK_LT(static_cast<size_t>(chain.active_rpc_endpoint_index),
+            chain.rpc_endpoints.size());
+  dict.SetIntKey("activeRpcEndpointIndex", chain.active_rpc_endpoint_index);
   base::Value currency(base::Value::Type::DICTIONARY);
   currency.SetStringKey("name", chain.symbol_name);
   currency.SetStringKey("symbol", chain.symbol);
@@ -217,6 +292,23 @@ base::ListValue PermissionRequestResponseToValue(
   dict.SetStringKey("parentCapability", "eth_accounts");
   container_list.Append(std::move(dict));
   return container_list;
+}
+
+int GetFirstValidChainURLIndex(const std::vector<GURL>& chain_urls) {
+  if (chain_urls.empty())
+    return 0;
+  size_t index = 0;
+  for (const GURL& url : chain_urls) {
+    if (url.is_valid() && url.SchemeIsHTTPOrHTTPS() &&
+        !base::Contains(url.spec(), "$%7BINFURA_API_KEY%7D") &&
+        !base::Contains(url.spec(), "$%7BALCHEMY_API_KEY%7D") &&
+        !base::Contains(url.spec(), "$%7BAPI_KEY%7D") &&
+        !base::Contains(url.spec(), "$%7BPULSECHAIN_API_KEY%7D")) {
+      return index;
+    }
+    index++;
+  }
+  return 0;
 }
 
 }  // namespace brave_wallet

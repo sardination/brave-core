@@ -750,8 +750,8 @@ IN_PROC_BROWSER_TEST_F(SendTransactionBrowserTest,
   RestoreWallet();
 
   mojom::NetworkInfo chain("0x5566", "Test Custom Chain", {"https://url1.com"},
-                           {"https://url1.com"}, {"https://url1.com"}, "TC",
-                           "Test Coin", 11, mojom::CoinType::ETH, false);
+                           {"https://url1.com"}, 0, {GURL("https://url1.com")},
+                           "TC", "Test Coin", 11, mojom::CoinType::ETH, false);
   AddCustomNetwork(browser()->profile()->GetPrefs(), chain);
 
   TestUserApproved("request", "", true /* skip_restore */);

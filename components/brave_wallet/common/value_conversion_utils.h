@@ -20,6 +20,7 @@ absl::optional<std::string> ExtractChainIdFromValue(
     const base::Value::Dict* dict);
 base::Value EthNetworkInfoToValue(const mojom::NetworkInfo& info);
 mojom::NetworkInfoPtr ValueToEthNetworkInfo(const base::Value& value);
+mojom::NetworkInfoPtr ParseEip3085Payload(const base::Value& value);
 base::ListValue PermissionRequestResponseToValue(
     const url::Origin& origin,
     const std::vector<std::string> accounts);
@@ -27,6 +28,12 @@ base::ListValue PermissionRequestResponseToValue(
 mojom::BlockchainTokenPtr ValueToBlockchainToken(const base::Value& value,
                                                  const std::string& chain_id,
                                                  mojom::CoinType coin);
+
+// Returns index of the first URL to use that:
+// 1. Has no variables in it like ${INFURA_API_KEY}
+// 2. Is HTTP or HTTPS
+// Otherwise returns 0.
+int GetFirstValidChainURLIndex(const std::vector<GURL>& chain_urls);
 
 }  // namespace brave_wallet
 

@@ -1,8 +1,9 @@
 import { BraveWallet } from '../constants/types'
-export const emptyNetwork = {
+export const emptyNetwork: BraveWallet.NetworkInfo = {
   chainId: '',
   chainName: '',
-  rpcUrls: [],
+  activeRpcEndpointIndex: 0,
+  rpcEndpoints: [],
   blockExplorerUrls: [],
   iconUrls: [],
   symbol: '',
