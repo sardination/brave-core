@@ -49,7 +49,7 @@ void start::start_client(std::string server_address,
     } else {
       std::cout << "Disconnect, then re-establish connection after"
                 << sleep_duration << "second(s)" << std::endl;
-      std::this_thread::sleep_for(base::Time::Milliseconds());
+      std::this_thread::sleep_for(base::Time::Milliseconds()); // USER TIMER HERE INSTEAD
     }
   }
 
