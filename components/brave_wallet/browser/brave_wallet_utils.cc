@@ -90,7 +90,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Ethereum",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true))},
+     true},
     {brave_wallet::mojom::kPolygonMainnetChainId,
      "Polygon Mainnet",
      {"https://polygonscan.com"},
@@ -100,7 +100,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "MATIC",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true))},
+     true},
     {brave_wallet::mojom::kBinanceSmartChainMainnetChainId,
      "Binance Smart Chain Mainnet",
      {"https://bscscan.com"},
@@ -110,7 +110,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Binance Chain Native Token",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(false))},
+     false},
     {brave_wallet::mojom::kCeloMainnetChainId,
      "Celo Mainnet",
      {"https://explorer.celo.org"},
@@ -120,7 +120,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "CELO",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(false))},
+     false},
     {brave_wallet::mojom::kAvalancheMainnetChainId,
      "Avalanche C-Chain",
      {"https://snowtrace.io"},
@@ -130,7 +130,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Avalanche",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true))},
+     true},
     {brave_wallet::mojom::kFantomMainnetChainId,
      "Fantom Opera",
      {"https://ftmscan.com"},
@@ -140,7 +140,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Fantom",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true))},
+     true},
     {brave_wallet::mojom::kOptimismMainnetChainId,
      "Optimism",
      {"https://optimistic.etherscan.io"},
@@ -150,7 +150,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Ether",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(false))},
+     false},
     {brave_wallet::mojom::kAuroraMainnetChainId,
      "Aurora Mainnet",
      {"https://aurorascan.dev"},
@@ -160,7 +160,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Ether",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(false))},
+     false},
     {brave_wallet::mojom::kRinkebyChainId,
      "Rinkeby Test Network",
      {"https://rinkeby.etherscan.io"},
@@ -170,7 +170,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Ethereum",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true))},
+     true},
     {brave_wallet::mojom::kRopstenChainId,
      "Ropsten Test Network",
      {"https://ropsten.etherscan.io"},
@@ -180,7 +180,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Ethereum",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true))},
+     true},
     {brave_wallet::mojom::kGoerliChainId,
      "Goerli Test Network",
      {"https://goerli.etherscan.io"},
@@ -190,7 +190,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Ethereum",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true))},
+     true},
     {brave_wallet::mojom::kKovanChainId,
      "Kovan Test Network",
      {"https://kovan.etherscan.io"},
@@ -200,7 +200,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Ethereum",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true))},
+     true},
     {brave_wallet::mojom::kLocalhostChainId,
      "Localhost",
      {kGanacheLocalhostURL},
@@ -210,8 +210,7 @@ const brave_wallet::mojom::NetworkInfo kKnownEthNetworks[] = {
      "Ethereum",
      18,
      brave_wallet::mojom::CoinType::ETH,
-     mojom::NetworkInfoData::NewEthData(
-         mojom::NetworkInfoDataETH::New(false))}};
+     false}};
 
 const brave_wallet::mojom::NetworkInfo kKnownSolNetworks[] = {
     {brave_wallet::mojom::kSolanaMainnet,
@@ -223,7 +222,7 @@ const brave_wallet::mojom::NetworkInfo kKnownSolNetworks[] = {
      "Solana",
      9,
      brave_wallet::mojom::CoinType::SOL,
-     nullptr},
+     false},
     {brave_wallet::mojom::kSolanaTestnet,
      "Solana Testnet",
      {"https://explorer.solana.com/?cluster=testnet"},
@@ -233,7 +232,7 @@ const brave_wallet::mojom::NetworkInfo kKnownSolNetworks[] = {
      "Solana",
      9,
      brave_wallet::mojom::CoinType::SOL,
-     nullptr},
+     false},
     {brave_wallet::mojom::kSolanaDevnet,
      "Solana Devnet",
      {"https://explorer.solana.com/?cluster=devnet"},
@@ -243,7 +242,7 @@ const brave_wallet::mojom::NetworkInfo kKnownSolNetworks[] = {
      "Solana",
      9,
      brave_wallet::mojom::CoinType::SOL,
-     nullptr},
+     false},
     {brave_wallet::mojom::kLocalhostChainId,
      "Solana Localhost",
      {"https://explorer.solana.com/"
@@ -254,7 +253,7 @@ const brave_wallet::mojom::NetworkInfo kKnownSolNetworks[] = {
      "Solana",
      9,
      brave_wallet::mojom::CoinType::SOL,
-     nullptr}};
+     false}};
 
 const brave_wallet::mojom::NetworkInfo kKnownFilNetworks[] = {
     {brave_wallet::mojom::kFilecoinMainnet,
@@ -266,7 +265,7 @@ const brave_wallet::mojom::NetworkInfo kKnownFilNetworks[] = {
      "Filecoin",
      18,
      brave_wallet::mojom::CoinType::FIL,
-     nullptr},
+     false},
     {brave_wallet::mojom::kFilecoinTestnet,
      "Filecoin Testnet",
      {"https://calibration.filscan.io/tipset/message-detail"},
@@ -276,7 +275,7 @@ const brave_wallet::mojom::NetworkInfo kKnownFilNetworks[] = {
      "Filecoin",
      18,
      brave_wallet::mojom::CoinType::FIL,
-     nullptr},
+     false},
     {brave_wallet::mojom::kLocalhostChainId,
      "Filecoin Localhost",
      {kFilecoinLocalhostURL},
@@ -286,7 +285,7 @@ const brave_wallet::mojom::NetworkInfo kKnownFilNetworks[] = {
      "Filecoin",
      18,
      brave_wallet::mojom::CoinType::FIL,
-     nullptr}};
+     false}};
 
 const base::flat_map<std::string, std::string> kInfuraSubdomains = {
     {brave_wallet::mojom::kMainnetChainId, "mainnet"},
@@ -403,8 +402,7 @@ mojom::NetworkInfoPtr GetKnownEthChain(PrefService* prefs,
       result->rpc_urls.push_back(GetInfuraURLForKnownChainId(chain_id));
 
     if (prefs && chain_id == brave_wallet::mojom::kLocalhostChainId) {
-      result->data->set_eth_data(mojom::NetworkInfoDataETH::New(
-          prefs->GetBoolean(kSupportEip1559OnLocalhostChain)));
+      result->is_eip1559 = prefs->GetBoolean(kSupportEip1559OnLocalhostChain);
     }
 
     return result;

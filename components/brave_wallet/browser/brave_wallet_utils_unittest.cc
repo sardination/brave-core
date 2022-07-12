@@ -666,14 +666,13 @@ TEST(BraveWalletUtilsUnitTest, GetAllEthCustomChainsTest) {
   mojom::NetworkInfo chain1("chain_id", "chain_name", {"https://url1.com"},
                             {"https://url1.com"}, {"https://url1.com"},
                             "symbol_name", "symbol", 11, mojom::CoinType::ETH,
-                            mojom::NetworkInfoData::NewEthData(
-                                mojom::NetworkInfoDataETH::New(false)));
+                            false);
   values.push_back(EthNetworkInfoToValue(chain1));
 
-  mojom::NetworkInfo chain2(
-      "chain_id2", "chain_name2", {"https://url2.com"}, {"https://url2.com"},
-      {"https://url2.com"}, "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
-      mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true)));
+  mojom::NetworkInfo chain2("chain_id2", "chain_name2", {"https://url2.com"},
+                            {"https://url2.com"}, {"https://url2.com"},
+                            "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
+                            true);
   values.push_back(EthNetworkInfoToValue(chain2));
   UpdateCustomNetworks(&prefs, &values);
 
@@ -691,8 +690,7 @@ TEST(BraveWalletUtilsUnitTest, KnownEthChainExists) {
   mojom::NetworkInfo chain("chain_id", "chain_name", {"https://url1.com"},
                            {"https://url1.com"}, {"https://url1.com"},
                            "symbol_name", "symbol", 11, mojom::CoinType::ETH,
-                           mojom::NetworkInfoData::NewEthData(
-                               mojom::NetworkInfoDataETH::New(false)));
+                           false);
   values.push_back(EthNetworkInfoToValue(chain));
   UpdateCustomNetworks(&prefs, &values);
 
@@ -715,14 +713,13 @@ TEST(BraveWalletUtilsUnitTest, CustomEthChainExists) {
   mojom::NetworkInfo chain1("chain_id", "chain_name", {"https://url1.com"},
                             {"https://url1.com"}, {"https://url1.com"},
                             "symbol_name", "symbol", 11, mojom::CoinType::ETH,
-                            mojom::NetworkInfoData::NewEthData(
-                                mojom::NetworkInfoDataETH::New(false)));
+                            false);
   values.push_back(EthNetworkInfoToValue(chain1));
 
-  mojom::NetworkInfo chain2(
-      "chain_id2", "chain_name2", {"https://url2.com"}, {"https://url2.com"},
-      {"https://url2.com"}, "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
-      mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true)));
+  mojom::NetworkInfo chain2("chain_id2", "chain_name2", {"https://url2.com"},
+                            {"https://url2.com"}, {"https://url2.com"},
+                            "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
+                            true);
   values.push_back(EthNetworkInfoToValue(chain2));
 
   EXPECT_FALSE(CustomEthChainExists(&prefs, chain1.chain_id));
@@ -744,15 +741,13 @@ TEST(BraveWalletUtilsUnitTest, GetAllChainsTest) {
   mojom::NetworkInfo chain1(mojom::kPolygonMainnetChainId, "chain_name",
                             {"https://url1.com"}, {"https://url1.com"},
                             {"https://url1.com"}, "symbol_name", "symbol", 11,
-                            mojom::CoinType::ETH,
-                            mojom::NetworkInfoData::NewEthData(
-                                mojom::NetworkInfoDataETH::New(false)));
+                            mojom::CoinType::ETH, false);
   values.push_back(EthNetworkInfoToValue(chain1));
 
-  mojom::NetworkInfo chain2(
-      "chain_id2", "chain_name2", {"https://url2.com"}, {"https://url2.com"},
-      {"https://url2.com"}, "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
-      mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true)));
+  mojom::NetworkInfo chain2("chain_id2", "chain_name2", {"https://url2.com"},
+                            {"https://url2.com"}, {"https://url2.com"},
+                            "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
+                            true);
   values.push_back(EthNetworkInfoToValue(chain2));
   UpdateCustomNetworks(&prefs, &values);
 
@@ -799,14 +794,13 @@ TEST(BraveWalletUtilsUnitTest, GetNetworkURLTest) {
   mojom::NetworkInfo chain1("chain_id", "chain_name", {"https://url1.com"},
                             {"https://url1.com"}, {"https://url1.com"},
                             "symbol_name", "symbol", 11, mojom::CoinType::ETH,
-                            mojom::NetworkInfoData::NewEthData(
-                                mojom::NetworkInfoDataETH::New(false)));
+                            false);
   values.push_back(EthNetworkInfoToValue(chain1));
 
-  mojom::NetworkInfo chain2(
-      "chain_id2", "chain_name2", {"https://url2.com"}, {"https://url2.com"},
-      {"https://url2.com"}, "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
-      mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true)));
+  mojom::NetworkInfo chain2("chain_id2", "chain_name2", {"https://url2.com"},
+                            {"https://url2.com"}, {"https://url2.com"},
+                            "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
+                            true);
   values.push_back(EthNetworkInfoToValue(chain2));
   UpdateCustomNetworks(&prefs, &values);
   for (const auto& chain : GetAllKnownEthChains(&prefs)) {
@@ -886,18 +880,14 @@ TEST(BraveWalletUtilsUnitTest, GetKnownEthChain) {
     EXPECT_EQ(network->symbol, chain->symbol);
     EXPECT_EQ(network->decimals, chain->decimals);
     EXPECT_EQ(network->symbol_name, chain->symbol_name);
-    ASSERT_TRUE(network->data);
-    ASSERT_TRUE(network->data->is_eth_data());
-    EXPECT_EQ(network->data->get_eth_data()->is_eip1559,
+    EXPECT_EQ(network->is_eip1559,
               !non_eip1559_networks.contains(chain->chain_id));
   }
 
   prefs.SetBoolean(kSupportEip1559OnLocalhostChain, true);
   auto network =
       GetKnownEthChain(&prefs, brave_wallet::mojom::kLocalhostChainId);
-  ASSERT_TRUE(network->data);
-  ASSERT_TRUE(network->data->is_eth_data());
-  EXPECT_EQ(network->data->get_eth_data()->is_eip1559, true);
+  EXPECT_EQ(network->is_eip1559, true);
 }
 
 TEST(BraveWalletUtilsUnitTest, GetCustomEthChain) {
@@ -911,8 +901,7 @@ TEST(BraveWalletUtilsUnitTest, GetCustomEthChain) {
   mojom::NetworkInfo chain("0x5566", "chain_name", {"https://url1.com"},
                            {"https://url1.com"}, {"https://url1.com"},
                            "symbol_name", "symbol", 11, mojom::CoinType::ETH,
-                           mojom::NetworkInfoData::NewEthData(
-                               mojom::NetworkInfoDataETH::New(false)));
+                           false);
   values.push_back(EthNetworkInfoToValue(chain));
   UpdateCustomNetworks(&prefs, &values);
 
@@ -930,14 +919,12 @@ TEST(BraveWalletUtilsUnitTest, GetChain) {
   mojom::NetworkInfo chain1("0x5566", "chain_name", {"https://url1.com"},
                             {"https://url1.com"}, {"https://url1.com"},
                             "symbol_name", "symbol", 11, mojom::CoinType::ETH,
-                            mojom::NetworkInfoData::NewEthData(
-                                mojom::NetworkInfoDataETH::New(false)));
+                            false);
   values.push_back(EthNetworkInfoToValue(chain1));
   mojom::NetworkInfo chain2("0x89", "CustomPolygon", {"https://url1.com"},
                             {"https://url1.com"}, {"https://url1.com"},
                             "symbol_name", "symbol", 123, mojom::CoinType::ETH,
-                            mojom::NetworkInfoData::NewEthData(
-                                mojom::NetworkInfoDataETH::New(false)));
+                            false);
   values.push_back(EthNetworkInfoToValue(chain2));
   UpdateCustomNetworks(&prefs, &values);
 
@@ -955,7 +942,7 @@ TEST(BraveWalletUtilsUnitTest, GetChain) {
       brave_wallet::mojom::kSolanaMainnet, "Solana Mainnet Beta",
       {"https://explorer.solana.com/"}, {},
       {"https://mainnet-beta-solana.brave.com/rpc"}, "SOL", "Solana", 9,
-      brave_wallet::mojom::CoinType::SOL, nullptr);
+      brave_wallet::mojom::CoinType::SOL, false);
   EXPECT_FALSE(GetChain(&prefs, "0x123", mojom::CoinType::SOL));
   EXPECT_EQ(GetChain(&prefs, "0x65", mojom::CoinType::SOL),
             sol_mainnet.Clone());
@@ -965,7 +952,7 @@ TEST(BraveWalletUtilsUnitTest, GetChain) {
       brave_wallet::mojom::kFilecoinMainnet, "Filecoin Mainnet",
       {"https://filscan.io/tipset/message-detail"}, {},
       {"https://api.node.glif.io/rpc/v0"}, "FIL", "Filecoin", 18,
-      brave_wallet::mojom::CoinType::FIL, nullptr);
+      brave_wallet::mojom::CoinType::FIL, false);
   EXPECT_FALSE(GetChain(&prefs, "0x123", mojom::CoinType::FIL));
   EXPECT_EQ(GetChain(&prefs, "f", mojom::CoinType::FIL), fil_mainnet.Clone());
 }
@@ -1017,14 +1004,13 @@ TEST(BraveWalletUtilsUnitTest, GetNetworkId) {
   mojom::NetworkInfo chain1("chain_id", "chain_name", {"https://url1.com"},
                             {"https://url1.com"}, {"https://url1.com"},
                             "symbol_name", "symbol", 11, mojom::CoinType::ETH,
-                            mojom::NetworkInfoData::NewEthData(
-                                mojom::NetworkInfoDataETH::New(false)));
+                            false);
   values.push_back(EthNetworkInfoToValue(chain1));
 
-  mojom::NetworkInfo chain2(
-      "chain_id2", "chain_name2", {"https://url2.com"}, {"https://url2.com"},
-      {"https://url2.com"}, "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
-      mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true)));
+  mojom::NetworkInfo chain2("chain_id2", "chain_name2", {"https://url2.com"},
+                            {"https://url2.com"}, {"https://url2.com"},
+                            "symbol_name2", "symbol2", 22, mojom::CoinType::ETH,
+                            true);
   values.push_back(EthNetworkInfoToValue(chain2));
   UpdateCustomNetworks(&prefs, &values);
 
@@ -1060,13 +1046,11 @@ TEST(BraveWalletUtilsUnitTest, AddCustomNetwork) {
   mojom::NetworkInfo chain1("chain_id", "chain_name", {"https://url1.com"},
                             {"https://url1.com"}, {"https://url1.com"},
                             "symbol", "symbol_name", 11, mojom::CoinType::ETH,
-                            mojom::NetworkInfoData::NewEthData(
-                                mojom::NetworkInfoDataETH::New(false)));
+                            false);
 
-  mojom::NetworkInfo chain2(
-      "chain_id2", "chain_name2", {"https://url2.com"}, {} /* icon_urls */,
-      {"https://url2.com"}, "symbol2", "symbol_name2", 22, mojom::CoinType::ETH,
-      mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true)));
+  mojom::NetworkInfo chain2("chain_id2", "chain_name2", {"https://url2.com"},
+                            {} /* icon_urls */, {"https://url2.com"}, "symbol2",
+                            "symbol_name2", 22, mojom::CoinType::ETH, true);
 
   AddCustomNetwork(&prefs, chain1);
   AddCustomNetwork(&prefs, chain2);
@@ -1132,9 +1116,7 @@ TEST(BraveWalletUtilsUnitTest, CustomNetworkMatchesKnownNetwork) {
   mojom::NetworkInfo chain1(mojom::kPolygonMainnetChainId, "Custom Polygon",
                             {"https://url1.com"}, {"https://url1.com"},
                             {"https://custom-rpc.com"}, "symbol", "symbol_name",
-                            11, mojom::CoinType::ETH,
-                            mojom::NetworkInfoData::NewEthData(
-                                mojom::NetworkInfoDataETH::New(false)));
+                            11, mojom::CoinType::ETH, false);
 
   AddCustomNetwork(&prefs, chain1);
 
@@ -1164,8 +1146,7 @@ TEST(BraveWalletUtilsUnitTest, RemoveCustomNetwork) {
   mojom::NetworkInfo chain("some_id", "Custom Polygon", {"https://url1.com"},
                            {"https://url1.com"}, {"https://custom-rpc.com"},
                            "symbol", "symbol_name", 11, mojom::CoinType::ETH,
-                           mojom::NetworkInfoData::NewEthData(
-                               mojom::NetworkInfoDataETH::New(false)));
+                           false);
 
   AddCustomNetwork(&prefs, chain);
   EXPECT_TRUE(CustomEthChainExists(&prefs, chain.chain_id));

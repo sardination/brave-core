@@ -150,17 +150,13 @@ TEST(TestBraveWalletHandler, RemoveEthereumChain) {
   brave_wallet::mojom::NetworkInfo chain1(
       "chain_id", "chain_name", {"https://url1.com"}, {"https://url1.com"},
       {"https://url1.com"}, "symbol_name", "symbol", 11,
-      brave_wallet::mojom::CoinType::ETH,
-      brave_wallet::mojom::NetworkInfoData::NewEthData(
-          brave_wallet::mojom::NetworkInfoDataETH::New(false)));
+      brave_wallet::mojom::CoinType::ETH, false);
   values.push_back(brave_wallet::EthNetworkInfoToValue(chain1));
 
   brave_wallet::mojom::NetworkInfo chain2(
       "chain_id2", "chain_name2", {"https://url2.com"}, {"https://url2.com"},
       {"https://url2.com"}, "symbol_name2", "symbol2", 22,
-      brave_wallet::mojom::CoinType::ETH,
-      brave_wallet::mojom::NetworkInfoData::NewEthData(
-          brave_wallet::mojom::NetworkInfoDataETH::New(true)));
+      brave_wallet::mojom::CoinType::ETH, true);
   values.push_back(brave_wallet::EthNetworkInfoToValue(chain2));
   UpdateCustomNetworks(handler.prefs(), &values);
   EXPECT_EQ(handler.GetAllEthCustomChains().size(), 2u);
@@ -184,9 +180,7 @@ TEST(TestBraveWalletHandler, ResetEthereumChain) {
   brave_wallet::mojom::NetworkInfo chain1(
       brave_wallet::mojom::kPolygonMainnetChainId, "chain_name",
       {"https://url1.com"}, {"https://url1.com"}, {"https://url1.com"},
-      "symbol_name", "symbol", 11, brave_wallet::mojom::CoinType::ETH,
-      brave_wallet::mojom::NetworkInfoData::NewEthData(
-          brave_wallet::mojom::NetworkInfoDataETH::New(false)));
+      "symbol_name", "symbol", 11, brave_wallet::mojom::CoinType::ETH, false);
   values.push_back(brave_wallet::EthNetworkInfoToValue(chain1));
 
   EXPECT_EQ(handler.GetAllEthCustomChains().size(), 0u);
@@ -209,9 +203,7 @@ TEST(TestBraveWalletHandler, AddEthereumChain) {
   brave_wallet::mojom::NetworkInfo chain1(
       "0x999", "chain_name", {"https://url1.com"}, {"https://url1.com"},
       {"https://url1.com"}, "symbol", "symbol_name", 11,
-      brave_wallet::mojom::CoinType::ETH,
-      brave_wallet::mojom::NetworkInfoData::NewEthData(
-          brave_wallet::mojom::NetworkInfoDataETH::New(false)));
+      brave_wallet::mojom::CoinType::ETH, false);
   EXPECT_EQ(handler.GetAllEthCustomChains().size(), 0u);
 
   auto args = base::ListValue();
@@ -264,9 +256,7 @@ TEST(TestBraveWalletHandler, AddEthereumChainWrongNetwork) {
   brave_wallet::mojom::NetworkInfo chain1(
       "0x999", "chain_name", {"https://url1.com"}, {"https://url2.com"},
       {"https://url3.com"}, "symbol", "symbol_name", 11,
-      brave_wallet::mojom::CoinType::ETH,
-      brave_wallet::mojom::NetworkInfoData::NewEthData(
-          brave_wallet::mojom::NetworkInfoDataETH::New(false)));
+      brave_wallet::mojom::CoinType::ETH, false);
 
   EXPECT_EQ(handler.GetAllEthCustomChains().size(), 0u);
 
@@ -326,17 +316,13 @@ TEST(TestBraveWalletHandler, GetNetworkList) {
   brave_wallet::mojom::NetworkInfo chain1(
       "chain_id", "chain_name", {"https://url1.com"}, {"https://url1.com"},
       {"https://url1.com"}, "symbol_name", "symbol", 11,
-      brave_wallet::mojom::CoinType::ETH,
-      brave_wallet::mojom::NetworkInfoData::NewEthData(
-          brave_wallet::mojom::NetworkInfoDataETH::New(false)));
+      brave_wallet::mojom::CoinType::ETH, false);
   values.push_back(brave_wallet::EthNetworkInfoToValue(chain1));
 
   brave_wallet::mojom::NetworkInfo chain2(
       "chain_id2", "chain_name2", {"https://url2.com"}, {"https://url2.com"},
       {"https://url2.com"}, "symbol_name2", "symbol2", 22,
-      brave_wallet::mojom::CoinType::ETH,
-      brave_wallet::mojom::NetworkInfoData::NewEthData(
-          brave_wallet::mojom::NetworkInfoDataETH::New(true)));
+      brave_wallet::mojom::CoinType::ETH, true);
   values.push_back(brave_wallet::EthNetworkInfoToValue(chain2));
   UpdateCustomNetworks(handler.prefs(), &values);
   EXPECT_EQ(handler.GetAllEthCustomChains().size(), 2u);
@@ -367,17 +353,13 @@ TEST(TestBraveWalletHandler, SetActiveNetwork) {
   brave_wallet::mojom::NetworkInfo chain1(
       "chain_id", "chain_name", {"https://url1.com"}, {"https://url1.com"},
       {"https://url1.com"}, "symbol_name", "symbol", 11,
-      brave_wallet::mojom::CoinType::ETH,
-      brave_wallet::mojom::NetworkInfoData::NewEthData(
-          brave_wallet::mojom::NetworkInfoDataETH::New(false)));
+      brave_wallet::mojom::CoinType::ETH, false);
   values.push_back(brave_wallet::EthNetworkInfoToValue(chain1));
 
   brave_wallet::mojom::NetworkInfo chain2(
       "chain_id2", "chain_name2", {"https://url2.com"}, {"https://url2.com"},
       {"https://url2.com"}, "symbol_name2", "symbol2", 22,
-      brave_wallet::mojom::CoinType::ETH,
-      brave_wallet::mojom::NetworkInfoData::NewEthData(
-          brave_wallet::mojom::NetworkInfoDataETH::New(true)));
+      brave_wallet::mojom::CoinType::ETH, true);
   values.push_back(brave_wallet::EthNetworkInfoToValue(chain2));
   UpdateCustomNetworks(handler.prefs(), &values);
   EXPECT_EQ(handler.GetAllEthCustomChains().size(), 2u);

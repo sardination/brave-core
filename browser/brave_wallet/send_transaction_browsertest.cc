@@ -751,9 +751,7 @@ IN_PROC_BROWSER_TEST_F(SendTransactionBrowserTest,
 
   mojom::NetworkInfo chain("0x5566", "Test Custom Chain", {"https://url1.com"},
                            {"https://url1.com"}, {"https://url1.com"}, "TC",
-                           "Test Coin", 11, mojom::CoinType::ETH,
-                           mojom::NetworkInfoData::NewEthData(
-                               mojom::NetworkInfoDataETH::New(false)));
+                           "Test Coin", 11, mojom::CoinType::ETH, false);
   AddCustomNetwork(browser()->profile()->GetPrefs(), chain);
 
   TestUserApproved("request", "", true /* skip_restore */);

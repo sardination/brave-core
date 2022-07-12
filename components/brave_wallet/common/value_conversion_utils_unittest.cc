@@ -71,9 +71,7 @@ TEST(ValueConversionUtilsUnitTest, ValueToEthNetworkInfoTest) {
     EXPECT_EQ("https://xdaichain.com/fake/example/url/xdai.png",
               chain->icon_urls.back());
     ASSERT_EQ(chain->coin, mojom::CoinType::ETH);
-    ASSERT_TRUE(chain->data);
-    ASSERT_TRUE(chain->data->is_eth_data());
-    EXPECT_TRUE(chain->data->get_eth_data()->is_eip1559);
+    EXPECT_TRUE(chain->is_eip1559);
   }
   {
     mojom::NetworkInfoPtr chain =
@@ -90,7 +88,7 @@ TEST(ValueConversionUtilsUnitTest, ValueToEthNetworkInfoTest) {
     ASSERT_TRUE(chain->symbol_name.empty());
     ASSERT_TRUE(chain->symbol.empty());
     ASSERT_EQ(chain->coin, mojom::CoinType::ETH);
-    ASSERT_FALSE(chain->data);
+    ASSERT_FALSE(chain->is_eip1559);
     EXPECT_EQ(chain->decimals, 0);
   }
 
@@ -111,10 +109,10 @@ TEST(ValueConversionUtilsUnitTest, ValueToEthNetworkInfoTest) {
 }
 
 TEST(ValueConversionUtilsUnitTest, EthNetworkInfoToValueTest) {
-  mojom::NetworkInfo chain(
-      "chain_id", "chain_name", {"https://url1.com"}, {"https://url1.com"},
-      {"https://url1.com"}, "symbol_name", "symbol", 11, mojom::CoinType::ETH,
-      mojom::NetworkInfoData::NewEthData(mojom::NetworkInfoDataETH::New(true)));
+  mojom::NetworkInfo chain("chain_id", "chain_name", {"https://url1.com"},
+                           {"https://url1.com"}, {"https://url1.com"},
+                           "symbol_name", "symbol", 11, mojom::CoinType::ETH,
+                           true);
   base::Value value = brave_wallet::EthNetworkInfoToValue(chain);
   EXPECT_EQ(*value.FindStringKey("chainId"), chain.chain_id);
   EXPECT_EQ(*value.FindStringKey("chainName"), chain.chain_name);

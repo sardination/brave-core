@@ -78,14 +78,9 @@ mojom::NetworkInfoPtr ValueToEthNetworkInfo(const base::Value& value) {
       chain.decimals = decimals.value();
     }
   }
+  chain.is_eip1559 = params_dict->FindBoolKey("is_eip1559").value_or(false);
 
   chain.coin = mojom::CoinType::ETH;
-
-  absl::optional<bool> is_eip1559 = params_dict->FindBoolKey("is_eip1559");
-  if (is_eip1559) {
-    chain.data = mojom::NetworkInfoData::NewEthData(
-        mojom::NetworkInfoDataETH::New(*is_eip1559));
-  }
 
   return chain.Clone();
 }
@@ -95,11 +90,7 @@ base::Value EthNetworkInfoToValue(const mojom::NetworkInfo& chain) {
   DCHECK_EQ(chain.coin, mojom::CoinType::ETH);
   dict.SetStringKey("chainId", chain.chain_id);
   dict.SetStringKey("chainName", chain.chain_name);
-  bool is_eip1559 = false;
-  if (chain.data && chain.data->is_eth_data()) {
-    is_eip1559 = chain.data->get_eth_data()->is_eip1559;
-  }
-  dict.SetBoolKey("is_eip1559", is_eip1559);
+  dict.SetBoolKey("is_eip1559", chain.is_eip1559);
 
   base::ListValue blockExplorerUrlsValue;
   if (!chain.block_explorer_urls.empty()) {
