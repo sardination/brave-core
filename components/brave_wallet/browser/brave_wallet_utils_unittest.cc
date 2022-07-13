@@ -1190,7 +1190,7 @@ TEST(BraveWalletUtilsUnitTest, HiddenNetworks) {
               ElementsAreArray<std::string>({}));
 }
 
-TEST_F(BraveWalletUtilsUnitTest, GetPrefKeyForCoinType) {
+TEST(BraveWalletUtilsUnitTest, GetPrefKeyForCoinType) {
   auto key = GetPrefKeyForCoinType(mojom::CoinType::ETH);
   EXPECT_EQ(key, kEthereumPrefKey);
   key = GetPrefKeyForCoinType(mojom::CoinType::FIL);

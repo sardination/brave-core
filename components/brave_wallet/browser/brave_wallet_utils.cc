@@ -164,7 +164,8 @@ const std::vector<mojom::NetworkInfo>& GetKnownEthNetworks() {
         "Aurora Mainnet",
         {"https://aurorascan.dev"},
         {},
-        {"https://mainnet.aurora.dev"},
+        0,
+        {GURL("https://mainnet.aurora.dev")},
         "ETH",
         "Ether",
         18,
@@ -415,7 +416,9 @@ GURL AddInfuraProjectId(const GURL& url) {
 }
 
 GURL MaybeAddInfuraProjectId(const GURL& url) {
-  DCHECK(url.is_valid()) << url.possibly_invalid_spec();
+  if (!url.is_valid())
+    return GURL();
+
   for (const auto& infura_chain_id : kInfuraChains) {
     if (GetInfuraURLForKnownChainId(infura_chain_id) == url) {
       return AddInfuraProjectId(url);
@@ -915,8 +918,8 @@ GURL GetNetworkURL(PrefService* prefs,
     }
   } else if (coin == mojom::CoinType::FIL) {
     for (const auto& network : GetKnownFilNetworks()) {
-      if (network->chain_id == chain_id) {
-        return GetActiveEndpointUrl(*network);
+      if (network.chain_id == chain_id) {
+        return GetActiveEndpointUrl(network);
       }
     }
   }
@@ -1027,8 +1030,8 @@ std::string GetKnownFilNetworkId(const std::string& chain_id) {
   // does not have predefined subdomain.
   if (chain_id == mojom::kLocalhostChainId) {
     for (const auto& network : GetKnownFilNetworks()) {
-      if (network->chain_id == chain_id) {
-        return GURL(network->rpc_endpoints.front()).spec();
+      if (network.chain_id == chain_id) {
+        return GURL(network.rpc_endpoints.front()).spec();
       }
     }
   }
