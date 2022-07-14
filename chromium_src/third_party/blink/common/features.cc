@@ -48,5 +48,9 @@ const base::Feature kPartitionBlinkMemoryCache{
 const base::Feature kRestrictWebSocketsPool{"RestrictWebSocketsPool",
                                             base::FEATURE_ENABLED_BY_DEFAULT};
 
+// Allow certain client hints in request header.
+const base::Feature kAllowCertainClientHints{"AllowCertainClientHints",
+                                             base::FEATURE_ENABLED_BY_DEFAULT};
+
 }  // namespace features
 }  // namespace blink

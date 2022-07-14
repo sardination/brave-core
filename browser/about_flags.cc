@@ -335,6 +335,12 @@ constexpr char kRestrictWebSocketsPoolDescription[] =
 constexpr char kPlaylistName[] = "Playlist";
 constexpr char kPlaylistDescription[] = "Enables Playlist";
 
+constexpr char kAllowCertainClientHintsName[] =
+    "Allow certain request client hints";
+constexpr char kAllowCertainClientHintsDescription[] =
+    "Allows setting certain request client hints (sec-ch-ua, sec-ch-ua-mobile, "
+    "sec-ch-ua-platform)";
+
 }  // namespace
 
 }  // namespace flag_descriptions
@@ -603,6 +609,10 @@ constexpr char kPlaylistDescription[] = "Enables Playlist";
       flag_descriptions::kRestrictWebSocketsPoolName,                       \
       flag_descriptions::kRestrictWebSocketsPoolDescription, kOsAll,        \
       FEATURE_VALUE_TYPE(blink::features::kRestrictWebSocketsPool)},        \
+    {"allow-certain-client-hints",                                          \
+      flag_descriptions::kAllowCertainClientHintsName,                      \
+      flag_descriptions::kAllowCertainClientHintsDescription, kOsAll,       \
+      FEATURE_VALUE_TYPE(blink::features::kAllowCertainClientHints)},       \
     BRAVE_IPFS_FEATURE_ENTRIES                                              \
     BRAVE_NATIVE_WALLET_FEATURE_ENTRIES                                     \
     BRAVE_NEWS_FEATURE_ENTRIES                                              \
