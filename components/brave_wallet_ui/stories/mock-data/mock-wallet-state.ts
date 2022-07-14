@@ -29,7 +29,7 @@ const mockAccount: WalletAccountType = {
   keyringId: undefined
 }
 
-const mockNetworkList = [
+const mockNetworkList: BraveWallet.NetworkInfo[] = [
   {
     'chainId': '0x1',
     'chainName': 'Ethereum Mainnet',
@@ -37,18 +37,15 @@ const mockNetworkList = [
       'https://etherscan.io'
     ],
     'iconUrls': [],
-    'rpcUrls': [
-      'https://mainnet-infura.brave.com/f7106c838853428280fa0c585acc9485'
+    'activeRpcEndpointIndex': 0,
+    'rpcEndpoints': [
+      { url: 'https://mainnet-infura.brave.com/f7106c838853428280fa0c585acc9485' }
     ],
     'symbol': 'ETH',
     'symbolName': 'Ethereum',
     'decimals': 18,
     'coin': 60,
-    'data': {
-      'ethData': {
-        'isEip1559': true
-      }
-    }
+    'isEip1559': true
   },
   {
     'chainId': '0x4',
@@ -57,18 +54,15 @@ const mockNetworkList = [
       'https://rinkeby.etherscan.io'
     ],
     'iconUrls': [],
-    'rpcUrls': [
-      'https://rinkeby-infura.brave.com/f7106c838853428280fa0c585acc9485'
+    'activeRpcEndpointIndex': 0,
+    'rpcEndpoints': [
+      { url: 'https://rinkeby-infura.brave.com/f7106c838853428280fa0c585acc9485' }
     ],
     'symbol': 'ETH',
     'symbolName': 'Ethereum',
     'decimals': 18,
     'coin': 60,
-    'data': {
-      'ethData': {
-        'isEip1559': true
-      }
-    }
+    'isEip1559': true
   },
   {
     'chainId': '0x3',
@@ -77,18 +71,15 @@ const mockNetworkList = [
       'https://ropsten.etherscan.io'
     ],
     'iconUrls': [],
-    'rpcUrls': [
-      'https://ropsten-infura.brave.com/f7106c838853428280fa0c585acc9485'
+    'activeRpcEndpointIndex': 0,
+    'rpcEndpoints': [
+      { url: 'https://ropsten-infura.brave.com/f7106c838853428280fa0c585acc9485' }
     ],
     'symbol': 'ETH',
     'symbolName': 'Ethereum',
     'decimals': 18,
     'coin': 60,
-    'data': {
-      'ethData': {
-        'isEip1559': true
-      }
-    }
+    'isEip1559': true
   },
   {
     'chainId': '0x5',
@@ -97,18 +88,15 @@ const mockNetworkList = [
       'https://goerli.etherscan.io'
     ],
     'iconUrls': [],
-    'rpcUrls': [
-      'https://goerli-infura.brave.com/f7106c838853428280fa0c585acc9485'
+    'activeRpcEndpointIndex': 0,
+    'rpcEndpoints': [
+      { url: 'https://goerli-infura.brave.com/f7106c838853428280fa0c585acc9485' }
     ],
     'symbol': 'ETH',
     'symbolName': 'Ethereum',
     'decimals': 18,
     'coin': 60,
-    'data': {
-      'ethData': {
-        'isEip1559': true
-      }
-    }
+    'isEip1559': true
   },
   {
     'chainId': '0x2a',
@@ -117,18 +105,15 @@ const mockNetworkList = [
       'https://kovan.etherscan.io'
     ],
     'iconUrls': [],
-    'rpcUrls': [
-      'https://kovan-infura.brave.com/f7106c838853428280fa0c585acc9485'
+    'activeRpcEndpointIndex': 0,
+    'rpcEndpoints': [
+      { url: 'https://kovan-infura.brave.com/f7106c838853428280fa0c585acc9485' }
     ],
     'symbol': 'ETH',
     'symbolName': 'Ethereum',
     'decimals': 18,
     'coin': 60,
-    'data': {
-      'ethData': {
-        'isEip1559': true
-      }
-    }
+    'isEip1559': true
   },
   {
     'chainId': '0x539',
@@ -137,18 +122,15 @@ const mockNetworkList = [
       'http://localhost:7545/'
     ],
     'iconUrls': [],
-    'rpcUrls': [
-      'http://localhost:7545/'
+    'activeRpcEndpointIndex': 0,
+    'rpcEndpoints': [
+      { url: 'http://localhost:7545/' }
     ],
     'symbol': 'ETH',
     'symbolName': 'Ethereum',
     'decimals': 18,
     'coin': 60,
-    'data': {
-      'ethData': {
-        'isEip1559': false
-      }
-    }
+    'isEip1559': false
   }
 ]
 
