@@ -82,7 +82,6 @@ void EnsureBrowserContextKeyedServiceFactoriesBuilt() {
 #if !BUILDFLAG(IS_ANDROID)
   BookmarkPrefsServiceFactory::GetInstance();
   SearchEngineProviderServiceFactory::GetInstance();
-  BraveSyncAlertsServiceFactory::GetInstance();
 #else
   ntp_background_images::NTPBackgroundImagesBridgeFactory::GetInstance();
 #endif
@@ -117,6 +116,8 @@ void EnsureBrowserContextKeyedServiceFactoriesBuilt() {
 #if BUILDFLAG(ENABLE_PLAYLIST)
   playlist::PlaylistServiceFactory::GetInstance();
 #endif
+
+  BraveSyncAlertsServiceFactory::GetInstance();
 }
 
 }  // namespace brave
