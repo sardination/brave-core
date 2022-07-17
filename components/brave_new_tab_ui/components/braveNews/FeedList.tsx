@@ -21,7 +21,9 @@ const Subtitle = styled.span`
 
 export default function FeedList() {
     const publishers = usePublishers({ enabled: true });
-    const orderedPublishers = useMemo(() => publishers.sort((a, b) => a.publisherName.localeCompare(b.publisherName)), [publishers]);
+    const orderedPublishers = useMemo(() => publishers
+        .sort((a, b) =>
+            a.publisherName.localeCompare(b.publisherName)), [publishers]);
 
     return <div>
         <Flex direction="row" justify="space-between" align="center">

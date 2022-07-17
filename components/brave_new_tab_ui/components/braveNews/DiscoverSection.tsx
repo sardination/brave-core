@@ -20,12 +20,6 @@ const Header = styled.span`
     margin: 8px 0;
 `
 
-const Link = styled.a`
-    color: #4C54D2;
-    font-size: 12px;
-    font-weight: 600;
-`
-
 const Subtitle = styled.span`
     font-size: 12px;
 `
@@ -41,7 +35,6 @@ export default function DiscoverSection(props: Props) {
     return <Container direction='column'>
         <Flex direction='row' gap={8} align='center'>
             <Header>{props.name}</Header>
-            <Link>View All</Link>
         </Flex>
         {props.subtitle && <Subtitle>
             {props.subtitle}

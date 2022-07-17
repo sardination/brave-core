@@ -6,7 +6,6 @@ import { api, usePublishers } from "../../api/brave_news/news";
 import Flex from "../Flex";
 import { useBraveNews } from "./Context";
 import FeedCard from "./FeedCard";
-import FollowButton from "./FollowButton";
 import { BackArrow } from "./Icons";
 
 const Container = styled.div`
@@ -33,8 +32,7 @@ const HeaderText = styled(Flex)`
 
 const FeedCardsContainer = styled('div')`
     display: grid;
-    grid-template-columns: repeat(3, auto);
-    grid-template-columns: repeat(auto-fill, auto);
+    grid-template-columns: repeat(3, minmax(0, 208px));
     gap: 40px 16px;
     margin-top: 12px;
 `
@@ -67,9 +65,8 @@ export default function BrowseCategory(props: { categoryId: string }) {
         <Flex direction="row" justify="space-between" align="center">
             <Flex direction="row" align="center" gap={8}>
                 <Toggle isOn={allSelected} onChange={toggleAllSelected} />
-                <span>Select {allSelected ? 'None' : 'All'}</span>
+                <span>{allSelected ? 'Select None' : 'Select All'}</span>
             </Flex>
-            <FollowButton following={false} onClick={console.log} />
         </Flex>
         <FeedCardsContainer>
             {publishers.map((p) => <FeedCard

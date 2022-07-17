@@ -32,7 +32,8 @@ class BraveNewsApi {
 
     getCategories() {
         return Array.from(Object.values(this.lastValue).reduce((prev, next) => {
-            prev.add(next.categoryName);
+            if (next.categoryName)
+                prev.add(next.categoryName);
             return prev;
         }, new Set<string>()));
     }
