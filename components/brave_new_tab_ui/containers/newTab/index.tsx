@@ -1243,26 +1243,6 @@ class NewTabPage extends React.Component<Props, State> {
               </Page.GridItemClock>
             }
             {
-              showTopSites
-                ? (
-                  <Page.GridItemTopSites>
-                    <TopSitesGrid
-                      actions={actions}
-                      paddingType={'none'}
-                      customLinksEnabled={newTabData.customLinksEnabled}
-                      onShowEditTopSite={this.showEditTopSite}
-                      widgetTitle={getLocale('topSitesTitle')}
-                      gridSites={gridSitesData.gridSites}
-                      menuPosition={'right'}
-                      hideWidget={this.toggleShowTopSites}
-                      onAddSite={showAddNewSiteMenuItem ? this.showEditTopSite : undefined}
-                      onToggleCustomLinksEnabled={this.toggleCustomLinksEnabled}
-                      textDirection={newTabData.textDirection}
-                    />
-                  </Page.GridItemTopSites>
-                ) : null
-            }
-            {
               gridSitesData.shouldShowSiteRemovedNotification
                 ? (
                   <Page.GridItemNotification>

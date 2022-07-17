@@ -1,5 +1,6 @@
 
 import * as React from "react";
+import { useMemo } from "react";
 import styled from "styled-components";
 import { usePublishers } from "../../api/brave_news/news";
 import Flex from "../Flex";
@@ -20,6 +21,7 @@ const Subtitle = styled.span`
 
 export default function FeedList() {
     const publishers = usePublishers({ enabled: true });
+    const orderedPublishers = useMemo(() => publishers.sort((a, b) => a.publisherName.localeCompare(b.publisherName)), [publishers]);
 
     return <div>
         <Flex direction="row" justify="space-between" align="center">
@@ -27,7 +29,7 @@ export default function FeedList() {
             <Subtitle>{publishers.length} sources</Subtitle>
         </Flex>
         <Flex direction="column">
-            {publishers.map((p) => (
+            {orderedPublishers.map((p) => (
                 <FeedListEntry key={p.publisherId} publisherId={p.publisherId} />
             ))}
         </Flex>
