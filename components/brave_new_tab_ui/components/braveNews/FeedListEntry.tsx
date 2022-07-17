@@ -38,7 +38,8 @@ export default function FeedListEntry(props: Props) {
 
     return <Container direction="row" justify="space-between" align='center' onClick={() => setEnabled(!enabled)}>
         <Flex align='center' gap={8}>
-            <FavIcon src={''} />
+            {/* Currently, we don't have favicons for publishers coming through to the UI */}
+            {'favicon' in publisher && <FavIcon src={''} />}
             <Text>{publisher.publisherName}</Text>
         </Flex>
         <ToggleButton>

@@ -8,6 +8,7 @@ interface Props extends Omit<ButtonProps, 'isPrimary'> {
 }
 
 const StyledButton = styled(Button)`
+    padding: 5px 14px;
     ${p => !p.isPrimary && css`
         color: var(--interactive5);
         --inner-border-color: var(--interactive5);

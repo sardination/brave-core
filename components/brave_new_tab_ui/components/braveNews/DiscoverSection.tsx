@@ -5,7 +5,6 @@ import Flex from '../Flex';
 interface Props {
     name: string;
     subtitle?: React.ReactNode;
-    sectionId: string;
     children?: React.ReactNode;
 }
 

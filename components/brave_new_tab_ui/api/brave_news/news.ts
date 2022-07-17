@@ -152,7 +152,9 @@ export const usePublishers = (options?: { enabled?: boolean, categoryId?: string
             api.removeListener(handler);
         }
     }, [options?.enabled, options?.categoryId]);
-    return publishers;
+
+    const sorted = useMemo(() => publishers.sort((a, b) => a.publisherName.localeCompare(b.publisherName)), [publishers]);
+    return sorted;
 }
 
 export const usePublisher = (publisherId: string) => {
