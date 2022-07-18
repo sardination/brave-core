@@ -1,13 +1,14 @@
+import Button from '$web-components/button'
 import TextInput from '$web-components/input'
 import * as React from 'react'
+import { useState } from 'react'
 import styled from 'styled-components'
+import { useCategories, usePublishers } from '../../api/brave_news/news'
 import Flex from '../Flex'
-import Button from '$web-components/button'
 import CategoryCard from './CategoryCard'
 import DiscoverSection from './DiscoverSection'
-import { useCategories, usePublishers, useSearchResults } from '../../api/brave_news/news'
-import { useState } from 'react'
-import FeedCard, { DirectFeedCard } from './FeedCard'
+import FeedCard from './FeedCard'
+import SearchResults from './SearchResults'
 
 const Header = styled.span`
     font-size: 24px;
@@ -53,19 +54,12 @@ export default function Discover(props: {}) {
     const categories = useCategories();
     const [showingAllCategories, setShowingAllCategories] = React.useState(false);
     const [query, setQuery] = useState('');
-    const { feedResults, directResults, loading } = useSearchResults(query);
     const publishers = usePublishers();
 
     return <Flex direction='column'>
         <Header>Discover</Header>
         <SearchInput type="search" placeholder='Search for news, site, topic or RSS feed' value={query} onInput={e => setQuery(e.currentTarget.value)} />
-        {loading && <span>Loading...</span>}
-        {!!directResults.length && <DiscoverSection name='Direct Feeds'>
-            {directResults.map(r => <DirectFeedCard key={r.feedUrl.url} feedUrl={r.feedUrl.url} title={r.feedTitle} />)}
-        </DiscoverSection>}
-        {!!feedResults.length && <DiscoverSection name="">
-            {feedResults.map(r => <FeedCard key={r.publisherId} publisherId={r.publisherId} />)}
-        </DiscoverSection>}
+        <SearchResults query={query} />
         {!query && <>
             <DiscoverSection name='Browse by category'>
                 {categories

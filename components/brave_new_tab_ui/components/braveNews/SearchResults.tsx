@@ -1,5 +1,4 @@
 import * as React from 'react';
-import styled from 'styled-components';
 import { useSearchResults } from '../../api/brave_news/news';
 import DiscoverSection from './DiscoverSection';
 import FeedCard, { DirectFeedCard } from './FeedCard';
@@ -7,11 +6,6 @@ import FeedCard, { DirectFeedCard } from './FeedCard';
 interface Props {
     query: string;
 }
-
-const Grid = styled.div`
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-`
 
 export default function SearchResults(props: Props) {
     const { loading, directResults, feedResults } = useSearchResults(props.query);
@@ -25,7 +19,7 @@ export default function SearchResults(props: Props) {
         {loading
             ? <span>Loading...</span>
             : <>
-                {!directResults.length
+                {!!directResults.length
                     && <DiscoverSection name='Direct Feeds'>
                         {directResults.map(r => <DirectFeedCard key={r.feedUrl.url} feedUrl={r.feedUrl.url} title={r.feedTitle} />)}
                     </DiscoverSection>}
