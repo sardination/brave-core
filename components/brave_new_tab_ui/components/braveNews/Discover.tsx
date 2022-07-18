@@ -53,19 +53,20 @@ export default function Discover(props: {}) {
     const categories = useCategories();
     const [showingAllCategories, setShowingAllCategories] = React.useState(false);
     const [query, setQuery] = useState('');
-    const { feedResults, directResults } = useSearchResults(query);
+    const { feedResults, directResults, loading } = useSearchResults(query);
     const publishers = usePublishers();
 
     return <Flex direction='column'>
         <Header>Discover</Header>
         <SearchInput type="search" placeholder='Search for news, site, topic or RSS feed' value={query} onInput={e => setQuery(e.currentTarget.value)} />
+        {loading && <span>Loading...</span>}
         {!!directResults.length && <DiscoverSection name='Direct Feeds'>
             {directResults.map(r => <DirectFeedCard key={r.feedUrl.url} feedUrl={r.feedUrl.url} title={r.feedTitle} />)}
         </DiscoverSection>}
         {!!feedResults.length && <DiscoverSection name="">
             {feedResults.map(r => <FeedCard key={r.publisherId} publisherId={r.publisherId} />)}
         </DiscoverSection>}
-        {!query.length && <>
+        {!query && <>
             <DiscoverSection name='Browse by category'>
                 {categories
                     // If we're showing all categories, there's no end to the slice.

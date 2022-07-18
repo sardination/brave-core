@@ -11,7 +11,7 @@ interface BraveNewsContext {
 }
 
 export const BraveNewsContext = React.createContext<BraveNewsContext>({
-    page: null,
+    page: 'news',
     setPage: () => {}
 });
 

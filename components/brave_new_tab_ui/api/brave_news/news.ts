@@ -200,14 +200,20 @@ export const useSearchResults = (query: string) => {
     }).sort((a, b) => a.publisherName.localeCompare(b.publisherName)), [query]);
 
     const [directResults, setDirectResults] = useState<FeedSearchResultItem[]>([]);
+    const [loading, setLoading] = useState(false);
+
     useEffect(() => {
         let cancelled = false;
         let url: URL | undefined;
         try { url = new URL(query) } catch { }
         if (!url) return;
 
+        setLoading(true);
+        setDirectResults([]);
+
         api.controller.findFeeds({ url: url.toString() }).then(({ results }) => {
             if (cancelled) return;
+            setLoading(false);
             setDirectResults(results);
         });
         return () => {
@@ -216,6 +222,7 @@ export const useSearchResults = (query: string) => {
     }, [query]);
 
     return {
+        loading,
         feedResults,
         directResults
     }
