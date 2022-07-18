@@ -46,21 +46,23 @@ class BraveNewsApi {
                 userEnabledStatus: status
             }
         }
-        const oldValue = this.lastValue;
-        this.lastValue = newValue;
-        this.notifyListeners(newValue, oldValue);
+
+        // We completely remove direct feeds when setting the UserEnabled status
+        // to DISABLED.
+        if (this.isDirectFeed(publisherId) && status == UserEnabled.DISABLED)
+            delete newValue[publisherId];
+        
         this.controller.setPublisherPref(publisherId, status);
-        this.lastValue = newValue;
+        this.updatePublishers(newValue);
     }
 
     async subscribeToDirectFeed(feedUrl: string) {
-        await this.controller.subscribeToNewDirectFeed({ url: feedUrl });
-        await this.updatePublishers();
+        const { publishers } = await this.controller.subscribeToNewDirectFeed({ url: feedUrl });
+        this.updatePublishers(publishers);
     }
 
     setPublisherEnabled(publisherId: string, enabled: boolean) {
         this.setPublisherPref(publisherId, enabled ? UserEnabled.ENABLED : UserEnabled.DISABLED);
-        this.updatePublishers();
     }
 
     isPublisherEnabled(publisherId: string) {
@@ -77,14 +79,14 @@ class BraveNewsApi {
         return publisher.type == PublisherType.DIRECT_SOURCE;
     }
 
-    async updatePublishers() {
-        const { publishers: newValue } = await this.controller.getPublishers();
+    async updatePublishers(newPublishers?: Publishers) {
+        if (!newPublishers)
+            ({ publishers: newPublishers } = await this.controller.getPublishers());
 
         const oldValue = this.lastValue;
-        this.lastValue = newValue;
+        this.lastValue = newPublishers!;
 
-        this.notifyListeners(newValue, oldValue);
-        this.lastValue = newValue;
+        this.notifyListeners(newPublishers!, oldValue);
     }
 
     addListener(listener: UpdatedListener) {
@@ -207,7 +209,7 @@ export const useSearchResults = (query: string) => {
                 return true;
             return false;
         }).sort((a, b) => a.publisherName.localeCompare(b.publisherName))
-        : [], [query]);
+        : [], [query, publishers]);
 
     const [directResults, setDirectResults] = useState<FeedSearchResultItem[]>([]);
     const [loading, setLoading] = useState(false);
