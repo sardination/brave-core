@@ -107,12 +107,16 @@
                         on-click="onAddRpcUrlTap_"
                         disabled="{{isRpcPlusButtonDisabled_}}" ></cr-icon-button>
       </div>
-      <cr-radio-group selected="{{selectedRpcUrl}}" on-selected-changed="selectedRpcUrlChanged_">
+      <cr-radio-group id="rpcRadioGroup" selected="{{selectedRpcUrl}}" on-selected-changed="selectedRpcUrlChanged_">
         <template is="dom-repeat" items="[[rpcUrls]]">
           <cr-radio-button name="{{item.value}}">
-            <cr-input type="url" class="rpc-endpoint" placeholder="$i18n{walletAddNetworkDialogUrlPlaceholder}"
-              error-message="$i18n{walletAddNetworkInvalidURLInput}" spellcheck="false" on-input=urlChangedRpc_
-              value="{{item.value}}">
+            <cr-input type="url"
+                      class="rpc-endpoint"
+                      placeholder="$i18n{walletAddNetworkDialogUrlPlaceholder}"
+                      error-message="$i18n{walletAddNetworkInvalidURLInput}"
+                      spellcheck="false"
+                      on-input=urlChangedRpc_
+                      value="{{item.value}}">
             </cr-input>
           </cr-radio-button>
         </template>

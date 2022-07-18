@@ -97,9 +97,8 @@ void BraveSettingsUI::AddResources(content::WebUIDataSource* html_source,
     html_source->DisableContentSecurityPolicy();
   }
 
-  if (ShouldExposeElementsForTesting()) {
-    html_source->AddBoolean("shouldExposeElementsForTesting", true);
-  }
+  html_source->AddBoolean("shouldExposeElementsForTesting",
+                          ShouldExposeElementsForTesting());
 }
 
 // static
