@@ -609,6 +609,13 @@
 
     Are you sure you want to do this?
   </message>
+  <message name="IDS_BRAVE_SYNC_PASSPHRASE_DECRYPTION_ERROR_MESSAGE" desc="Warning message that informs user about Brave Sync is not running and browser needs to have access to secure OS passwords store">
+    Browser could not decrypt the passphrase, Brave Sync is not running.
+
+    Please check that browser has access to secure OS passwords store. If you are using macOS, this is Keychain app. If you are using Ubuntu, this is Passwords and Keys app.
+
+    Also don't use copied profile from other machines, this is not supported for security reasons.
+  </message>
 
   <!-- Settings / Search engine -->
   <message name="IDS_SETTINGS_BRAVE_OTHER_SEARCH_ENGINES_LABEL" desc="The label for the settings switch controlling the addition of custom search engines">

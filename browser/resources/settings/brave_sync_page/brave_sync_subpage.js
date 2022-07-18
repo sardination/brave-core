@@ -68,6 +68,13 @@ class SettingBraveSyncSubpage extends SettingBraveSyncSubpageBase {
       },
 
       /** @private */
+      syncWordsDecryptionError_:{
+        type: Boolean,
+        value: false,
+        computed: 'computeSyncWordsDecryptionError_(syncStatus.syncWordsDecryptionError)',
+      },
+
+      /** @private */
       syncSectionDisabled_: {
         type: Boolean,
         value: false,
@@ -156,6 +163,7 @@ class SettingBraveSyncSubpage extends SettingBraveSyncSubpageBase {
   computeSyncSectionDisabled_() {
     return this.syncStatus !== undefined &&
       (!!this.syncStatus.disabled ||
+        !!this.syncStatus.syncWordsDecryptionError ||
         (!!this.syncStatus.hasError &&
           this.syncStatus.statusAction !==
           StatusAction.ENTER_PASSPHRASE &&
@@ -169,6 +177,14 @@ class SettingBraveSyncSubpage extends SettingBraveSyncSubpageBase {
   */
   computeSyncDisabledByAdmin_() {
     return this.syncStatus != undefined && !!this.syncStatus.managed
+  }
+
+  /**
+  * @return {boolean}
+  * @private
+  */
+  computeSyncWordsDecryptionError_() {
+    return this.syncStatus != undefined && !!this.syncStatus.syncWordsDecryptionError
   }
 
   /** @protected */
