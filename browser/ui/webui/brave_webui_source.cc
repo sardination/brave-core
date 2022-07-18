@@ -201,6 +201,8 @@ void CustomizeWebUIHTMLSource(const std::string &name,
         { "promoted", IDS_BRAVE_TODAY_PROMOTED },
         { "ad", IDS_BRAVE_TODAY_DISPLAY_AD_LABEL },
 
+        { "braveNewsBackToDashboard", IDS_BRAVE_NEWS_BACK_TO_DASHBOARD },
+
         { "addWidget", IDS_BRAVE_NEW_TAB_WIDGET_ADD },
         { "hideWidget", IDS_BRAVE_NEW_TAB_WIDGET_HIDE },
         { "rewardsWidgetDesc", IDS_BRAVE_NEW_TAB_REWARDS_WIDGET_DESC },

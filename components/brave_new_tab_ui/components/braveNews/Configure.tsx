@@ -10,6 +10,8 @@ import DisabledPlaceholder from "./DisabledPlaceholder";
 import BrowseCategory from "./BrowseCategory";
 import { useNewTabPref } from "../../hooks/usePref";
 import { useBraveNews, useCurrentCategory } from "./Context";
+import { getLocale } from "../../../common/locale";
+import { formatMessage } from "../../../brave_rewards/resources/shared/lib/locale_context";
 
 const Grid = styled.div`
   width: 100%;
@@ -114,14 +116,18 @@ export default function Configure() {
         <BackButton onClick={() => setPage(null)}>
           {BackArrow}
           <BackButtonText>
-            Back to <b>Dashboard</b>
+            {formatMessage(getLocale('braveNewsBackToDashboard'), {
+              tags: {
+                $1: content => <strong>{content}</strong>
+              }
+            })}
           </BackButtonText>
         </BackButton>
       </BackButtonContainer>
       <Header direction="row-reverse" gap={12} align="center" justify="space-between">
         <CloseButton onClick={() => setPage(null)}>{Cross}</CloseButton>
         {enabled && <Flex direction="row" align="center" gap={8}>
-          <HeaderText>Brave News</HeaderText>
+          <HeaderText>{getLocale('braveTodayTitle')}</HeaderText>
           <Toggle isOn={enabled} onChange={setEnabled} />
         </Flex>}
       </Header>
