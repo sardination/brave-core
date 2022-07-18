@@ -1,6 +1,7 @@
 import Button from "$web-components/button"
 import * as React from "react"
 import styled from "styled-components"
+import { getLocale } from "../../../common/locale";
 import Flex from "../Flex"
 
 const TodayGraphic = <svg width="370" height="80" viewBox="0 0 370 80" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -41,13 +42,13 @@ export default function DisabledPlaceholder(props: { enableBraveNews: () => void
     return <Container align="center" justify="center" direction="column" gap={12}>
         {TodayGraphic}
         <Header>
-            Turn on Brave News, and never miss a story
+            {getLocale('braveNewsDisabledPlaceholderHeader')}
         </Header>
         <Subtitle>
-            Customized news feeds, from leading sources, delivered right to your browser. All 100% private.
+            {getLocale('braveNewsDisabledPlaceholderSubtitle')}
         </Subtitle>
         <EnableButton isPrimary onClick={props.enableBraveNews}>
-            Turn on Brave News
+            {getLocale('braveNewsDisabledPlaceholderEnableButton')}
         </EnableButton>
     </Container>
 }
