@@ -85,7 +85,7 @@ describe('useSwap hook', () => {
 
     expect(result.current.toAsset).toEqual({
       coingeckoId: 'usd-coin',
-      contractAddress: '0x07865c6E87B9F70255377e024ace6630C1Eaa37F',
+      contractAddress: '0x07865c6e87b9f70255377e024ace6630c1eaa37f',
       decimals: 6,
       isErc20: true,
       isErc721: false,

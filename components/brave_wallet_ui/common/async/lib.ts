@@ -17,7 +17,8 @@ import {
   SupportedTestNetworks,
   SendEthTransactionParams,
   SendFilTransactionParams,
-  SendSolTransactionParams
+  SendSolTransactionParams,
+  SPLSwapParams
 } from '../../constants/types'
 import * as WalletActions from '../actions/wallet_actions'
 
@@ -774,4 +775,16 @@ export async function sendSPLTransaction (payload: BraveWallet.SolanaTxData) {
   const { txService } = getAPIProxy()
   // @ts-expect-error google closure is ok with undefined for other fields but mojom runtime is not
   return await txService.addUnapprovedTransaction({ solanaTxData: payload }, payload.feePayer)
+}
+
+export async function sendSPLSwapTransaction (payload: SPLSwapParams) {
+  const { solanaTxManagerProxy, txService } = getAPIProxy()
+  const result = await solanaTxManagerProxy.makeTokenSwapProgramTxData(payload.message)
+  if (result.error !== BraveWallet.ProviderError.kSuccess) {
+    console.error(`Failed to sign Solana message: ${result.errorMessage}`)
+    return { success: false, errorMessage: result.errorMessage }
+  } else {
+    // @ts-expect-error google closure is ok with undefined for other fields but mojom runtime is not
+    return await txService.addUnapprovedTransaction({ solanaTxData: result.txData }, payload.from)
+  }
 }

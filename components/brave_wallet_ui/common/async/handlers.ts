@@ -59,6 +59,7 @@ import { Store } from './types'
 import InteractionNotifier from './interactionNotifier'
 import BalanceUpdater from './balanceUpdater'
 import { getCoinFromTxDataUnion, getNetworkInfo } from '../../utils/network-utils'
+import { SolanaTransactionTypes } from '../constants/solana'
 
 const handler = new AsyncActionHandler()
 
@@ -472,12 +473,7 @@ handler.on(WalletActions.refreshGasEstimates.getType(), async (store: Store, txI
   const { selectedAccount, selectedNetwork } = getWalletState(store)
   const { ethTxManagerProxy, solanaTxManagerProxy } = getAPIProxy()
 
-  if (
-    txInfo.txType === BraveWallet.TransactionType.SolanaDappSignAndSendTransaction ||
-    txInfo.txType === BraveWallet.TransactionType.SolanaSystemTransfer ||
-    txInfo.txType === BraveWallet.TransactionType.SolanaSPLTokenTransfer ||
-    txInfo.txType === BraveWallet.TransactionType.SolanaSPLTokenTransferWithAssociatedTokenAccountCreation
-  ) {
+  if (SolanaTransactionTypes.includes(txInfo.txType)) {
     const getSolFee = await solanaTxManagerProxy.getEstimatedTxFee(txInfo.id)
     if (!getSolFee.fee) {
       console.error('Failed to fetch SOL Fee estimates')

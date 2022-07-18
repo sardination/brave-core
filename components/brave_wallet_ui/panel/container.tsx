@@ -56,6 +56,9 @@ import {
   BuySendSwapViewTypes,
   ToOrFromType
 } from '../constants/types'
+import {
+  SolanaTransactionTypes
+} from '../common/constants/solana'
 import { AppsList } from '../options/apps-list-options'
 import LockPanel from '../components/extension/lock-panel'
 import { getNetworkInfo } from '../utils/network-utils'
@@ -488,12 +491,7 @@ function Container () {
     return (
       <PanelWrapper isLonger={true}>
         <LongWrapper>
-          {[
-            BraveWallet.TransactionType.SolanaDappSignAndSendTransaction,
-            BraveWallet.TransactionType.SolanaSPLTokenTransfer,
-            BraveWallet.TransactionType.SolanaSPLTokenTransferWithAssociatedTokenAccountCreation,
-            BraveWallet.TransactionType.SolanaSystemTransfer
-          ].includes(selectedPendingTransaction.txType)
+          {SolanaTransactionTypes.includes(selectedPendingTransaction.txType)
             ? <ConfirmSolanaTransactionPanel
               onConfirm={onConfirmTransaction}
               onReject={onRejectTransaction}

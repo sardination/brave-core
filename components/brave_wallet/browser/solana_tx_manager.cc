@@ -91,15 +91,18 @@ void SolanaTxManager::ApproveTransaction(const std::string& tx_meta_id,
   }
 
   const std::string blockhash = meta->tx()->message()->recent_blockhash();
-  if (blockhash.empty()) {
+  const uint64_t block_height =
+      meta->tx()->message()->last_valid_block_height();
+  if (blockhash.empty() || block_height == 0UL) {
     GetSolanaBlockTracker()->GetLatestBlockhash(
         base::BindOnce(&SolanaTxManager::OnGetLatestBlockhash,
                        weak_ptr_factory_.GetWeakPtr(), std::move(meta),
                        std::move(callback)),
         true);
   } else {
-    OnGetLatestBlockhash(std::move(meta), std::move(callback), blockhash, 0,
-                         mojom::SolanaProviderError::kSuccess, "");
+    OnGetLatestBlockhash(std::move(meta), std::move(callback), blockhash,
+                         block_height, mojom::SolanaProviderError::kSuccess,
+                         "");
   }
 }
 
@@ -359,6 +362,33 @@ void SolanaTxManager::MakeTokenProgramTransferTxData(
           spl_token_mint_address, from_wallet_address, to_wallet_address,
           *from_associated_token_account, *to_associated_token_account, amount,
           std::move(callback)));
+}
+
+void SolanaTxManager::MakeTokenSwapProgramTxData(
+    const std::string& message,
+    MakeTokenSwapProgramTxDataCallback callback) {
+  absl::optional<std::vector<std::uint8_t>> message_bytes =
+      base::Base64Decode(message);
+  if (!message_bytes || message_bytes->empty() ||
+      message_bytes->size() > kSolanaMaxTxSize) {
+    std::move(callback).Run(
+        nullptr, mojom::SolanaProviderError::kInternalError,
+        l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));
+    return;
+  }
+
+  auto transaction =
+      SolanaTransaction::FromSignedTransactionBytes(*message_bytes);
+  transaction->set_tx_type(mojom::TransactionType::SolanaSwap);
+  transaction->message()->set_recent_blockhash("");
+  transaction->set_send_options(
+      SolanaTransaction::SendOptions(absl::nullopt, absl::nullopt, true));
+
+  auto tx_data = transaction->ToSolanaTxData();
+  // This won't be null because we will always construct the mojo struct.
+  DCHECK(tx_data);
+  std::move(callback).Run(std::move(tx_data),
+                          mojom::SolanaProviderError::kSuccess, "");
 }
 
 void SolanaTxManager::OnGetAccountInfo(

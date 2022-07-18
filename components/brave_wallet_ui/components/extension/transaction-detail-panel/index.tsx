@@ -17,15 +17,18 @@ import { toProperCase } from '../../../utils/string-utils'
 import { mojoTimeDeltaToJSDate } from '../../../../common/mojomUtils'
 import Amount from '../../../utils/amount'
 import { getNetworkFromTXDataUnion, getCoinFromTxDataUnion } from '../../../utils/network-utils'
-
 import { getLocale } from '../../../../common/locale'
+
+// Constants
 import {
   BraveWallet,
   WalletAccountType,
   DefaultCurrencies,
   WalletState
 } from '../../../constants/types'
-import Header from '../../buy-send-swap/select-header'
+import {
+  SolanaTransactionTypes
+} from '../../../common/constants/solana'
 
 // Styled Components
 import {
@@ -46,12 +49,11 @@ import {
   ArrowIcon,
   AlertIcon
 } from './style'
-
 import {
   DetailTextDarkBold,
   DetailTextDark
 } from '../shared-panel-styles'
-
+import Header from '../../buy-send-swap/select-header'
 import { StatusBubble } from '../../shared/style'
 import { TransactionStatusTooltip } from '../transaction-status-tooltip'
 import { Tooltip } from '../../shared'
@@ -166,13 +168,7 @@ const TransactionDetailPanel = (props: Props) => {
     return ''
   }, [transactionDetails, liveTransaction, defaultCurrencies])
 
-  const isSolanaTransaction =
-    liveTransaction.txType === BraveWallet.TransactionType.SolanaSystemTransfer ||
-    liveTransaction.txType === BraveWallet.TransactionType.SolanaSPLTokenTransfer ||
-    liveTransaction.txType === BraveWallet.TransactionType.SolanaSPLTokenTransferWithAssociatedTokenAccountCreation ||
-    liveTransaction.txType === BraveWallet.TransactionType.SolanaDappSignAndSendTransaction ||
-    liveTransaction.txType === BraveWallet.TransactionType.SolanaDappSignTransaction
-
+  const isSolanaTransaction = SolanaTransactionTypes.includes(liveTransaction.txType)
   const isFilecoinTransaction = getCoinFromTxDataUnion(liveTransaction.txDataUnion) === BraveWallet.CoinType.FIL
 
   return (

@@ -427,6 +427,11 @@ export interface SPLTransferFromParams extends BaseTransactionParams {
   splTokenMintAddress: string
 }
 
+export interface SPLSwapParams {
+  message: string
+  from: string
+}
+
 export interface SendEthTransactionParams extends BaseEthTransactionParams {
   data?: number[]
 }

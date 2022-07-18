@@ -306,6 +306,13 @@ void TxService::MakeTokenProgramTransferTxData(
       std::move(callback));
 }
 
+void TxService::MakeTokenSwapProgramTxData(
+    const std::string& message,
+    MakeTokenSwapProgramTxDataCallback callback) {
+  GetSolanaTxManager()->MakeTokenSwapProgramTxData(message,
+                                                   std::move(callback));
+}
+
 void TxService::GetEstimatedTxFee(const std::string& tx_meta_id,
                                   GetEstimatedTxFeeCallback callback) {
   GetSolanaTxManager()->GetEstimatedTxFee(tx_meta_id, std::move(callback));

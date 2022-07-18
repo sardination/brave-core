@@ -928,13 +928,14 @@ enum TransactionType {
   ERC721TransferFrom = 3,
   ERC721SafeTransferFrom = 4,
   Other = 5,
-  SolanaSystemTransfer = 6,  // transfering SOL
+  SolanaSystemTransfer = 6,  // transferring SOL
   SolanaSPLTokenTransfer = 7,
   SolanaSPLTokenTransferWithAssociatedTokenAccountCreation = 8,
   ERC1155SafeTransferFrom = 9,
   ETHSwap = 10,
   SolanaDappSignAndSendTransaction = 11,
-  SolanaDappSignTransaction = 12
+  SolanaDappSignTransaction = 12,
+  SolanaSwap = 13
 };
 
 struct FilTxData {
@@ -1068,6 +1069,9 @@ interface SolanaTxManagerProxy {
       => (SolanaTxData? tx_data, SolanaProviderError error, string error_message);
 
   GetEstimatedTxFee(string tx_meta_id) => (uint64 fee, SolanaProviderError error, string error_message);
+
+  MakeTokenSwapProgramTxData(string message)
+     => (SolanaTxData? tx_data, SolanaProviderError error, string error_message);
 };
 
 interface FilTxManagerProxy {

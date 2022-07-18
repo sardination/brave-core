@@ -3,13 +3,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { useHistory } from 'react-router'
 import * as EthereumBlockies from 'ethereum-blockies'
 
-import { getLocale } from '../../../../common/locale'
 import {
   BraveWallet,
   WalletAccountType,
   WalletState,
   WalletRoutes
 } from '../../../constants/types'
+import { SolanaTransactionTypes } from '../../../common/constants/solana'
 
 // Utils
 import { toProperCase } from '../../../utils/string-utils'
@@ -18,6 +18,7 @@ import { mojoTimeDeltaToJSDate } from '../../../../common/mojomUtils'
 import Amount from '../../../utils/amount'
 import { copyToClipboard } from '../../../utils/copy-to-clipboard'
 import { getCoinFromTxDataUnion } from '../../../utils/network-utils'
+import { getLocale } from '../../../../common/locale'
 
 // Hooks
 import { useExplorer, useTransactionParser } from '../../../common/hooks'
@@ -81,11 +82,7 @@ const PortfolioTransactionItem = (props: Props) => {
   // state
   const [showTransactionPopup, setShowTransactionPopup] = React.useState<boolean>(false)
 
-  const isSolanaTransaction =
-    transaction.txType === BraveWallet.TransactionType.SolanaSystemTransfer ||
-    transaction.txType === BraveWallet.TransactionType.SolanaSPLTokenTransfer ||
-    transaction.txType === BraveWallet.TransactionType.SolanaSPLTokenTransferWithAssociatedTokenAccountCreation
-
+  const isSolanaTransaction = SolanaTransactionTypes.includes(transaction.txType)
   const isFilecoinTransaction = getCoinFromTxDataUnion(transaction.txDataUnion) === BraveWallet.CoinType.FIL
 
   // custom hooks

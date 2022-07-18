@@ -62,6 +62,8 @@ class SolanaTxManager : public TxManager, public SolanaBlockTracker::Observer {
       mojom::SolanaTxManagerProxy::MakeSystemProgramTransferTxDataCallback;
   using MakeTokenProgramTransferTxDataCallback =
       mojom::SolanaTxManagerProxy::MakeTokenProgramTransferTxDataCallback;
+  using MakeTokenSwapProgramTxDataCallback =
+      mojom::SolanaTxManagerProxy::MakeTokenSwapProgramTxDataCallback;
   using GetEstimatedTxFeeCallback =
       mojom::SolanaTxManagerProxy::GetEstimatedTxFeeCallback;
   void MakeSystemProgramTransferTxData(
@@ -75,6 +77,8 @@ class SolanaTxManager : public TxManager, public SolanaBlockTracker::Observer {
       const std::string& to_wallet_address,
       uint64_t amount,
       MakeTokenProgramTransferTxDataCallback callback);
+  void MakeTokenSwapProgramTxData(const std::string& message,
+                                  MakeTokenSwapProgramTxDataCallback callback);
   void GetEstimatedTxFee(const std::string& tx_meta_id,
                          GetEstimatedTxFeeCallback callback);
   void ProcessSolanaHardwareSignature(

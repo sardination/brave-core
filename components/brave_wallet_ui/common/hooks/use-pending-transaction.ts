@@ -23,12 +23,13 @@ import usePricing from './pricing'
 import useTokenInfo from './token'
 import { useLib } from './useLib'
 
-// types
+// Constants
 import { WalletState, BraveWallet } from '../../constants/types'
 import {
   UpdateUnapprovedTransactionGasFieldsType,
   UpdateUnapprovedTransactionNonceType
 } from '../constants/action_types'
+import { SolanaTransactionTypes } from '../constants/solana'
 
 export const usePendingTransactions = () => {
   // redux
@@ -80,14 +81,8 @@ export const usePendingTransactions = () => {
   const isERC721SafeTransferFrom = transactionInfo?.txType === BraveWallet.TransactionType.ERC721SafeTransferFrom
   const isERC721TransferFrom = transactionInfo?.txType === BraveWallet.TransactionType.ERC721TransferFrom
 
-  const isSolanaTransaction = transactionInfo?.txType && [
-    BraveWallet.TransactionType.SolanaDappSignAndSendTransaction,
-    BraveWallet.TransactionType.SolanaDappSignTransaction,
-    BraveWallet.TransactionType.SolanaSPLTokenTransfer,
-    BraveWallet.TransactionType.SolanaSPLTokenTransferWithAssociatedTokenAccountCreation,
-    BraveWallet.TransactionType.SolanaSystemTransfer
-  ].includes(transactionInfo.txType)
-
+  const isSolanaTransaction = transactionInfo?.txType &&
+    SolanaTransactionTypes.includes(transactionInfo.txType)
   const isSolanaDappTransaction = transactionInfo?.txType && [
     BraveWallet.TransactionType.SolanaDappSignAndSendTransaction,
     BraveWallet.TransactionType.SolanaDappSignTransaction
