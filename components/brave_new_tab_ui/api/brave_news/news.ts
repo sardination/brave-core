@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import getBraveNewsController, { Publishers } from ".";
-import { BraveNewsControllerRemote, FeedSearchResultItem, Publisher, UserEnabled } from "../../../../../out/Component/gen/brave/components/brave_today/common/brave_news.mojom.m";
+import { BraveNewsControllerRemote, FeedSearchResultItem, Publisher, PublisherType, UserEnabled } from "../../../../../out/Component/gen/brave/components/brave_today/common/brave_news.mojom.m";
 
 type PublisherListener = (newValue: Publisher, oldValue: Publisher) => void;
 type UpdatedListener = (publishers: Publishers, oldValue: Publishers) => void;
@@ -53,8 +53,14 @@ class BraveNewsApi {
         this.lastValue = newValue;
     }
 
+    async subscribeToDirectFeed(feedUrl: string) {
+        await this.controller.subscribeToNewDirectFeed({ url: feedUrl });
+        await this.updatePublishers();
+    }
+
     setPublisherEnabled(publisherId: string, enabled: boolean) {
         this.setPublisherPref(publisherId, enabled ? UserEnabled.ENABLED : UserEnabled.DISABLED);
+        this.updatePublishers();
     }
 
     isPublisherEnabled(publisherId: string) {
@@ -65,13 +71,15 @@ class BraveNewsApi {
             || publisher.userEnabledStatus == UserEnabled.ENABLED;
     }
 
-    async updatePublishers() {
-        const { publishers } = await this.controller.getPublishers();
+    isDirectFeed(publisherId: string) {
+        const publisher = this.lastValue[publisherId];
+        if (!publisher) return false;
+        return publisher.type == PublisherType.DIRECT_SOURCE;
+    }
 
-        const newValue = {
-            ...this.lastValue,
-            ...publishers
-        };
+    async updatePublishers() {
+        const { publishers: newValue } = await this.controller.getPublishers();
+
         const oldValue = this.lastValue;
         this.lastValue = newValue;
 
@@ -189,27 +197,30 @@ export const useSearchResults = (query: string) => {
     query = query.toLocaleLowerCase();
 
     const publishers = usePublishers();
-    const feedResults = useMemo(() => publishers.filter(p => {
-        if (p.publisherName.toLocaleLowerCase().includes(query))
-            return true;
-        if (p.categoryName.toLocaleLowerCase().includes(query))
-            return true;
-        if (p.feedSource?.url?.toLocaleLowerCase().includes(query))
-            return true;
-        return false;
-    }).sort((a, b) => a.publisherName.localeCompare(b.publisherName)), [query]);
+    const feedResults = useMemo(() => query
+        ? publishers.filter(p => {
+            if (p.publisherName.toLocaleLowerCase().includes(query))
+                return true;
+            if (p.categoryName.toLocaleLowerCase().includes(query))
+                return true;
+            if (p.feedSource?.url?.toLocaleLowerCase().includes(query))
+                return true;
+            return false;
+        }).sort((a, b) => a.publisherName.localeCompare(b.publisherName))
+        : [], [query]);
 
     const [directResults, setDirectResults] = useState<FeedSearchResultItem[]>([]);
     const [loading, setLoading] = useState(false);
 
     useEffect(() => {
+        setDirectResults([]);
+
         let cancelled = false;
         let url: URL | undefined;
         try { url = new URL(query) } catch { }
         if (!url) return;
 
         setLoading(true);
-        setDirectResults([]);
 
         api.controller.findFeeds({ url: url.toString() }).then(({ results }) => {
             if (cancelled) return;
@@ -221,9 +232,14 @@ export const useSearchResults = (query: string) => {
         }
     }, [query]);
 
+    const dedupedDirectResults = useMemo(() => {
+        const allFeeds = new Set(publishers.map(p => p.feedSource.url));
+        return directResults.filter(d => !allFeeds.has(d.feedUrl.url));
+    }, [directResults, publishers]);
+
     return {
         loading,
         feedResults,
-        directResults
+        directResults: dedupedDirectResults
     }
 }

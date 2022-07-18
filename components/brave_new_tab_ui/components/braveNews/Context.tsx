@@ -11,12 +11,12 @@ interface BraveNewsContext {
 }
 
 export const BraveNewsContext = React.createContext<BraveNewsContext>({
-    page: 'news',
+    page: null,
     setPage: () => {}
 });
 
 export function BraveNewsContextProvider(props: { children: React.ReactNode }) {
-    const [page, setPage] = useState<NewsPage>(null);
+    const [page, setPage] = useState<NewsPage>('news');
     const context = useMemo(() => ({
         page,
         setPage

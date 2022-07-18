@@ -14,7 +14,6 @@ export default function SearchResults(props: Props) {
         && !directResults.length
         && !feedResults.length;
 
-        console.log(props.query, loading, directResults, feedResults);
     return <div>
         {loading
             ? <span>Loading...</span>
@@ -23,11 +22,10 @@ export default function SearchResults(props: Props) {
                     && <DiscoverSection name='Direct Feeds'>
                         {directResults.map(r => <DirectFeedCard key={r.feedUrl.url} feedUrl={r.feedUrl.url} title={r.feedTitle} />)}
                     </DiscoverSection>}
-
-                {!!feedResults.length && <DiscoverSection name="Results">
-                    {feedResults.map(r => <FeedCard key={r.publisherId} publisherId={r.publisherId} />)}
-                </DiscoverSection>}
             </>}
+        {!!feedResults.length && <DiscoverSection name="Results">
+            {feedResults.map(r => <FeedCard key={r.publisherId} publisherId={r.publisherId} />)}
+        </DiscoverSection>}
         {noResults && <div>
             There's nothing here :'(
         </div>}

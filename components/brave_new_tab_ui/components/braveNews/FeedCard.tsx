@@ -4,7 +4,7 @@ import styled, { keyframes } from "styled-components";
 import Flex from "../Flex";
 import FollowButton from "./FollowButton";
 import { Heart, HeartOutline } from "./Icons";
-import { usePublisher } from "../../api/brave_news/news";
+import { api, usePublisher } from "../../api/brave_news/news";
 
 const Container = styled(Flex)`
 `;
@@ -108,9 +108,14 @@ export function DirectFeedCard(props: {
     feedUrl: string;
     title: string;
 }) {
+    const [loading, setLoading] = useState(false);
     return <Container direction="column" gap={8}>
         <Card>
-            <StyledFollowButton following={false} onClick={console.log}/>
+            <StyledFollowButton isDisabled={loading} following={false} onClick={async () => {
+                setLoading(true);
+                await api.subscribeToDirectFeed(props.feedUrl);
+                setLoading(false);
+            }}/>
         </Card>
         <Name>
             {props.title}
