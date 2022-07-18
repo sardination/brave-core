@@ -19,6 +19,8 @@ export default function SearchResults(props: Props) {
         && !loading
         && !directResults.length
         && !feedResults.length;
+
+        console.log(props.query, loading, directResults, feedResults);
     return <div>
         {loading
             ? <span>Loading...</span>
@@ -28,7 +30,7 @@ export default function SearchResults(props: Props) {
                         {directResults.map(r => <DirectFeedCard key={r.feedUrl.url} feedUrl={r.feedUrl.url} title={r.feedTitle} />)}
                     </DiscoverSection>}
 
-                {!!feedResults.length && <DiscoverSection name="">
+                {!!feedResults.length && <DiscoverSection name="Results">
                     {feedResults.map(r => <FeedCard key={r.publisherId} publisherId={r.publisherId} />)}
                 </DiscoverSection>}
             </>}
