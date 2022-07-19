@@ -1,6 +1,7 @@
 import Button, { ButtonProps } from "$web-components/button";
 import * as React from "react";
 import styled, { css } from "styled-components";
+import { getLocale } from "../../../common/locale";
 import { Heart, HeartOutline } from "./Icons";
 
 interface Props extends Omit<ButtonProps, 'isPrimary'> {
@@ -20,10 +21,10 @@ export default function FollowButton(props: Props) {
     const { following, ...rest } = props;
     return <StyledButton {...rest} isPrimary={!following}>
         {following ? <>
-            {Heart} Following
+            {Heart} {getLocale('braveNewsFollowButtonFollowing')}
         </>
         : <>
-            {HeartOutline} Follow
+            {HeartOutline} {getLocale('braveNewsFollowButtonNotFollowing')}
         </>}
     </StyledButton>
 }
