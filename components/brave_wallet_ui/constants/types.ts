@@ -427,9 +427,12 @@ export interface SPLTransferFromParams extends BaseTransactionParams {
   splTokenMintAddress: string
 }
 
-export interface SPLSwapParams {
+export interface SolanaSerializedTransactionParams {
   message: string
   from: string
+  txType: BraveWallet.TransactionType
+  sendOptions?: BraveWallet.SolanaSendTransactionOptions
+  groupId?: string
 }
 
 export interface SendEthTransactionParams extends BaseEthTransactionParams {

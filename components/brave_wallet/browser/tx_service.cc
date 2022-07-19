@@ -114,11 +114,12 @@ void TxService::AddUnapprovedTransaction(
     mojom::TxDataUnionPtr tx_data_union,
     const std::string& from,
     const absl::optional<url::Origin>& origin,
+    const absl::optional<std::string>& group_id,
     AddUnapprovedTransactionCallback callback) {
   auto coin_type = GetCoinTypeFromTxDataUnion(*tx_data_union);
 
   GetTxManager(coin_type)->AddUnapprovedTransaction(
-      std::move(tx_data_union), from, origin, std::move(callback));
+      std::move(tx_data_union), from, origin, group_id, std::move(callback));
 }
 
 void TxService::ApproveTransaction(mojom::CoinType coin_type,
@@ -306,11 +307,14 @@ void TxService::MakeTokenProgramTransferTxData(
       std::move(callback));
 }
 
-void TxService::MakeTokenSwapProgramTxData(
+void TxService::MakeTokenProgramTxDataFromMessage(
     const std::string& message,
-    MakeTokenSwapProgramTxDataCallback callback) {
-  GetSolanaTxManager()->MakeTokenSwapProgramTxData(message,
-                                                   std::move(callback));
+    const mojom::TransactionType tx_type,
+    mojom::SolanaSendTransactionOptionsPtr send_options,
+    MakeTokenProgramTxDataFromMessageCallback callback) {
+  GetSolanaTxManager()->MakeTokenProgramTxDataFromMessage(
+      message, std::move(tx_type), std::move(send_options),
+      std::move(callback));
 }
 
 void TxService::GetEstimatedTxFee(const std::string& tx_meta_id,

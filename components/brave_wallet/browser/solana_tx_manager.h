@@ -43,6 +43,7 @@ class SolanaTxManager : public TxManager, public SolanaBlockTracker::Observer {
   void AddUnapprovedTransaction(mojom::TxDataUnionPtr tx_data_union,
                                 const std::string& from,
                                 const absl::optional<url::Origin>& origin,
+                                const absl::optional<std::string>& group_id,
                                 AddUnapprovedTransactionCallback) override;
   void ApproveTransaction(const std::string& tx_meta_id,
                           ApproveTransactionCallback) override;
@@ -62,8 +63,8 @@ class SolanaTxManager : public TxManager, public SolanaBlockTracker::Observer {
       mojom::SolanaTxManagerProxy::MakeSystemProgramTransferTxDataCallback;
   using MakeTokenProgramTransferTxDataCallback =
       mojom::SolanaTxManagerProxy::MakeTokenProgramTransferTxDataCallback;
-  using MakeTokenSwapProgramTxDataCallback =
-      mojom::SolanaTxManagerProxy::MakeTokenSwapProgramTxDataCallback;
+  using MakeTokenProgramTxDataFromMessageCallback =
+      mojom::SolanaTxManagerProxy::MakeTokenProgramTxDataFromMessageCallback;
   using GetEstimatedTxFeeCallback =
       mojom::SolanaTxManagerProxy::GetEstimatedTxFeeCallback;
   void MakeSystemProgramTransferTxData(
@@ -77,8 +78,11 @@ class SolanaTxManager : public TxManager, public SolanaBlockTracker::Observer {
       const std::string& to_wallet_address,
       uint64_t amount,
       MakeTokenProgramTransferTxDataCallback callback);
-  void MakeTokenSwapProgramTxData(const std::string& message,
-                                  MakeTokenSwapProgramTxDataCallback callback);
+  void MakeTokenProgramTxDataFromMessage(
+      const std::string& message,
+      const mojom::TransactionType tx_type,
+      mojom::SolanaSendTransactionOptionsPtr send_options,
+      MakeTokenProgramTxDataFromMessageCallback callback);
   void GetEstimatedTxFee(const std::string& tx_meta_id,
                          GetEstimatedTxFeeCallback callback);
   void ProcessSolanaHardwareSignature(

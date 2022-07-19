@@ -38,6 +38,7 @@ import { debounce } from '../../../common/debounce'
 import { WalletActions } from '../actions'
 import getAPIProxy from '../async/bridge'
 import { hexStrToNumberArray } from '../../utils/hex-utils'
+import { randomHexString } from '../../utils/random-utils'
 
 // Hooks
 import useAssetManagement from './assets-management'
@@ -93,6 +94,18 @@ function getSwapProvider (network: BraveWallet.NetworkInfo): SwapProvider {
   }
 }
 
+function makeSendOptions (maxRetries?: number, preflightCommitment?: string, skipPreflight?: boolean): BraveWallet.SolanaSendTransactionOptions {
+  return {
+    maxRetries: maxRetries !== undefined
+      ? { maxRetries: maxRetries } as unknown as BraveWallet.OptionalMaxRetries
+      : undefined,
+    preflightCommitment,
+    skipPreflight: skipPreflight !== undefined
+      ? { skipPreflight: skipPreflight }
+      : undefined
+  }
+}
+
 export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetProp }: Args = {}) {
   // redux
   const {
@@ -133,7 +146,7 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
   const isMounted = useIsMounted()
   const getBalance = useBalance(networkList)
   const { makeTokenVisible } = useAssetManagement()
-  const { getIsSwapSupported, getERC20Allowance, sendSPLSwapTransaction } = useLib()
+  const { getIsSwapSupported, getERC20Allowance, sendSolanaSerializedTransaction } = useLib()
 
   // memos
   const nativeAsset = React.useMemo(() => makeNetworkAsset(selectedNetwork), [selectedNetwork])
@@ -352,7 +365,7 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
       sellToken: fromAsset.contractAddress || NATIVE_ASSET_CONTRACT_ADDRESS_0X,
       slippagePercentage: slippageTolerance.slippage / 100,
       gasPrice: ''
-    }
+    } as BraveWallet.SwapParams
 
     const quote = await (
       full ? swapService.getTransactionPayload(swapParams) : swapService.getPriceQuote(swapParams)
@@ -476,16 +489,25 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
           cleanupTransaction
         ].filter(txn => txn !== '')
 
-        console.log(serializedTransactions)
-        if (serializedTransactions.length === 1) {
-          await sendSPLSwapTransaction({
-            message: serializedTransactions[0],
-            from: accountAddress
-          })
+        const hasParts = serializedTransactions.length > 1
+        const groupId = hasParts
+          ? randomHexString()
+          : undefined
 
-          if (isMounted) {
-            setJupiterQuote(undefined)
-          }
+        await Promise.all(serializedTransactions.map(async (message, idx) => {
+          await sendSolanaSerializedTransaction({
+            message,
+            from: accountAddress,
+            txType: !hasParts || idx === 1
+              ? BraveWallet.TransactionType.SolanaSwap
+              : BraveWallet.TransactionType.SolanaDappSignAndSendTransaction,
+            sendOptions: makeSendOptions(undefined, undefined, true),
+            groupId
+          })
+        }))
+
+        if (isMounted) {
+          setJupiterQuote(undefined)
         }
       } else if (swapTransactions.errorResponse) {
         console.error(`[swap] error querying Jupiter swap API: ${swapTransactions.errorResponse}`)

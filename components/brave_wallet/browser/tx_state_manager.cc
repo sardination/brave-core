@@ -79,6 +79,11 @@ bool TxStateManager::ValueToTxMeta(const base::Value& value, TxMeta* meta) {
     DCHECK(!meta->origin()->opaque());
   }
 
+  const std::string* group_id = value.FindStringKey("group_id");
+  if (group_id) {
+    meta->set_group_id(*group_id);
+  }
+
   return true;
 }
 

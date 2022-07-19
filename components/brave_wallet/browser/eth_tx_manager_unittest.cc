@@ -379,9 +379,10 @@ class EthTxManagerUnitTest : public testing::Test {
       mojom::TxDataUnionPtr tx_data,
       const std::string& from,
       const absl::optional<url::Origin>& origin,
+      const absl::optional<std::string>& group_id,
       EthTxManager::AddUnapprovedTransactionCallback callback) {
     eth_tx_manager()->AddUnapprovedTransaction(std::move(tx_data), from, origin,
-                                               std::move(callback));
+                                               group_id, std::move(callback));
   }
 
   void AddUnapprovedTransaction(

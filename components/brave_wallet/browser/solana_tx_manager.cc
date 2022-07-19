@@ -46,6 +46,7 @@ void SolanaTxManager::AddUnapprovedTransaction(
     mojom::TxDataUnionPtr tx_data_union,
     const std::string& from,
     const absl::optional<url::Origin>& origin,
+    const absl::optional<std::string>& group_id,
     AddUnapprovedTransactionCallback callback) {
   DCHECK(tx_data_union->is_solana_tx_data());
 
@@ -70,6 +71,7 @@ void SolanaTxManager::AddUnapprovedTransaction(
   meta.set_from(from);
   meta.set_origin(
       origin.value_or(url::Origin::Create(GURL("chrome://wallet"))));
+  meta.set_group_id(group_id);
   meta.set_created_time(base::Time::Now());
   meta.set_status(mojom::TransactionStatus::Unapproved);
   tx_state_manager_->AddOrUpdateTx(meta);
@@ -364,9 +366,11 @@ void SolanaTxManager::MakeTokenProgramTransferTxData(
           std::move(callback)));
 }
 
-void SolanaTxManager::MakeTokenSwapProgramTxData(
+void SolanaTxManager::MakeTokenProgramTxDataFromMessage(
     const std::string& message,
-    MakeTokenSwapProgramTxDataCallback callback) {
+    const mojom::TransactionType tx_type,
+    mojom::SolanaSendTransactionOptionsPtr send_options,
+    MakeTokenProgramTxDataFromMessageCallback callback) {
   absl::optional<std::vector<std::uint8_t>> message_bytes =
       base::Base64Decode(message);
   if (!message_bytes || message_bytes->empty() ||
@@ -381,8 +385,12 @@ void SolanaTxManager::MakeTokenSwapProgramTxData(
       SolanaTransaction::FromSignedTransactionBytes(*message_bytes);
   transaction->set_tx_type(mojom::TransactionType::SolanaSwap);
   transaction->message()->set_recent_blockhash("");
-  transaction->set_send_options(
-      SolanaTransaction::SendOptions(absl::nullopt, absl::nullopt, true));
+
+  if (send_options) {
+    const auto& options = SolanaTransaction::SendOptions::FromMojomSendOptions(
+        std::move(send_options));
+    transaction->set_send_options(std::move(options));
+  }
 
   auto tx_data = transaction->ToSolanaTxData();
   // This won't be null because we will always construct the mojo struct.
