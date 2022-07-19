@@ -161,6 +161,7 @@ class AdsServiceImpl : public AdsService,
   void OnResourceComponentUpdated(const std::string& id) override;
 
   absl::optional<ads::NewTabPageAdInfo> GetPrefetchedNewTabPageAd() override;
+  void PrefetchNewTabPageAd() override;
   void TriggerNewTabPageAdEvent(
       const std::string& placement_id,
       const std::string& creative_instance_id,
@@ -286,7 +287,6 @@ class AdsServiceImpl : public AdsService,
 
   void RegisterResourceComponentsForLocale(const std::string& locale);
 
-  void PrefetchNewTabPageAd();
   void OnPrefetchNewTabPageAd(bool success, const std::string& json);
 
   void OnURLRequestStarted(

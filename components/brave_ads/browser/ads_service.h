@@ -133,6 +133,7 @@ class AdsService : public KeyedService {
   virtual void OnResourceComponentUpdated(const std::string& id) = 0;
 
   virtual absl::optional<ads::NewTabPageAdInfo> GetPrefetchedNewTabPageAd() = 0;
+  virtual void PrefetchNewTabPageAd() = 0;
   virtual void TriggerNewTabPageAdEvent(
       const std::string& placement_id,
       const std::string& creative_instance_id,

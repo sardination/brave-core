@@ -1234,6 +1234,20 @@ AdsServiceImpl::GetPrefetchedNewTabPageAd() {
     prefetched_new_tab_page_ad_info_.reset();
   }
 
+  return ad_info;
+}
+
+void AdsServiceImpl::PrefetchNewTabPageAd() {
+  if (!connected()) {
+    return;
+  }
+
+  // The previous prefetched new tab page ad is available. No need to do
+  // prefetch again.
+  if (prefetched_new_tab_page_ad_info_) {
+    return;
+  }
+
   if (purge_orphaned_new_tab_page_ad_events_time_ &&
       *purge_orphaned_new_tab_page_ad_events_time_ <= base::Time::Now()) {
     purge_orphaned_new_tab_page_ad_events_time_.reset();
@@ -1242,10 +1256,9 @@ AdsServiceImpl::GetPrefetchedNewTabPageAd() {
         base::BindOnce(&AdsServiceImpl::OnPurgeOrphanedAdEventsForNewTabPageAds,
                        AsWeakPtr()));
   } else {
-    PrefetchNewTabPageAd();
+    bat_ads_->MaybeServeNewTabPageAd(
+        base::BindOnce(&AdsServiceImpl::OnPrefetchNewTabPageAd, AsWeakPtr()));
   }
-
-  return ad_info;
 }
 
 void AdsServiceImpl::TriggerNewTabPageAdEvent(
@@ -1382,28 +1395,13 @@ void AdsServiceImpl::RegisterResourceComponentsForLocale(
       locale);
 }
 
-void AdsServiceImpl::PrefetchNewTabPageAd() {
-  if (!connected()) {
-    return;
-  }
-
-  // The previous prefetched new tab page ad is available. No need to do
-  // prefetch again.
-  if (prefetched_new_tab_page_ad_info_) {
-    return;
-  }
-
-  bat_ads_->MaybeServeNewTabPageAd(
-      base::BindOnce(&AdsServiceImpl::OnPrefetchNewTabPageAd, AsWeakPtr()));
-}
-
 void AdsServiceImpl::OnPrefetchNewTabPageAd(bool success,
                                             const std::string& json) {
   if (!success) {
     return;
   }
 
-  // The previous successfully prefetched new tab page ad was not served.
+  // The previous successfully prefetched new tab page ad was not consumed.
   if (prefetched_new_tab_page_ad_info_ &&
       !purge_orphaned_new_tab_page_ad_events_time_) {
     purge_orphaned_new_tab_page_ad_events_time_ =
