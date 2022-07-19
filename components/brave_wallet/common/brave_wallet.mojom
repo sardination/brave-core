@@ -376,6 +376,7 @@ struct JupiterQuoteParams {
 struct JupiterSwapParams {
   JupiterRoute route;
   string user_public_key;
+  string output_mint;
 };
 
 struct JupiterSwapTransactions {

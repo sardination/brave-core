@@ -474,7 +474,8 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
 
       const swapTransactions = await swapService.getJupiterSwapTransactions({
         userPublicKey: accountAddress,
-        route: jupiterQuote.routes[0]
+        route: jupiterQuote.routes[0],
+        outputMint: toAsset.contractAddress || WRAPPED_SOL_CONTRACT_ADDRESS
       })
 
       if (swapTransactions.success && swapTransactions.response) {
