@@ -3,6 +3,7 @@ import TextInput from '$web-components/input'
 import * as React from 'react'
 import { useState } from 'react'
 import styled from 'styled-components'
+import { getLocale } from '../../../common/locale'
 import { useCategories, usePublishers } from '../../api/brave_news/news'
 import Flex from '../Flex'
 import CategoryCard from './CategoryCard'
@@ -58,10 +59,10 @@ export default function Discover(props: {}) {
 
     return <Flex direction='column'>
         <Header>Discover</Header>
-        <SearchInput type="search" placeholder='Search for news, site, topic or RSS feed' value={query} onInput={e => setQuery(e.currentTarget.value)} />
+        <SearchInput type="search" placeholder={getLocale('braveNewsSearchPlaceholderLabel')} value={query} onInput={e => setQuery(e.currentTarget.value)} />
         <SearchResults query={query} />
         {!query && <>
-            <DiscoverSection name='Browse by category'>
+            <DiscoverSection name={getLocale('braveNewsBrowseByCategoryHeader')}>
                 {categories
                     // If we're showing all categories, there's no end to the slice.
                     // Otherwise, just show the default number.
@@ -71,10 +72,10 @@ export default function Discover(props: {}) {
                     .map((c, i) => <CategoryCard key={c} categoryId={c} text={c} backgroundColor={colors[stringHashCode(c) % colors.length]} />)}
                 {!showingAllCategories
                     && <LoadMoreButton onClick={() => setShowingAllCategories(true)}>
-                        Load more
+                        {getLocale('braveNewsLoadMoreCategoriesButton')}
                     </LoadMoreButton>}
             </DiscoverSection>
-            <DiscoverSection name='All Sources'>
+            <DiscoverSection name={getLocale('braveNewsAllSourcesHeader')}>
                 {publishers.map(p => <FeedCard key={p.publisherId} publisherId={p.publisherId} />)}
             </DiscoverSection>
         </>}
