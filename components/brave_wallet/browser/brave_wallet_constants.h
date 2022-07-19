@@ -687,8 +687,8 @@ constexpr webui::LocalizedString kLocalizedStrings[] = {
     {"braveWalletVolumeStat", IDS_BRAVE_WALLET_VOLUME_STAT},
     {"braveWalletMarketCapStat", IDS_BRAVE_WALLET_MARKET_CAP_STAT},
     {"braveWalletHelpCenter", IDS_BRAVE_WALLET_HELP_CENTER},
-     {"braveWalletBuyTapBuyNotSupportedMessage",
-         IDS_BRAVE_WALLET_BUY_TAB_BUY_NOT_SUPPORTED_MESSAGE},
+    {"braveWalletBuyTapBuyNotSupportedMessage",
+     IDS_BRAVE_WALLET_BUY_TAB_BUY_NOT_SUPPORTED_MESSAGE},
     {"braveWalletHelpCenterText", IDS_BRAVE_WALLET_HELP_CENTER_TEXT}};
 
 // 0x swap constants
