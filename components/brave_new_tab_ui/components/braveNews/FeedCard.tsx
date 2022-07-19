@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import * as React from "react";
 import styled, { keyframes } from "styled-components";
 import Flex from "../Flex";
@@ -75,14 +75,14 @@ export default function FeedCard(props: {
     backgroundImage?: string;
 }) {
     const { publisher, enabled, setEnabled } = usePublisher(props.publisherId);
-    const [toggled, setToggled] = useState(false);
-    const toggle = () => {
-        setToggled(true);
-        setEnabled(!enabled);
-    }
+    const [changeCount, setToggleCount] = useState(0);
+    useEffect(() => {
+        setToggleCount(t => t + 1);
+    }, [enabled]);
+
     return <Container direction="column" gap={8}>
         <Card backgroundColor={props.backgroundColor} backgroundImage={props.backgroundImage}>
-            <StyledFollowButton following={enabled} onClick={toggle} />
+            <StyledFollowButton following={enabled} onClick={() => setEnabled(!enabled)} />
 
             {/*
                 Use whether or not we're following this element as the key, so
@@ -92,7 +92,7 @@ export default function FeedCard(props: {
                 We don't display the overlay unless we've toggled this publisher
                 so we don't play the pulse animation on first load.
             */}
-            {toggled && <HeartOverlay key={enabled + ''} align="center" justify="center">
+            {changeCount > 1 && <HeartOverlay key={changeCount} align="center" justify="center">
                 <HeartContainer>
                     {enabled ? Heart : HeartOutline}
                 </HeartContainer>
@@ -115,7 +115,7 @@ export function DirectFeedCard(props: {
                 setLoading(true);
                 await api.subscribeToDirectFeed(props.feedUrl);
                 setLoading(false);
-            }}/>
+            }} />
         </Card>
         <Name>
             {props.title}
