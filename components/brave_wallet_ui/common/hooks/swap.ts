@@ -117,6 +117,9 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
   } = useSelector(({ wallet }: { wallet: WalletState }) => wallet)
   const dispatch = useDispatch()
 
+  const swapProvider = React.useMemo(() =>
+    getSwapProvider(selectedNetwork), [selectedNetwork])
+
   // common state
   const [customSlippageTolerance, setCustomSlippageTolerance] = React.useState<string>('')
   const [exchangeRate, setExchangeRate] = React.useState('')
@@ -128,11 +131,14 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
   const [orderExpiration, setOrderExpiration] = React.useState<ExpirationPresetObjectType>(ExpirationPresetOptions[0])
   const [orderType, setOrderType] = React.useState<OrderTypes>('market')
   const [selectedPreset, setSelectedPreset] = React.useState<AmountPresetTypes | undefined>(undefined)
-  const [slippageTolerance, setSlippageTolerance] = React.useState<SlippagePresetObjectType>(SlippagePresetOptions[0])
+  const [slippageTolerance, setSlippageTolerance] = React.useState<SlippagePresetObjectType>(
+    swapProvider === SwapProvider.Jupiter
+      ? SlippagePresetOptions[1] // 1%
+      : SlippagePresetOptions[0] // 0.5%
+  )
   const [swapToOrFrom, setSwapToOrFrom] = React.useState<ToOrFromType>('from')
   const [toAmount, setToAmount] = React.useState('')
   const [toAsset, setToAsset] = React.useState<BraveWallet.BlockchainToken | undefined>(toAssetProp)
-  const [swapProvider, setSwapProvider] = React.useState<SwapProvider>(getSwapProvider(selectedNetwork))
 
   // evm swaps (0x) state
   const [allowance, setAllowance] = React.useState<string | undefined>(undefined)
@@ -457,7 +463,7 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
         inputMint: fromAsset.contractAddress || WRAPPED_SOL_CONTRACT_ADDRESS,
         outputMint: toAsset.contractAddress || WRAPPED_SOL_CONTRACT_ADDRESS,
         amount: fromAssetAmount || '',
-        slippagePercentage: slippageTolerance.slippage / 100
+        slippagePercentage: slippageTolerance.slippage
       })
 
       if (quote.success && quote.response) {
@@ -872,13 +878,11 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
       }
     ).catch(error => console.log(error))
 
-    setSwapProvider(getSwapProvider(selectedNetwork))
-
     // cleanup function, unsubscribe to promise on unmount
     return () => {
       isSubscribed = false
     }
-  }, [selectedNetwork, setSwapProvider])
+  }, [selectedNetwork])
 
   React.useEffect(() => {
     let isSubscribed = true // track if the component is mounted

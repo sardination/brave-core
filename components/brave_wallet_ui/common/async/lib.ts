@@ -26,6 +26,7 @@ import * as WalletActions from '../actions/wallet_actions'
 import { getNetworkInfo, getNetworksByCoinType, getTokensCoinType } from '../../utils/network-utils'
 import { getTokenParam, getFlattenedAccountBalances } from '../../utils/api-utils'
 import Amount from '../../utils/amount'
+import { sortTransactionByDate } from '../../utils/tx-utils'
 
 import getAPIProxy from './bridge'
 import { Dispatch, State, Store } from './types'
@@ -496,7 +497,7 @@ export function refreshTransactionHistory (address?: string) {
     const freshTransactions: AccountTransactions = await accountsToUpdate.reduce(
       async (acc, account) => acc.then(async (obj) => {
         const { transactionInfos } = await txService.getAllTransactionInfo(account.coin, account.address)
-        obj[account.address] = transactionInfos
+        obj[account.address] = sortTransactionByDate(transactionInfos, 'descending')
         return obj
       }), Promise.resolve({}))
 
