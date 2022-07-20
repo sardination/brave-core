@@ -383,7 +383,7 @@ void SolanaTxManager::MakeTokenProgramTxDataFromMessage(
 
   auto transaction =
       SolanaTransaction::FromSignedTransactionBytes(*message_bytes);
-  transaction->set_tx_type(mojom::TransactionType::SolanaSwap);
+  transaction->set_tx_type(std::move(tx_type));
   transaction->message()->set_recent_blockhash("");
 
   if (send_options) {
