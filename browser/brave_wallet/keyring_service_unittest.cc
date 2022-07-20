@@ -1194,9 +1194,6 @@ TEST_F(KeyringServiceUnitTest, GetKeyringInfo) {
   EXPECT_TRUE(callback_called);
 
   // invalid id or keyring is not yet created
-#if BUILDFLAG(IS_ANDROID)
-  EXPECT_TRUE(IsKeyringInfoEmpty(&service, mojom::kSolanaKeyringId));
-#endif
   EXPECT_TRUE(IsKeyringInfoEmpty(&service, "invalid_id"));
 }
 
@@ -3161,7 +3158,7 @@ TEST_F(KeyringServiceUnitTest, PreCreateEncryptors) {
     ASSERT_TRUE(CreateWallet(&service, "brave"));
     EXPECT_NE(service.encryptors_.at(mojom::kDefaultKeyringId), nullptr);
 #if BUILDFLAG(IS_ANDROID)
-    EXPECT_FALSE(service.encryptors_.contains(mojom::kSolanaKeyringId));
+    EXPECT_NE(service.encryptors_.at(mojom::kSolanaKeyringId), nullptr);
     EXPECT_FALSE(service.encryptors_.contains(mojom::kFilecoinKeyringId));
 #else
     EXPECT_NE(service.encryptors_.at(mojom::kSolanaKeyringId), nullptr);
@@ -3188,7 +3185,7 @@ TEST_F(KeyringServiceUnitTest, PreCreateEncryptors) {
     ASSERT_TRUE(CreateWallet(&service, "brave"));
     EXPECT_NE(service.encryptors_.at(mojom::kDefaultKeyringId), nullptr);
 #if BUILDFLAG(IS_ANDROID)
-    EXPECT_FALSE(service.encryptors_.contains(mojom::kSolanaKeyringId));
+    EXPECT_NE(service.encryptors_.at(mojom::kSolanaKeyringId), nullptr);
     EXPECT_FALSE(service.encryptors_.contains(mojom::kFilecoinKeyringId));
 #else
     EXPECT_NE(service.encryptors_.at(mojom::kSolanaKeyringId), nullptr);
@@ -3220,7 +3217,7 @@ TEST_F(KeyringServiceUnitTest, PreCreateEncryptors) {
         RestoreWallet(&service, *mnemonic_to_be_restored, "brave", false));
     EXPECT_NE(service.encryptors_.at(mojom::kDefaultKeyringId), nullptr);
 #if BUILDFLAG(IS_ANDROID)
-    EXPECT_FALSE(service.encryptors_.contains(mojom::kSolanaKeyringId));
+    EXPECT_NE(service.encryptors_.at(mojom::kSolanaKeyringId), nullptr);
     EXPECT_FALSE(service.encryptors_.contains(mojom::kFilecoinKeyringId));
 #else
     EXPECT_NE(service.encryptors_.at(mojom::kSolanaKeyringId), nullptr);
