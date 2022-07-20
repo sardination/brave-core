@@ -888,14 +888,6 @@ void BraveVpnService::GetPurchaseToken(GetPurchaseTokenCallback callback) {
         prefs_->GetString(prefs::kBraveVPNPurchaseTokenAndroid);
   }
 
-  // TODO(bsclifton): remove me. This is for testing only
-  if (purchase_token_string.length() == 0) {
-    purchase_token_string =
-        "oohdhbmbebmciddpbcicgnko.AO-J1OxJGS6-"
-        "tNYvzofx7RO2hJSEgQmi6tOrLHEB4zJ2OhsyhX3mhEe4QKS0MVxtJCBNIAlBP5jAgDPqdX"
-        "DNz15JhIXt5QYcIExIxe5H5ifbhAsHILlUXlE";
-  }
-
   std::string type;
 #if BUILDFLAG(IS_ANDROID)
   type = "android";
