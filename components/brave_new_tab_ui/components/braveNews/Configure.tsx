@@ -118,7 +118,7 @@ export default function Configure() {
           <BackButtonText>
             {formatMessage(getLocale('braveNewsBackToDashboard'), {
               tags: {
-                $1: content => <strong>{content}</strong>
+                $1: content => <strong key="$1">{content}</strong>
               }
             })}
           </BackButtonText>
