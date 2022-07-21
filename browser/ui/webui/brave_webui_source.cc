@@ -47,21 +47,19 @@ struct WebUISimpleItem {
 void AddLocalizedStringsBulk(content::WebUIDataSource* html_source,
                              const std::vector<WebUISimpleItem>& simple_items) {
   for (size_t i = 0; i < simple_items.size(); i++) {
-    html_source->AddLocalizedString(simple_items[i].name,
-                                    simple_items[i].id);
+    html_source->AddLocalizedString(simple_items[i].name, simple_items[i].id);
   }
 }
 
 void AddResourcePaths(content::WebUIDataSource* html_source,
                       const std::vector<WebUISimpleItem>& simple_items) {
   for (size_t i = 0; i < simple_items.size(); i++) {
-    html_source->AddResourcePath(simple_items[i].name,
-                                 simple_items[i].id);
+    html_source->AddResourcePath(simple_items[i].name, simple_items[i].id);
   }
 }
 
-void CustomizeWebUIHTMLSource(const std::string &name,
-    content::WebUIDataSource* source) {
+void CustomizeWebUIHTMLSource(const std::string& name,
+                              content::WebUIDataSource* source) {
 #if !BUILDFLAG(IS_ANDROID)
   if (name == "rewards" || name == "wallet") {
     NavigationBarDataProvider::Initialize(source);
@@ -213,6 +211,10 @@ void CustomizeWebUIHTMLSource(const std::string &name,
         { "braveNewsSourceCount", IDS_BRAVE_NEWS_SOURCE_COUNT},
         { "braveNewsFollowButtonFollowing", IDS_BRAVE_NEWS_FOLLOW_BUTTON_FOLLOWING},
         { "braveNewsFollowButtonNotFollowing", IDS_BRAVE_NEWS_FOLLOW_BUTTON_NOT_FOLLOWING},
+        { "braveNewsSearchResultsLoading", IDS_BRAVE_NEWS_SEARCH_RESULTS_LOADING},
+        { "braveNewsSearchResultsNoResults", IDS_BRAVE_NEWS_SEARCH_RESULTS_NO_RESULTS},
+        { "braveNewsSearchResultsLocalResults", IDS_BRAVE_NEWS_SEARCH_RESULTS_LOCAL_RESULTS},
+        { "braveNewsSearchResultsDirectResults", IDS_BRAVE_NEWS_SEARCH_RESULTS_DIRECT_RESULTS},
 
         { "addWidget", IDS_BRAVE_NEW_TAB_WIDGET_ADD },
         { "hideWidget", IDS_BRAVE_NEW_TAB_WIDGET_HIDE },
