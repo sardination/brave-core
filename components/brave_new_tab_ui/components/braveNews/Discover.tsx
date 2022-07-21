@@ -7,6 +7,7 @@ import { getLocale } from '../../../common/locale'
 import { useCategories, usePublishers } from '../../api/brave_news/news'
 import Flex from '../Flex'
 import CategoryCard from './CategoryCard'
+import { getCardColor } from './colors'
 import DiscoverSection from './DiscoverSection'
 import FeedCard from './FeedCard'
 import SearchResults from './SearchResults'
@@ -27,24 +28,6 @@ const SearchInput = styled(TextInput)`
 const LoadMoreButton = styled(Button)`
     grid-column: 2;
 `
-
-const colors = [
-    '#FF9AA2',
-    '#FFB7B2',
-    '#FFDAC1',
-    '#E2F0CB',
-    '#B5EAD7',
-    '#C7CEEA',
-];
-
-// Used to get a random but deterministic distribution of colors.
-const stringHashCode = (str: string) => {
-    let hash = 0
-    for (let i = 0; i < str.length; ++i)
-        hash = Math.imul(31, hash) + str.charCodeAt(i)
-
-    return (hash | 0) + 2147483647 + 1;
-}
 
 // The default number of category cards to show.
 const DEFAULT_NUM_CATEGORIES = 3;
@@ -69,7 +52,7 @@ export default function Discover(props: {}) {
                     .slice(0, showingAllCategories
                         ? undefined
                         : DEFAULT_NUM_CATEGORIES)
-                    .map((c, i) => <CategoryCard key={c} categoryId={c} text={c} backgroundColor={colors[stringHashCode(c) % colors.length]} />)}
+                    .map(c => <CategoryCard key={c} categoryId={c} text={c} backgroundColor={getCardColor(c)} />)}
                 {!showingAllCategories
                     && <LoadMoreButton onClick={() => setShowingAllCategories(true)}>
                         {getLocale('braveNewsLoadMoreCategoriesButton')}

@@ -5,6 +5,7 @@ import Flex from "../Flex";
 import FollowButton from "./FollowButton";
 import { Heart, HeartOutline } from "./Icons";
 import { api, usePublisher } from "../../api/brave_news/news";
+import { getCardColor } from "./colors";
 
 const Container = styled(Flex)`
 `;
@@ -33,7 +34,6 @@ const Name = styled.span`
 const Pulse = keyframes`
     0% {
         pointer-events: auto;
-        opacity: 0;
     }
     5% { opacity: 1; }
     80% { opacity: 1; }
@@ -81,7 +81,7 @@ export default function FeedCard(props: {
     }, [enabled]);
 
     return <Container direction="column" gap={8}>
-        <Card backgroundColor={props.backgroundColor} backgroundImage={props.backgroundImage}>
+        <Card backgroundColor={getCardColor(publisher.feedSource?.url || publisher.publisherId)} backgroundImage={props.backgroundImage}>
             <StyledFollowButton following={enabled} onClick={() => setEnabled(!enabled)} />
 
             {/*
@@ -110,7 +110,7 @@ export function DirectFeedCard(props: {
 }) {
     const [loading, setLoading] = useState(false);
     return <Container direction="column" gap={8}>
-        <Card>
+        <Card backgroundColor={getCardColor(props.feedUrl)}>
             <StyledFollowButton isDisabled={loading} following={false} onClick={async () => {
                 setLoading(true);
                 await api.subscribeToDirectFeed(props.feedUrl);
