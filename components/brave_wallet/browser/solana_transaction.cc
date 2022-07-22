@@ -40,7 +40,8 @@ const base::flat_set<mojom::TransactionType> kSolanaTransactionTypes = {
         SolanaSPLTokenTransferWithAssociatedTokenAccountCreation,
     mojom::TransactionType::SolanaDappSignAndSendTransaction,
     mojom::TransactionType::SolanaDappSignTransaction,
-    mojom::TransactionType::SolanaSwap};
+    mojom::TransactionType::SolanaSwap,
+    mojom::TransactionType::Other};
 
 bool IsValidCommitmentString(const std::string& commitment) {
   return commitment == "processed" || commitment == "confirmed" ||

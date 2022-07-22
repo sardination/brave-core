@@ -154,6 +154,10 @@ class FilTxManagerUnitTest : public testing::Test {
 
   PrefService* prefs() { return &prefs_; }
 
+  url::Origin GetOrigin() const {
+    return url::Origin::Create(GURL("https://brave.com"));
+  }
+
   void AddUnapprovedTransaction(mojom::FilTxDataPtr tx_data,
                                 const std::string& from,
                                 const absl::optional<url::Origin>& origin,
@@ -162,7 +166,27 @@ class FilTxManagerUnitTest : public testing::Test {
 
     base::RunLoop run_loop;
     fil_tx_manager()->AddUnapprovedTransaction(
-        std::move(tx_data_union), from, origin,
+        std::move(tx_data_union), from, origin, absl::nullopt,
+        base::BindLambdaForTesting([&](bool success, const std::string& id,
+                                       const std::string& err_message) {
+          ASSERT_TRUE(success);
+          ASSERT_FALSE(id.empty());
+          ASSERT_TRUE(err_message.empty());
+          *meta_id = id;
+          run_loop.Quit();
+        }));
+    run_loop.Run();
+  }
+
+  void AddUnapprovedTransaction(mojom::FilTxDataPtr tx_data,
+                                const std::string& from,
+                                const std::string& group_id,
+                                std::string* meta_id) {
+    auto tx_data_union = mojom::TxDataUnion::NewFilTxData(std::move(tx_data));
+
+    base::RunLoop run_loop;
+    fil_tx_manager()->AddUnapprovedTransaction(
+        std::move(tx_data_union), from, GetOrigin(), group_id,
         base::BindLambdaForTesting([&](bool success, const std::string& id,
                                        const std::string& err_message) {
           ASSERT_TRUE(success);
@@ -447,6 +471,21 @@ TEST_F(FilTxManagerUnitTest, SomeSiteOrigin) {
   ASSERT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->origin(),
             url::Origin::Create(GURL("https://some.site.com")));
+}
+
+TEST_F(FilTxManagerUnitTest, GroupId) {
+  const std::string from_account = "t1h4n7rphclbmwyjcp6jrdiwlfcuwbroxy3jvg33q";
+  const std::string to_account = "t1lqarsh4nkg545ilaoqdsbtj4uofplt6sto26ziy";
+  SetGasEstimateInterceptor(from_account, to_account);
+  auto tx_data = mojom::FilTxData::New(
+      "" /* nonce */, "" /* gas_premium */, "" /* gas_fee_cap */,
+      "" /* gas_limit */, "" /* max_fee */, to_account, from_account, "11");
+  std::string meta_id;
+  AddUnapprovedTransaction(std::move(tx_data), from_account, "mockGroupId",
+                           &meta_id);
+  auto tx_meta = fil_tx_manager()->GetTxForTesting(meta_id);
+  ASSERT_TRUE(tx_meta);
+  EXPECT_EQ(tx_meta->group_id(), "mockGroupId");
 }
 
 TEST_F(FilTxManagerUnitTest, GetTransactionMessageToSign) {

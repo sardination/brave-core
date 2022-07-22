@@ -515,7 +515,8 @@ TEST_F(SolanaTransactionUnitTest, SetTxType) {
       mojom::TransactionType::
           SolanaSPLTokenTransferWithAssociatedTokenAccountCreation,
       mojom::TransactionType::SolanaDappSignAndSendTransaction,
-      mojom::TransactionType::SolanaDappSignTransaction};
+      mojom::TransactionType::SolanaDappSignTransaction,
+      mojom::TransactionType::SolanaSwap};
   for (int i = 0; i <= max; i++) {
     auto type = static_cast<mojom::TransactionType>(i);
     if (valid_types.contains(type)) {
