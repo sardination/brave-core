@@ -68,13 +68,17 @@ class SidebarService : public KeyedService {
 
  private:
   FRIEND_TEST_ALL_PREFIXES(SidebarServiceTest, AddRemoveItems);
+  FRIEND_TEST_ALL_PREFIXES(SidebarServiceTest, NewDefaultItemAdded);
+
+  static std::vector<SidebarItem::BuiltInItemType>
+  GetDefaultBuiltInItemTypes_ForTesting();
 
   void LoadSidebarItems();
   void UpdateSidebarItemsToPrefStore();
   std::vector<SidebarItem> GetDefaultSidebarItemsFromCurrentItems() const;
   void OnPreferenceChanged(const std::string& pref_name);
-  bool IsBlockedBuiltInItem(const SidebarItem& item) const;
   void MigrateSidebarShowOptions();
+  void MigratePrefSidebarBuiltInItemsToHidden();
 
   raw_ptr<PrefService> prefs_ = nullptr;
   std::vector<SidebarItem> items_;
