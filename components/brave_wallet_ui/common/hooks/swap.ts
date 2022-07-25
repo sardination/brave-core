@@ -81,7 +81,7 @@ const hasDecimalsOverflow = (amount: string, asset?: BraveWallet.BlockchainToken
   return amountBaseWrapped.value && amountBaseWrapped.value.decimalPlaces() > 0
 }
 
-enum SwapProvider {
+export enum SwapProvider {
   ZeroEx,
   Jupiter
 }
@@ -1078,6 +1078,7 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
     toAmount,
     toAsset,
     toAssetBalance,
+    swapProvider,
 
     // For use in unit-tests
     setSwapError,

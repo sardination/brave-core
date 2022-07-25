@@ -50,7 +50,8 @@ export const getMockedTransactionInfo = (): BraveWallet.TransactionInfo => {
       },
       originSpec: 'https://brave.com',
       eTldPlusOne: 'brave.com'
-    }
+    },
+    groupId: undefined
   }
 }
 

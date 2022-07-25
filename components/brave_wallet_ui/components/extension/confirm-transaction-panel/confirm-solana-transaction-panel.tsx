@@ -7,7 +7,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 // types
-import {BraveWallet, WalletState} from '../../../constants/types'
+import { BraveWallet, WalletState } from '../../../constants/types'
 
 // Utils
 import { reduceNetworkDisplayName } from '../../../utils/network-utils'
@@ -61,7 +61,7 @@ import {
   GroupEnumeration,
   SmallLoadIcon
 } from './style'
-import {StatusBubble} from "../../shared/style";
+import { StatusBubble } from '../../shared/style'
 
 type confirmPanelTabs = 'transaction' | 'details'
 export interface Props {
