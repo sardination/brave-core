@@ -205,4 +205,8 @@
     "META": {"sizes": {"includes": [250]}},
     "includes": [59520]
   },
+  "<(SHARED_INTERMEDIATE_DIR)/brave/web-ui-brave_speedreader_panel/brave_speedreader_panel.grd": {
+    "META": {"sizes": {"includes": [20]}},
+    "includes": [59540]
+  },
 }

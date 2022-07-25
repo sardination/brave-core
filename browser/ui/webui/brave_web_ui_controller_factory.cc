@@ -40,6 +40,7 @@
 #include "brave/browser/ui/webui/brave_welcome_ui.h"
 #include "brave/browser/ui/webui/new_tab_page/brave_new_tab_ui.h"
 #include "brave/browser/ui/webui/private_new_tab_page/brave_private_new_tab_ui.h"
+#include "brave/browser/ui/webui/speedreader/speedreader_panel_ui.h"
 #include "brave/components/brave_wallet/browser/brave_wallet_utils.h"
 #include "brave/components/brave_wallet/common/brave_wallet.mojom.h"
 #endif
@@ -134,6 +135,8 @@ WebUIController* NewWebUI(WebUI* web_ui, const GURL& url) {
     return new BraveNewTabUI(web_ui, url.host());
   } else if (host == kShieldsPanelHost) {
     return new ShieldsPanelUI(web_ui);
+  } else if (host == kSpeedreaderPanelHost) {
+    return new SpeedreaderPanelUI(web_ui, url.host());
 #endif  // !BUILDFLAG(IS_ANDROID)
 #if BUILDFLAG(ENABLE_TOR)
   } else if (host == kTorInternalsHost) {
@@ -170,6 +173,7 @@ WebUIFactoryFunction GetWebUIFactoryFunction(WebUI* web_ui, const GURL& url) {
       url.host_piece() == kWalletPageHost ||
 #endif
       url.host_piece() == kShieldsPanelHost ||
+      url.host_piece() == kSpeedreaderPanelHost ||
       url.host_piece() == kRewardsPageHost ||
       url.host_piece() == kFederatedInternalsHost ||
       url.host_piece() == kRewardsInternalsHost ||
