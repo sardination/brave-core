@@ -24,7 +24,8 @@ import sys
 import logging
 import argparse
 
-from lib import perf_test_utils, perf_config
+import components.perf_test_utils as perf_test_utils # pylint: disable=no-name-in-module,import-error
+import components.perf_config as perf_config # pylint: disable=no-name-in-module,import-error
 
 
 def main():

@@ -86,20 +86,17 @@ The tool performs OAuth2 flow, stores/loads credentials, refreshes a token.
 Returns a valid token to stdout if succeeded.
 """
 
-import logging
 import os
 import sys
 import json
 
-
-SRC_DIR = os.path.abspath(
-    os.path.join(os.path.dirname(__file__), os.pardir, os.pardir,
-                 os.pardir))
-sys.path.insert(0, os.path.join(SRC_DIR, 'third_party', 'catapult', 'third_party', 'google-auth'))
-
-from google.auth.transport.requests import Request
-from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
+# pylint: disable=no-name-in-module,import-error
+from components import path_util
+with path_util.SysPath(path_util.GOOGLE_AUTH_DIR):
+  from google.auth.transport.requests import Request
+  from google.oauth2.credentials import Credentials
+  from google_auth_oauthlib.flow import InstalledAppFlow
+# pylint: enable=no-name-in-module,import-error
 
 
 SCOPES = ['openid', 'https://www.googleapis.com/auth/userinfo.email']

@@ -3,6 +3,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this file,
 # you can obtain one at http://mozilla.org/MPL/2.0/.
 
+import contextlib
 import os
 import sys
 
@@ -20,10 +21,29 @@ BRAVE_PERF_BUCKET = 'brave-telemetry'
 
 BRAVE_DEPOT_TOOLS_DIR = os.path.join(BRAVE_SRC_DIR, 'vendor', 'depot_tools')
 
+PYJSON5_DIR = os.path.join(SRC_DIR, 'third_party', 'pyjson5', 'src')
+
+GOOGLE_AUTH_DIR = os.path.join(SRC_DIR, 'third_party', 'catapult',
+                               'third_party', 'google-auth')
+
 VPYTHON_2_PATH = os.path.join(
     BRAVE_DEPOT_TOOLS_DIR,
     'vpython.bat' if sys.platform == 'win32' else 'vpython')
 
+
+@contextlib.contextmanager
+def SysPath(path, position=None):
+  if position is None:
+    sys.path.append(path)
+  else:
+    sys.path.insert(position, path)
+  try:
+    yield
+  finally:
+    if sys.path[-1] == path:
+      sys.path.pop()
+    else:
+      sys.path.remove(path)
 
 def GetBinaryPath(browser_dir):
   if sys.platform == 'win32':

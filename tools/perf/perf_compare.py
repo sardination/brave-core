@@ -9,7 +9,7 @@ import argparse
 import sys
 import logging
 
-from lib import perf_test_utils
+import components.perf_test_utils as perf_test_utils  # pylint: disable=no-name-in-module,import-error
 
 
 def main():

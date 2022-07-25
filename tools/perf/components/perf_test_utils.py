@@ -13,21 +13,25 @@ import logging
 import shlex
 import shutil
 import time
+
 from copy import deepcopy
 
-from lib import path_util, browser_binary_fetcher, perf_profile
-from lib.perf_config import PerfConfiguration
+# pylint: disable=no-name-in-module,import-error
+from components import path_util, browser_binary_fetcher, perf_profile
+from components.perf_config import PerfConfiguration
+with path_util.SysPath(path_util.PYJSON5_DIR):
+  import json5
+# pylint: enable=no-name-in-module,import-error
 
-PYJSON5_DIR = os.path.join(path_util.SRC_DIR, 'third_party', 'pyjson5', 'src')
-sys.path.insert(0, PYJSON5_DIR)
-import json5  # pylint: disable=import-error
 
-# Returns pair [revision_number, sha1]. revision_number is a number "primary"
-# commits from the begging to `revision`.
-# Use this to get the commit from a revision number:
-# git rev-list --topo-order --first-parent --reverse origin/master
-# | head -n <rev_num> | tail -n 1 | git log -n 1 --stdin
 def GetRevisionNumberAndHash(revision: str) -> tuple[str, str]:
+  """Returns pair [revision_number, sha1]. revision_number is a number "primary"
+  commits from the begging to `revision`.
+  Use this to get the commit from a revision number:
+  git rev-list --topo-order --first-parent --reverse origin/master
+  | head -n <rev_num> | tail -n 1 | git log -n 1 --stdin
+  """
+
   brave_dir = os.path.join(path_util.SRC_DIR, 'brave')
   subprocess.check_call(['git', 'fetch', 'origin', revision],
                         cwd=brave_dir,
@@ -59,7 +63,8 @@ def RunSingleTest(binary,
     args.append(
         os.path.join(path_util.SRC_DIR, 'testing', 'scripts',
                      'run_performance_tests.py'))
-  args.append(os.path.join(path_util.SRC_DIR, 'tools', 'perf', 'run_benchmark'))
+  args.append(os.path.join(path_util.SRC_DIR,
+              'tools', 'perf', 'run_benchmark'))
 
   benchmark = config['benchmark']
 
@@ -86,7 +91,8 @@ def RunSingleTest(binary,
     for story in config['stories']:
       args.append(f'--story={story}')
 
-  if not is_ref:  # TODO_perf: should be is_chromium, see _GetVariationsBrowserArgs
+  # TODO_perf: should be is_chromium, see _GetVariationsBrowserArgs
+  if not is_ref:
     extra_browser_args.append('--use-brave-field-trial-config')
 
   args.extend(extra_benchmark_args)
@@ -294,8 +300,8 @@ class RunableConfiguration:
 
 
 def PrepareBinariesAndDirectories(
-    configurations: list[PerfConfiguration],
-    common_options: CommonOptions) -> list[RunableConfiguration]:
+        configurations: list[PerfConfiguration],
+        common_options: CommonOptions) -> list[RunableConfiguration]:
   runable_configurations: list[RunableConfiguration] = []
   for config in configurations:
     if config.tag == config.label:
@@ -317,7 +323,8 @@ def PrepareBinariesAndDirectories(
 
 def SpawnConfigurationsFromTargetList(
     target_list: list[str],
-    base_configuration: PerfConfiguration) -> list[PerfConfiguration]:
+    base_configuration: PerfConfiguration) -> \
+        list[PerfConfiguration]:
   configurations: list[PerfConfiguration] = []
   for target_string in target_list:
     config = deepcopy(base_configuration)
@@ -332,7 +339,7 @@ def SpawnConfigurationsFromTargetList(
 
 
 def ParseConfigurations(
-    configurations_list: list[dict]) -> list[PerfConfiguration]:
+        configurations_list: list[dict]) -> list[PerfConfiguration]:
   configurations: list[PerfConfiguration] = []
   for serialized_config in configurations_list:
     config = PerfConfiguration(serialized_config)
@@ -341,7 +348,7 @@ def ParseConfigurations(
       if not config.label:
         config.label = config.tag
     elif config.label:
-      config.tag = config.label  #TODO_perf: do we need this?
+      config.tag = config.label  # TODO_perf: do we need this?
     else:
       raise RuntimeError(
           f'label or tag should be specified {serialized_config}')

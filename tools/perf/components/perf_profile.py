@@ -14,15 +14,14 @@ import shlex
 
 from zipfile import ZipFile
 
-from lib import path_util
+from components import path_util  # pylint: disable=no-name-in-module
 
 sys.path.append(os.path.join(path_util.SRC_DIR, 'third_party', 'depot_tools'))
-import download_from_google_storage
+import download_from_google_storage  # pylint: disable=import-error,wrong-import-position
 
-
-# To upload call: upload_to_google_storage.py some_profile.zip -b brave-telemetry
+# To upload a profile call:
+# upload_to_google_storage.py some_profile.zip -b brave-telemetry
 def DownloadFromGoogleStorage(sha1, output_path):
-
   gsutil = download_from_google_storage.Gsutil(
       download_from_google_storage.GSUTIL_DEFAULT_PATH)
   gs_path = 'gs://' + path_util.BRAVE_PERF_BUCKET + '/' + sha1

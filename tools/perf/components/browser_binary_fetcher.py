@@ -10,15 +10,20 @@ import os
 import shutil
 import sys
 import re
+
 from urllib.request import urlopen
 from io import BytesIO
 from zipfile import ZipFile
 from distutils.dir_util import copy_tree
 
-from lib import path_util
+from components import path_util  # pylint: disable=no-name-in-module
 
-BRAVE_NIGHTLY_WIN_INSTALLER_URL = 'https://github.com/brave/brave-browser/releases/download/%s/BraveBrowserStandaloneSilentNightlySetup.exe'
-BRAVE_NIGHTLY_URL = 'https://github.com/brave/brave-browser/releases/download/%s/brave-%s-%s.zip'
+BRAVE_NIGHTLY_WIN_INSTALLER_URL = (
+    'https://github.com/brave/brave-browser/releases/download/%s/' +
+    'BraveBrowserStandaloneSilentNightlySetup.exe')
+BRAVE_NIGHTLY_URL = (
+    'https://github.com/brave/brave-browser/releases/' +
+    'download/%s/brave-%s-%s.zip')
 CHROME_RELEASES_JSON = os.path.join(path_util.BRAVE_PERF_DIR,
                                     'chrome_releases.json')
 
@@ -50,7 +55,7 @@ def GetNearestChromiumVersionAndUrl(tag):
   for version in chrome_versions:
     parsed_version = ParseVersion(version)
     if parsed_version[0] == parsed_requested_version[
-        0] and parsed_version >= parsed_requested_version:
+            0] and parsed_version >= parsed_requested_version:
       if not best_candidate or best_candidate > parsed_version:
         best_candidate = parsed_version
 
