@@ -8,15 +8,15 @@
     "save-artifacts": true,
   },
   "tests": [
-    {
-      "benchmark": "loading.desktop.brave",
-      "pageset-repeat": 1,
-      "stories": [
-        "example.com_cold",
-        "wikipedia.com_cold",
-        "IGN_warm",
-      ]
-    },
+    // {
+    //   "benchmark": "loading.desktop.brave",
+    //   "pageset-repeat": 1,
+    //   "stories": [
+    //     "example.com_cold",
+    //     "wikipedia.com_cold",
+    //     "IGN_warm",
+    //   ]
+    // },
     // {
     //   "benchmark": "speedometer2-chrome-health",
     //   "pageset-repeat": 1,
@@ -26,8 +26,8 @@
       "pageset-repeat": 1,
       "stories": [
         "load:chrome:blank",
-        "browse:news:hackernews:2020",
-        "load:media:youtube:2018",
+        // "browse:news:hackernews:2020",
+        // "load:media:youtube:2018",
       ]
     },
   ]

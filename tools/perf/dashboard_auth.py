@@ -92,7 +92,7 @@ import json
 
 # pylint: disable=no-name-in-module,import-error
 from components import path_util
-with path_util.SysPath(path_util.GOOGLE_AUTH_DIR):
+with path_util.SysPath(path_util.GOOGLE_AUTH_DIR, 0):
   from google.auth.transport.requests import Request
   from google.oauth2.credentials import Credentials
   from google_auth_oauthlib.flow import InstalledAppFlow

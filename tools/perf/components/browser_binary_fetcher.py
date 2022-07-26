@@ -102,7 +102,6 @@ def DownloadWinInstallerAndExtract(out_dir, url, expected_install_path, binary):
   logging.info('Copy files to %s', out_dir)
   copy_tree(expected_install_path, out_dir)
   for file in os.listdir(expected_install_path):
-    #TODO_perf: check brave tag? file.endswith(tag[2:])
     if re.match(r'\d+\.\d+\.\d+.\d+', file):
       assert (full_version is None)
       full_version = file

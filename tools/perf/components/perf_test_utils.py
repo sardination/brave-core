@@ -118,7 +118,7 @@ def RunSingleTest(binary,
 
 def ReportToDashboard(is_ref, configuration_name, revision, output_dir):
   args = [
-      path_util.VPYTHON_2_PATH,
+      path_util.VPYTHON_3_PATH,
       os.path.join(path_util.SRC_DIR, 'tools', 'perf',
                    'process_perf_results.py')
   ]
