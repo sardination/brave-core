@@ -28,9 +28,7 @@ brave_chrome_renderer_public_deps = [
   "//third_party/blink/public/common",
 ]
 
-if (enable_brave_vpn) {
-  if (is_android) {
-    brave_chrome_renderer_public_deps +=
-        [ "//brave/components/brave_vpn/renderer" ]
-  }
+if (enable_brave_vpn && is_android) {
+  brave_chrome_renderer_public_deps +=
+      [ "//brave/components/brave_vpn/renderer" ]
 }
