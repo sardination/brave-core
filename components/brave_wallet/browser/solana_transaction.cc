@@ -7,7 +7,6 @@
 
 #include "base/base64.h"
 #include "base/check.h"
-#include "base/containers/contains.h"
 #include "base/strings/string_number_conversions.h"
 #include "brave/components/brave_wallet/browser/keyring_service.h"
 #include "brave/components/brave_wallet/browser/solana_instruction.h"
@@ -32,16 +31,6 @@ constexpr char kEncodedSerializedMsg[] = "encoded_serialized_msg";
 constexpr char kMaxRetries[] = "maxRetries";
 constexpr char kPreflightCommitment[] = "preflightCommitment";
 constexpr char kSkipPreflight[] = "skipPreflight";
-
-const base::flat_set<mojom::TransactionType> kSolanaTransactionTypes = {
-    mojom::TransactionType::SolanaSystemTransfer,
-    mojom::TransactionType::SolanaSPLTokenTransfer,
-    mojom::TransactionType::
-        SolanaSPLTokenTransferWithAssociatedTokenAccountCreation,
-    mojom::TransactionType::SolanaDappSignAndSendTransaction,
-    mojom::TransactionType::SolanaDappSignTransaction,
-    mojom::TransactionType::SolanaSwap,
-    mojom::TransactionType::Other};
 
 bool IsValidCommitmentString(const std::string& commitment) {
   return commitment == "processed" || commitment == "confirmed" ||
@@ -362,7 +351,12 @@ base::Value SolanaTransaction::ToValue() const {
 }
 
 void SolanaTransaction::set_tx_type(mojom::TransactionType tx_type) {
-  DCHECK(base::Contains(kSolanaTransactionTypes, tx_type));
+  DCHECK((tx_type >= mojom::TransactionType::Other &&
+          tx_type <=
+              mojom::TransactionType::
+                  SolanaSPLTokenTransferWithAssociatedTokenAccountCreation) ||
+         (tx_type >= mojom::TransactionType::SolanaDappSignAndSendTransaction &&
+          tx_type <= mojom::TransactionType::SolanaSwap));
   tx_type_ = tx_type;
 }
 
