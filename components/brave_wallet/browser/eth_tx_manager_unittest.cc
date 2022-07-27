@@ -392,17 +392,8 @@ class EthTxManagerUnitTest : public testing::Test {
   void AddUnapprovedTransaction(
       mojom::TxDataPtr tx_data,
       const std::string& from,
-      EthTxManager::AddUnapprovedTransactionCallback callback) {
-    eth_tx_manager()->AddUnapprovedTransaction(std::move(tx_data), from,
-                                               GetOrigin(), absl::nullopt,
-                                               std::move(callback));
-  }
-
-  void AddUnapprovedTransaction(
-      mojom::TxDataUnionPtr tx_data,
-      const std::string& from,
-      const std::string& group_id,
-      EthTxManager::AddUnapprovedTransactionCallback callback) {
+      EthTxManager::AddUnapprovedTransactionCallback callback,
+      const absl::optional<std::string>& group_id = absl::nullopt) {
     eth_tx_manager()->AddUnapprovedTransaction(
         std::move(tx_data), from, GetOrigin(), group_id, std::move(callback));
   }
@@ -410,17 +401,8 @@ class EthTxManagerUnitTest : public testing::Test {
   void AddUnapproved1559Transaction(
       mojom::TxData1559Ptr tx_data,
       const std::string& from,
-      EthTxManager::AddUnapprovedTransactionCallback callback) {
-    eth_tx_manager()->AddUnapproved1559Transaction(std::move(tx_data), from,
-                                                   GetOrigin(), absl::nullopt,
-                                                   std::move(callback));
-  }
-
-  void AddUnapproved1559Transaction(
-      mojom::TxData1559Ptr tx_data,
-      const std::string& from,
-      const std::string& group_id,
-      EthTxManager::AddUnapprovedTransactionCallback callback) {
+      EthTxManager::AddUnapprovedTransactionCallback callback,
+      const absl::optional<std::string>& group_id = absl::nullopt) {
     eth_tx_manager()->AddUnapproved1559Transaction(
         std::move(tx_data), from, GetOrigin(), group_id, std::move(callback));
   }
@@ -551,7 +533,8 @@ TEST_F(EthTxManagerUnitTest, SomeSiteOrigin) {
             url::Origin::Create(GURL("https://some.site.com")));
 }
 
-TEST_F(EthTxManagerUnitTest, GroupId) {
+TEST_F(EthTxManagerUnitTest,
+       AddUnapprovedLegacyOrEIP1559TransactionWithGroupId) {
   auto tx_data =
       mojom::TxData::New("0x06", "0x09184e72a000", "0x0974",
                          "0xbe862ad9abfe6f22bcb087716c7d89a26051f74c",
@@ -559,17 +542,29 @@ TEST_F(EthTxManagerUnitTest, GroupId) {
   bool callback_called = false;
   std::string tx_meta_id;
 
+  // Legacy transaction with group_id
   AddUnapprovedTransaction(
-      mojom::TxDataUnion::NewEthTxData(std::move(tx_data)), from(),
-      "mockGroupId",
+      tx_data.Clone(), from(),
       base::BindOnce(&AddUnapprovedTransactionSuccessCallback, &callback_called,
-                     &tx_meta_id));
-
+                     &tx_meta_id),
+      "mockGroupId");
   base::RunLoop().RunUntilIdle();
   EXPECT_TRUE(callback_called);
   auto tx_meta = eth_tx_manager()->GetTxForTesting(tx_meta_id);
   EXPECT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->group_id(), "mockGroupId");
+
+  // Legacy transaction with empty group_id
+  callback_called = false;
+  AddUnapprovedTransaction(
+      std::move(tx_data), from(),
+      base::BindOnce(&AddUnapprovedTransactionSuccessCallback, &callback_called,
+                     &tx_meta_id));
+  base::RunLoop().RunUntilIdle();
+  EXPECT_TRUE(callback_called);
+  tx_meta = eth_tx_manager()->GetTxForTesting(tx_meta_id);
+  EXPECT_TRUE(tx_meta);
+  EXPECT_EQ(tx_meta->group_id(), absl::nullopt);
 
   auto tx_data_1559 = mojom::TxData1559::New(
       mojom::TxData::New("0x1", "", "0x0974",
@@ -577,17 +572,30 @@ TEST_F(EthTxManagerUnitTest, GroupId) {
                          "0x016345785d8a0000", data_),
       "0x04", "0x77359400" /* 2 Gwei */, "0xb2d05e000" /* 48 Gwei */, nullptr);
 
+  // EIP-1559 transaction with group_id
   callback_called = false;
   AddUnapproved1559Transaction(
-      std::move(tx_data_1559), from(), "mockGroupId1559",
+      tx_data_1559.Clone(), from(),
       base::BindOnce(&AddUnapprovedTransactionSuccessCallback, &callback_called,
-                     &tx_meta_id));
-
+                     &tx_meta_id),
+      "mockGroupId1559");
   base::RunLoop().RunUntilIdle();
   EXPECT_TRUE(callback_called);
   tx_meta = eth_tx_manager()->GetTxForTesting(tx_meta_id);
   EXPECT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->group_id(), "mockGroupId1559");
+
+  // EIP-1559 transaction with empty group_id
+  callback_called = false;
+  AddUnapproved1559Transaction(
+      std::move(tx_data_1559), from(),
+      base::BindOnce(&AddUnapprovedTransactionSuccessCallback, &callback_called,
+                     &tx_meta_id));
+  base::RunLoop().RunUntilIdle();
+  EXPECT_TRUE(callback_called);
+  tx_meta = eth_tx_manager()->GetTxForTesting(tx_meta_id);
+  EXPECT_TRUE(tx_meta);
+  EXPECT_EQ(tx_meta->group_id(), absl::nullopt);
 }
 
 TEST_F(EthTxManagerUnitTest, AddUnapprovedTransactionWithoutGasLimit) {
