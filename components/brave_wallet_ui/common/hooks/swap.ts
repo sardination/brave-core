@@ -501,9 +501,9 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
           ? randomHexString()
           : undefined
 
-        await Promise.all(serializedTransactions.map(async (message, idx) => {
+        await Promise.all(serializedTransactions.map(async (each, idx) => {
           await sendSolanaSerializedTransaction({
-            message,
+            encodedTransaction: each,
             from: accountAddress,
             txType: !hasParts || idx === 1
               ? BraveWallet.TransactionType.SolanaSwap

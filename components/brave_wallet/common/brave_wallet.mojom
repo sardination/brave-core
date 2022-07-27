@@ -1072,7 +1072,7 @@ interface SolanaTxManagerProxy {
 
   GetEstimatedTxFee(string tx_meta_id) => (uint64 fee, SolanaProviderError error, string error_message);
 
-  MakeTokenProgramTxDataFromMessage(string message, TransactionType tx_type, SolanaSendTransactionOptions? send_options)
+  MakeTxDataFromBase64EncodedTransaction(string encoded_transaction, TransactionType tx_type, SolanaSendTransactionOptions? send_options)
      => (SolanaTxData? tx_data, SolanaProviderError error, string error_message);
 };
 

@@ -307,13 +307,13 @@ void TxService::MakeTokenProgramTransferTxData(
       std::move(callback));
 }
 
-void TxService::MakeTokenProgramTxDataFromMessage(
-    const std::string& message,
+void TxService::MakeTxDataFromBase64EncodedTransaction(
+    const std::string& encoded_transaction,
     const mojom::TransactionType tx_type,
     mojom::SolanaSendTransactionOptionsPtr send_options,
-    MakeTokenProgramTxDataFromMessageCallback callback) {
-  GetSolanaTxManager()->MakeTokenProgramTxDataFromMessage(
-      message, std::move(tx_type), std::move(send_options),
+    MakeTxDataFromBase64EncodedTransactionCallback callback) {
+  GetSolanaTxManager()->MakeTxDataFromBase64EncodedTransaction(
+      encoded_transaction, std::move(tx_type), std::move(send_options),
       std::move(callback));
 }
 

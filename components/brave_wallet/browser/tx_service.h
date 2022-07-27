@@ -165,11 +165,11 @@ class TxService : public KeyedService,
       const std::string& to_wallet_address,
       uint64_t amount,
       MakeTokenProgramTransferTxDataCallback callback) override;
-  void MakeTokenProgramTxDataFromMessage(
-      const std::string& message,
+  void MakeTxDataFromBase64EncodedTransaction(
+      const std::string& encoded_transaction,
       const mojom::TransactionType tx_type,
       mojom::SolanaSendTransactionOptionsPtr send_options,
-      MakeTokenProgramTxDataFromMessageCallback callback) override;
+      MakeTxDataFromBase64EncodedTransactionCallback callback) override;
 
   void GetEstimatedTxFee(const std::string& tx_meta_id,
                          GetEstimatedTxFeeCallback callback) override;

@@ -334,16 +334,16 @@ class SolanaTxManagerUnitTest : public testing::Test {
     run_loop.Run();
   }
 
-  void TestMakeTokenProgramTxDataFromMessage(
-      const std::string& message,
+  void TestMakeTxDataFromBase64EncodedTransaction(
+      const std::string& encoded_transaction,
       const mojom::TransactionType tx_type,
       mojom::SolanaSendTransactionOptionsPtr send_options,
       mojom::SolanaTxDataPtr expected_tx_data,
       mojom::SolanaProviderError expected_error,
       const std::string& expected_err_message) {
     base::RunLoop run_loop;
-    solana_tx_manager()->MakeTokenProgramTxDataFromMessage(
-        message, tx_type, std::move(send_options),
+    solana_tx_manager()->MakeTxDataFromBase64EncodedTransaction(
+        encoded_transaction, tx_type, std::move(send_options),
         base::BindLambdaForTesting([&](mojom::SolanaTxDataPtr tx_data,
                                        mojom::SolanaProviderError error,
                                        const std::string& err_message) {
@@ -799,19 +799,19 @@ TEST_F(SolanaTxManagerUnitTest, MakeTokenProgramTxDataFromMessage) {
   auto tx_data = mojom::SolanaTxData::New(
       "", 0, from_account, "", "", 0, 0, mojom::TransactionType::SolanaSwap,
       std::move(instructions), send_options.ToMojomSendOptions(), nullptr);
-  TestMakeTokenProgramTxDataFromMessage(
-      message, mojom::TransactionType::SolanaSwap,
+  TestMakeTxDataFromBase64EncodedTransaction(
+      encoded_transaction, mojom::TransactionType::SolanaSwap,
       send_options.ToMojomSendOptions(), std::move(tx_data),
       mojom::SolanaProviderError::kSuccess, "");
 
   // KO: empty message
-  TestMakeTokenProgramTxDataFromMessage(
+  TestMakeTxDataFromBase64EncodedTransaction(
       "", mojom::TransactionType::SolanaSwap, nullptr, nullptr,
       mojom::SolanaProviderError::kInternalError,
       l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));
 
   // KO: invalid base64 message
-  TestMakeTokenProgramTxDataFromMessage(
+  TestMakeTxDataFromBase64EncodedTransaction(
       "not a base64 message", mojom::TransactionType::SolanaSwap, nullptr,
       nullptr, mojom::SolanaProviderError::kInternalError,
       l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));

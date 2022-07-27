@@ -428,7 +428,7 @@ export interface SPLTransferFromParams extends BaseTransactionParams {
 }
 
 export interface SolanaSerializedTransactionParams {
-  message: string
+  encodedTransaction: string
   from: string
   txType: BraveWallet.TransactionType
   sendOptions?: BraveWallet.SolanaSendTransactionOptions

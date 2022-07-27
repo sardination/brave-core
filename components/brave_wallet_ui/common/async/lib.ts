@@ -780,8 +780,8 @@ export async function sendSPLTransaction (payload: BraveWallet.SolanaTxData) {
 
 export async function sendSolanaSerializedTransaction (payload: SolanaSerializedTransactionParams) {
   const { solanaTxManagerProxy, txService } = getAPIProxy()
-  const result = await solanaTxManagerProxy.makeTokenProgramTxDataFromMessage(
-    payload.message,
+  const result = await solanaTxManagerProxy.makeTxDataFromBase64EncodedTransaction(
+    payload.encodedTransaction,
     payload.txType,
     payload.sendOptions || null
   )

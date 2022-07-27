@@ -363,15 +363,15 @@ void SolanaTxManager::MakeTokenProgramTransferTxData(
           std::move(callback)));
 }
 
-void SolanaTxManager::MakeTokenProgramTxDataFromMessage(
-    const std::string& message,
+void SolanaTxManager::MakeTxDataFromBase64EncodedTransaction(
+    const std::string& encoded_transaction,
     const mojom::TransactionType tx_type,
     mojom::SolanaSendTransactionOptionsPtr send_options,
-    MakeTokenProgramTxDataFromMessageCallback callback) {
-  absl::optional<std::vector<std::uint8_t>> message_bytes =
-      base::Base64Decode(message);
-  if (!message_bytes || message_bytes->empty() ||
-      message_bytes->size() > kSolanaMaxTxSize) {
+    MakeTxDataFromBase64EncodedTransactionCallback callback) {
+  absl::optional<std::vector<std::uint8_t>> transaction_bytes =
+      base::Base64Decode(encoded_transaction);
+  if (!transaction_bytes || transaction_bytes->empty() ||
+      transaction_bytes->size() > kSolanaMaxTxSize) {
     std::move(callback).Run(
         nullptr, mojom::SolanaProviderError::kInternalError,
         l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));
@@ -379,7 +379,7 @@ void SolanaTxManager::MakeTokenProgramTxDataFromMessage(
   }
 
   auto transaction =
-      SolanaTransaction::FromSignedTransactionBytes(*message_bytes);
+      SolanaTransaction::FromSignedTransactionBytes(*transaction_bytes);
   transaction->set_tx_type(std::move(tx_type));
 
   if (send_options) {
