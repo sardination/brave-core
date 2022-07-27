@@ -26,9 +26,9 @@ PYJSON5_DIR = os.path.join(SRC_DIR, 'third_party', 'pyjson5', 'src')
 GOOGLE_AUTH_DIR = os.path.join(SRC_DIR, 'third_party', 'catapult',
                                'third_party', 'google-auth')
 
-VPYTHON_3_PATH = os.path.join(
+VPYTHON_2_PATH = os.path.join(
     BRAVE_DEPOT_TOOLS_DIR,
-    'vpython3.bat' if sys.platform == 'win32' else 'vpython3')
+    'vpython.bat' if sys.platform == 'win32' else 'vpython')
 
 
 @contextlib.contextmanager
