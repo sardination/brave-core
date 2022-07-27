@@ -12,6 +12,8 @@ namespace brave_adaptive_captcha {
 
 std::string GetServerUrl(const std::string& path);
 
+void SetServerHostForTesting(const std::string& host);
+
 }  // namespace brave_adaptive_captcha
 
 #endif  // BRAVE_COMPONENTS_BRAVE_ADAPTIVE_CAPTCHA_SERVER_UTIL_H_

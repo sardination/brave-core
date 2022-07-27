@@ -9,7 +9,6 @@
 #include <utility>
 
 #include "base/strings/stringprintf.h"
-#include "brave/components/api_request_helper/api_request_helper.h"
 #include "brave/components/brave_adaptive_captcha/server_util.h"
 #include "components/prefs/pref_registry_simple.h"
 #include "components/prefs/pref_service.h"
@@ -70,10 +69,11 @@ BraveAdaptiveCaptchaService::BraveAdaptiveCaptchaService(
     : prefs_(prefs),
       rewards_service_(rewards_service),
       delegate_(std::move(delegate)),
-      captcha_challenge_(std::make_unique<GetAdaptiveCaptchaChallenge>(
-          std::make_unique<api_request_helper::APIRequestHelper>(
-              kAnnotationTag,
-              std::move(url_loader_factory)))) {
+      api_request_helper_(kAnnotationTag, url_loader_factory),
+      get_captcha_challenge_(
+          std::make_unique<GetAdaptiveCaptchaChallenge>(&api_request_helper_)),
+      post_captcha_solution_(
+          std::make_unique<PostAdaptiveCaptchaSolution>(&api_request_helper_)) {
   DCHECK(prefs);
   DCHECK(rewards_service);
 
@@ -87,7 +87,7 @@ BraveAdaptiveCaptchaService::~BraveAdaptiveCaptchaService() {
 void BraveAdaptiveCaptchaService::GetScheduledCaptcha(
     const std::string& payment_id,
     OnGetAdaptiveCaptchaChallenge callback) {
-  captcha_challenge_->Request(payment_id, std::move(callback));
+  get_captcha_challenge_->Request(payment_id, std::move(callback));
 }
 
 bool BraveAdaptiveCaptchaService::GetScheduledCaptchaInfo(

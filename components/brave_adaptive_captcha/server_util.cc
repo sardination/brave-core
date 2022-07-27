@@ -15,7 +15,13 @@ namespace {
 
 using brave_rewards::RewardsFlags;
 
+std::string g_server_host;
+
 std::string GetHost() {
+  if (!g_server_host.empty()) {
+    return g_server_host;
+  }
+
   const auto& flags = RewardsFlags::ForCurrentProcess();
   switch (flags.environment.value_or(RewardsFlags::Environment::kProduction)) {
     case RewardsFlags::Environment::kDevelopment:
@@ -31,6 +37,10 @@ std::string GetHost() {
 std::string GetServerUrl(const std::string& path) {
   DCHECK(!path.empty());
   return GetHost() + path;
+}
+
+void SetServerHostForTesting(const std::string& host) {
+  g_server_host = host;
 }
 
 }  // namespace brave_adaptive_captcha

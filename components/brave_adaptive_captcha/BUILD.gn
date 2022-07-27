@@ -9,6 +9,8 @@ source_set("brave_adaptive_captcha") {
     "brave_adaptive_captcha_service.h",
     "get_adaptive_captcha_challenge.cc",
     "get_adaptive_captcha_challenge.h",
+    "post_adaptive_captcha_solution.cc",
+    "post_adaptive_captcha_solution.h",
     "server_util.cc",
     "server_util.h",
   ]

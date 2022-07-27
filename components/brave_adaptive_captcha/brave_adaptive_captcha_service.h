@@ -10,8 +10,10 @@
 #include <string>
 
 #include "base/memory/raw_ptr.h"
+#include "brave/components/api_request_helper/api_request_helper.h"
 #include "brave/components/brave_adaptive_captcha/brave_adaptive_captcha_delegate.h"
 #include "brave/components/brave_adaptive_captcha/get_adaptive_captcha_challenge.h"
+#include "brave/components/brave_adaptive_captcha/post_adaptive_captcha_solution.h"
 #include "brave/components/brave_rewards/browser/rewards_service.h"
 #include "brave/components/brave_rewards/browser/rewards_service_observer.h"
 #include "components/keyed_service/core/keyed_service.h"
@@ -84,7 +86,9 @@ class BraveAdaptiveCaptchaService
   raw_ptr<brave_rewards::RewardsService> rewards_service_ =
       nullptr;  // NOT OWNED
   std::unique_ptr<BraveAdaptiveCaptchaDelegate> delegate_;
-  std::unique_ptr<GetAdaptiveCaptchaChallenge> captcha_challenge_;
+  api_request_helper::APIRequestHelper api_request_helper_;
+  std::unique_ptr<GetAdaptiveCaptchaChallenge> get_captcha_challenge_;
+  std::unique_ptr<PostAdaptiveCaptchaSolution> post_captcha_solution_;
 };
 
 }  // namespace brave_adaptive_captcha

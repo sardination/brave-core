@@ -1,9 +1,9 @@
-/* Copyright (c) 2021 The Brave Authors. All rights reserved.
+/* Copyright (c) 2022 The Brave Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "brave/components/brave_adaptive_captcha/get_adaptive_captcha_challenge.h"
+#include "brave/components/brave_adaptive_captcha/post_adaptive_captcha_solution.h"
 
 #include <memory>
 #include <string>
@@ -20,45 +20,45 @@
 #include "testing/gmock/include/gmock/gmock.h"
 #include "testing/gtest/include/gtest/gtest.h"
 
-// npm run test -- brave_unit_tests --filter=GetAdaptiveCaptchaChallengeTest.*
+// npm run test -- brave_unit_tests --filter=PostAdaptiveCaptchaSolutionTest.*
 
 namespace brave_adaptive_captcha {
 
-class GetAdaptiveCaptchaChallengeTest : public testing::Test {
+class PostAdaptiveCaptchaSolutionTest : public testing::Test {
  public:
-  GetAdaptiveCaptchaChallengeTest()
+  PostAdaptiveCaptchaSolutionTest()
       : api_request_helper_(TRAFFIC_ANNOTATION_FOR_TESTS,
                             test_url_loader_factory_.GetSafeWeakWrapper()),
-        get_challenge_(std::make_unique<GetAdaptiveCaptchaChallenge>(
+        post_solution_(std::make_unique<PostAdaptiveCaptchaSolution>(
             &api_request_helper_)) {
     brave_adaptive_captcha::SetServerHostForTesting(
         "https://grants.rewards.brave.com");
   }
 
-  void OnGetChallengeServerOK(const std::string& captcha_id) {
-    EXPECT_EQ(captcha_id, "ae07288c-d078-11eb-b8bc-0242ac130003");
+  void OnPostSolutionServerOK(const std::string& nonce) {
+    EXPECT_EQ(nonce, "0123456789");
     SignalUrlLoadCompleted();
   }
 
-  void OnGetChallengeServerError404(const std::string& captcha_id) {
-    EXPECT_EQ(captcha_id, "");
+  void OnPostSolutionServerError404(const std::string& nonce) {
+    EXPECT_EQ(nonce, "");
     SignalUrlLoadCompleted();
   }
 
-  void OnGetChallengeServerError500(const std::string& captcha_id) {
-    EXPECT_EQ(captcha_id, "");
+  void OnPostSolutionServerError500(const std::string& nonce) {
+    EXPECT_EQ(nonce, "");
     SignalUrlLoadCompleted();
   }
 
-  void OnGetChallengeServerErrorRandom(const std::string& captcha_id) {
-    EXPECT_EQ(captcha_id, "");
+  void OnPostSolutionServerErrorRandom(const std::string& nonce) {
+    EXPECT_EQ(nonce, "");
     SignalUrlLoadCompleted();
   }
 
  protected:
   network::TestURLLoaderFactory test_url_loader_factory_;
   api_request_helper::APIRequestHelper api_request_helper_;
-  std::unique_ptr<GetAdaptiveCaptchaChallenge> get_challenge_;
+  std::unique_ptr<PostAdaptiveCaptchaSolution> post_solution_;
 
   void WaitForUrlLoadToComplete() {
     if (url_loaded_) {
@@ -83,50 +83,53 @@ class GetAdaptiveCaptchaChallengeTest : public testing::Test {
   }
 };
 
-TEST_F(GetAdaptiveCaptchaChallengeTest, ServerOK) {
+TEST_F(PostAdaptiveCaptchaSolutionTest, ServerOK) {
   test_url_loader_factory_.AddResponse(
-      "https://grants.rewards.brave.com/v3/captcha/challenge/payment_id",
-      "{ \"captchaID\": \"ae07288c-d078-11eb-b8bc-0242ac130003\" }",
-      net::HTTP_OK);
-  get_challenge_->Request(
-      "payment_id",
-      base::BindOnce(&GetAdaptiveCaptchaChallengeTest::OnGetChallengeServerOK,
+      "https://grants.rewards.brave.com"
+      "/v3/captcha/solution/payment_id/captcha_id",
+      "{ \"solution\": \"0123456789\" }", net::HTTP_OK);
+  post_solution_->Request(
+      "payment_id", "captcha_id",
+      base::BindOnce(&PostAdaptiveCaptchaSolutionTest::OnPostSolutionServerOK,
                      base::Unretained(this)));
   WaitForUrlLoadToComplete();
 }
 
-TEST_F(GetAdaptiveCaptchaChallengeTest, ServerError404) {
+TEST_F(PostAdaptiveCaptchaSolutionTest, ServerError404) {
   test_url_loader_factory_.AddResponse(
-      "https://grants.rewards.brave.com/v3/captcha/challenge/payment_id", "",
-      net::HTTP_NOT_FOUND);
-  get_challenge_->Request(
-      "payment_id",
+      "https://grants.rewards.brave.com"
+      "/v3/captcha/solution/payment_id/captcha_id",
+      "", net::HTTP_NOT_FOUND);
+  post_solution_->Request(
+      "payment_id", "captcha_id",
       base::BindOnce(
-          &GetAdaptiveCaptchaChallengeTest::OnGetChallengeServerError404,
+          &PostAdaptiveCaptchaSolutionTest::OnPostSolutionServerError404,
           base::Unretained(this)));
   WaitForUrlLoadToComplete();
 }
 
-TEST_F(GetAdaptiveCaptchaChallengeTest, ServerError500) {
+TEST_F(PostAdaptiveCaptchaSolutionTest, ServerError500) {
   test_url_loader_factory_.AddResponse(
-      "https://grants.rewards.brave.com/v3/captcha/challenge/payment_id", "",
-      net::HTTP_INTERNAL_SERVER_ERROR);
-  get_challenge_->Request(
-      "payment_id",
+      "https://grants.rewards.brave.com"
+      "/v3/captcha/solution/payment_id/captcha_id",
+      "", net::HTTP_INTERNAL_SERVER_ERROR);
+  post_solution_->Request(
+      "payment_id", "captcha_id",
       base::BindOnce(
-          &GetAdaptiveCaptchaChallengeTest::OnGetChallengeServerError500,
+          &PostAdaptiveCaptchaSolutionTest::OnPostSolutionServerError500,
           base::Unretained(this)));
   WaitForUrlLoadToComplete();
 }
 
-TEST_F(GetAdaptiveCaptchaChallengeTest, ServerErrorRandom) {
+TEST_F(PostAdaptiveCaptchaSolutionTest, ServerErrorRandom) {
   test_url_loader_factory_.AddResponse(
-      "https://grants.rewards.brave.com/v3/captcha/challenge/payment_id", "",
-      net::HTTP_TOO_MANY_REQUESTS);
-  get_challenge_->Request(
-      "payment_id",
+      "https://grants.rewards.brave.com"
+      "/v3/captcha/solution/payment_id/captcha_id",
+      "", net::HTTP_TOO_MANY_REQUESTS);
+  post_solution_->Request(
+      "payment_id", "captcha_id",
       base::BindOnce(
-          &GetAdaptiveCaptchaChallengeTest::OnGetChallengeServerErrorRandom,
+          &PostAdaptiveCaptchaSolutionTest::OnPostSolutionServerErrorRandom,
           base::Unretained(this)));
   WaitForUrlLoadToComplete();
 }
