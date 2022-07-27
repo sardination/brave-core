@@ -110,9 +110,10 @@ export function useTransactionFeesParser (selectedNetwork: BraveWallet.NetworkIn
   }, [])
 
   return React.useCallback((transactionInfo: BraveWallet.TransactionInfo): ParsedTransactionFees => {
-    const { txDataUnion: { ethTxData1559: txData, filTxData }, txType } = transactionInfo
+    const { txDataUnion: { ethTxData1559: txData, filTxData, solanaTxData }, txType } = transactionInfo
 
-    const isSolanaTransaction = SolanaTransactionTypes.includes(txType)
+    const isSolanaTransaction = SolanaTransactionTypes.includes(txType) ||
+      (txType === BraveWallet.TransactionType.Other && solanaTxData !== undefined)
     const isFilTransaction = filTxData !== undefined
 
     const gasLimit = isFilTransaction
@@ -251,7 +252,8 @@ export function useTransactionParser (
       txType === BraveWallet.TransactionType.SolanaSPLTokenTransfer ||
       txType === BraveWallet.TransactionType.SolanaSPLTokenTransferWithAssociatedTokenAccountCreation
 
-    const isSolanaTransaction = SolanaTransactionTypes.includes(txType)
+    const isSolanaTransaction = SolanaTransactionTypes.includes(txType) ||
+      (txType === BraveWallet.TransactionType.Other && solTxData !== undefined)
 
     const value =
       isSPLTransaction ? solTxData?.amount.toString() ?? ''
@@ -273,7 +275,8 @@ export function useTransactionParser (
     switch (true) {
       case txType === BraveWallet.TransactionType.SolanaDappSignTransaction:
       case txType === BraveWallet.TransactionType.SolanaDappSignAndSendTransaction:
-      case txType === BraveWallet.TransactionType.SolanaSwap: {
+      case txType === BraveWallet.TransactionType.SolanaSwap:
+      case txType === BraveWallet.TransactionType.Other && solTxData !== undefined: {
         const instructions = solTxData ? getTypedSolanaTxInstructions(solTxData) : []
 
         const lamportsMovedFromInstructions = instructions.reduce((acc, { type, params }) => {

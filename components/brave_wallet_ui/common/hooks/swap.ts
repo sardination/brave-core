@@ -507,7 +507,7 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
             from: accountAddress,
             txType: !hasParts || idx === 1
               ? BraveWallet.TransactionType.SolanaSwap
-              : BraveWallet.TransactionType.SolanaDappSignAndSendTransaction,
+              : BraveWallet.TransactionType.Other,
             sendOptions: makeSendOptions(undefined, undefined, true),
             groupId
           })

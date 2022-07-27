@@ -32,7 +32,7 @@ export const getMockedTransactionInfo = (): BraveWallet.TransactionInfo => {
       },
       ethTxData: {} as any,
       filTxData: undefined,
-      solanaTxData: {} as any
+      solanaTxData: undefined
     },
     txStatus: BraveWallet.TransactionStatus.Approved,
     txType: BraveWallet.TransactionType.Other,
