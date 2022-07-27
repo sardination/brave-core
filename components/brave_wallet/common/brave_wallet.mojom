@@ -1072,8 +1072,15 @@ interface SolanaTxManagerProxy {
 
   GetEstimatedTxFee(string tx_meta_id) => (uint64 fee, SolanaProviderError error, string error_message);
 
-  MakeTxDataFromBase64EncodedTransaction(string encoded_transaction, TransactionType tx_type, SolanaSendTransactionOptions? send_options)
-     => (SolanaTxData? tx_data, SolanaProviderError error, string error_message);
+  // Get transaction data from transaction bytes encoded in base64 format.
+  //
+  // The client must set a TransactionType using the tx_type parameter, and
+  // optionally pass standard Solana send options.
+  MakeTxDataFromBase64EncodedTransaction(
+      string encoded_transaction,
+      TransactionType tx_type,
+      SolanaSendTransactionOptions? send_options)
+      => (SolanaTxData? tx_data, SolanaProviderError error, string error_message);
 };
 
 interface FilTxManagerProxy {
