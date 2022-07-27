@@ -766,17 +766,21 @@ TEST_F(SolanaTxManagerUnitTest, MakeTokenProgramTransferTxData) {
       l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));
 }
 
-TEST_F(SolanaTxManagerUnitTest, MakeTokenProgramTxDataFromMessage) {
-  // OK: TX data from base64-encoded signed message.
+TEST_F(SolanaTxManagerUnitTest, MakeTxDataFromBase64EncodedTransaction) {
+  // OK: TX data from base64-encoded transaction.
   // Data from SolanaTransactionUnitTest.FromSignedTransactionBytes
-  const std::string& message =
+  const std::string& encoded_transaction =
       "AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA"
       "AAAAAAAAAAAAAAABAAEDoTNZW3PS2dRMn6vIKJadRsVHGCzRbI8EOvvXPsmsn8X/"
       "4OT1Xu4XhM4oUvnby2eebttd+Y+"
       "Gz6yzTEMGqaSVJgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAg79TyWzB3v+"
       "wQ4jR2yoGqfCJjrmpBhFXewYqN6JAeFsBAgIAAQwCAAAAgJaYAAAAAAA=";
-  std::string from_account = "BrG44HdsEhzapvs8bEqzvkq4egwevS3fRE6ze2ENo6S8";
-  std::string to_account = "JDqrvDz8d8tFCADashbUKQDKfJZFobNy13ugN65t1wvV";
+  const std::string& from_account =
+      "BrG44HdsEhzapvs8bEqzvkq4egwevS3fRE6ze2ENo6S8";
+  const std::string& to_account =
+      "JDqrvDz8d8tFCADashbUKQDKfJZFobNy13ugN65t1wvV";
+  const std::string& recent_blockhash =
+      "9sHcv6xwn9YkB8nxTUGKDwPwNnmqVp5oAXxU8Fdkm4J6";
   const std::vector<uint8_t> data = {2, 0, 0, 0, 128, 150, 152, 0, 0, 0, 0, 0};
   auto solana_account_meta1 =
       mojom::SolanaAccountMeta::New(from_account, true, true);
@@ -797,8 +801,9 @@ TEST_F(SolanaTxManagerUnitTest, MakeTokenProgramTxDataFromMessage) {
   auto send_options =
       SolanaTransaction::SendOptions(absl::nullopt, absl::nullopt, true);
   auto tx_data = mojom::SolanaTxData::New(
-      "", 0, from_account, "", "", 0, 0, mojom::TransactionType::SolanaSwap,
-      std::move(instructions), send_options.ToMojomSendOptions(), nullptr);
+      recent_blockhash, 0, from_account, "", "", 0, 0,
+      mojom::TransactionType::SolanaSwap, std::move(instructions),
+      send_options.ToMojomSendOptions(), nullptr);
   TestMakeTxDataFromBase64EncodedTransaction(
       encoded_transaction, mojom::TransactionType::SolanaSwap,
       send_options.ToMojomSendOptions(), std::move(tx_data),
