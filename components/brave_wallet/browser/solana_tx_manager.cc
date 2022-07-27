@@ -93,18 +93,15 @@ void SolanaTxManager::ApproveTransaction(const std::string& tx_meta_id,
   }
 
   const std::string blockhash = meta->tx()->message()->recent_blockhash();
-  const uint64_t block_height =
-      meta->tx()->message()->last_valid_block_height();
-  if (blockhash.empty() || block_height == 0UL) {
+  if (blockhash.empty()) {
     GetSolanaBlockTracker()->GetLatestBlockhash(
         base::BindOnce(&SolanaTxManager::OnGetLatestBlockhash,
                        weak_ptr_factory_.GetWeakPtr(), std::move(meta),
                        std::move(callback)),
         true);
   } else {
-    OnGetLatestBlockhash(std::move(meta), std::move(callback), blockhash,
-                         block_height, mojom::SolanaProviderError::kSuccess,
-                         "");
+    OnGetLatestBlockhash(std::move(meta), std::move(callback), blockhash, 0,
+                         mojom::SolanaProviderError::kSuccess, "");
   }
 }
 
@@ -384,7 +381,6 @@ void SolanaTxManager::MakeTokenProgramTxDataFromMessage(
   auto transaction =
       SolanaTransaction::FromSignedTransactionBytes(*message_bytes);
   transaction->set_tx_type(std::move(tx_type));
-  transaction->message()->set_recent_blockhash("");
 
   if (send_options) {
     const auto& options = SolanaTransaction::SendOptions::FromMojomSendOptions(
