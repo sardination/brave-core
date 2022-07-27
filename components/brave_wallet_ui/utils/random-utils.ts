@@ -10,9 +10,3 @@ export function unbiasedRandom (min: number, max: number) {
     } while (value >= cutoff)
     return min + value % range
 }
-
-export function randomHexString (numBytes: number = 32) {
-  const bytes = new Uint8Array(numBytes)
-  return [...window.crypto.getRandomValues(bytes)]
-    .map(e => ('0' + e.toString(16)).slice(-2)).join('')
-}

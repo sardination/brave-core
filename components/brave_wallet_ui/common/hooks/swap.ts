@@ -38,7 +38,6 @@ import { debounce } from '../../../common/debounce'
 import { WalletActions } from '../actions'
 import getAPIProxy from '../async/bridge'
 import { hexStrToNumberArray } from '../../utils/hex-utils'
-import { randomHexString } from '../../utils/random-utils'
 
 // Hooks
 import useAssetManagement from './assets-management'
@@ -498,7 +497,8 @@ export default function useSwap ({ fromAsset: fromAssetProp, toAsset: toAssetPro
 
         const hasParts = serializedTransactions.length > 1
         const groupId = hasParts
-          ? randomHexString()
+          // @ts-expect-error
+          ? crypto.randomUUID()
           : undefined
 
         await Promise.all(serializedTransactions.map(async (each, idx) => {
