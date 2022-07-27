@@ -12,7 +12,7 @@ import { useExplorer, useTransactionParser } from '../../../common/hooks'
 
 // Utils
 import { reduceAddress } from '../../../utils/reduce-address'
-import { getTransactionStatusString } from '../../../utils/tx-utils'
+import { getTransactionStatusString, isSolanaTransaction } from '../../../utils/tx-utils'
 import { toProperCase } from '../../../utils/string-utils'
 import { mojoTimeDeltaToJSDate } from '../../../../common/mojomUtils'
 import Amount from '../../../utils/amount'
@@ -26,9 +26,6 @@ import {
   DefaultCurrencies,
   WalletState
 } from '../../../constants/types'
-import {
-  SolanaTransactionTypes
-} from '../../../common/constants/solana'
 
 // Styled Components
 import {
@@ -168,7 +165,7 @@ const TransactionDetailPanel = (props: Props) => {
     return ''
   }, [transactionDetails, liveTransaction, defaultCurrencies])
 
-  const isSolanaTransaction = SolanaTransactionTypes.includes(liveTransaction.txType)
+  const isSolanaTxn = isSolanaTransaction(liveTransaction)
   const isFilecoinTransaction = getCoinFromTxDataUnion(liveTransaction.txDataUnion) === BraveWallet.CoinType.FIL
 
   return (
@@ -221,7 +218,7 @@ const TransactionDetailPanel = (props: Props) => {
         </StatusRow>
       </DetailRow>
       {/* Will remove this conditional for solana once https://github.com/brave/brave-browser/issues/22040 is implemented. */}
-      {!isSolanaTransaction &&
+      {!isSolanaTxn &&
         <DetailRow>
           <DetailTitle>
             {getLocale('braveWalletAllowSpendTransactionFee')}
@@ -271,7 +268,7 @@ const TransactionDetailPanel = (props: Props) => {
       </DetailRow>
 
       {[BraveWallet.TransactionStatus.Approved, BraveWallet.TransactionStatus.Submitted].includes(transactionDetails.status) &&
-        !isSolanaTransaction &&
+        !isSolanaTxn &&
         !isFilecoinTransaction &&
         <DetailRow>
           <DetailTitle />
@@ -283,7 +280,7 @@ const TransactionDetailPanel = (props: Props) => {
         </DetailRow>
       }
       {transactionDetails.status === BraveWallet.TransactionStatus.Error &&
-        !isSolanaTransaction &&
+        !isSolanaTxn &&
         !isFilecoinTransaction &&
         <DetailRow>
           <DetailTitle />

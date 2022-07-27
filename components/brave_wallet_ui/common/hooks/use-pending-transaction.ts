@@ -29,8 +29,7 @@ import {
   UpdateUnapprovedTransactionGasFieldsType,
   UpdateUnapprovedTransactionNonceType
 } from '../constants/action_types'
-import { SolanaTransactionTypes } from '../constants/solana'
-import { sortTransactionByDate } from '../../utils/tx-utils'
+import { isSolanaTransaction, sortTransactionByDate } from '../../utils/tx-utils'
 
 export const usePendingTransactions = () => {
   // redux
@@ -83,8 +82,7 @@ export const usePendingTransactions = () => {
   const isERC721SafeTransferFrom = transactionInfo?.txType === BraveWallet.TransactionType.ERC721SafeTransferFrom
   const isERC721TransferFrom = transactionInfo?.txType === BraveWallet.TransactionType.ERC721TransferFrom
 
-  const isSolanaTransaction = transactionInfo?.txType &&
-    SolanaTransactionTypes.includes(transactionInfo.txType)
+  const isSolanaTxn = transactionInfo && isSolanaTransaction(transactionInfo)
   const isSolanaDappTransaction = transactionInfo?.txType && [
     BraveWallet.TransactionType.SolanaDappSignAndSendTransaction,
     BraveWallet.TransactionType.SolanaDappSignTransaction
@@ -264,7 +262,7 @@ export const usePendingTransactions = () => {
     isERC721SafeTransferFrom,
     isERC721TransferFrom,
     isSolanaDappTransaction,
-    isSolanaTransaction,
+    isSolanaTransaction: isSolanaTxn,
     isAssociatedTokenAccountCreation,
     isFilecoinTransaction,
     onEditAllowanceSave,
