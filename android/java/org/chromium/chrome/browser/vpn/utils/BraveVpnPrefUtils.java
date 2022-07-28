@@ -11,8 +11,10 @@ import android.content.SharedPreferences;
 
 import org.chromium.base.ContextUtils;
 import org.chromium.chrome.R;
-import org.chromium.chrome.browser.preferences.BravePrefServiceBridge;
+import org.chromium.chrome.browser.preferences.BravePref;
+import org.chromium.chrome.browser.profiles.Profile;
 import org.chromium.chrome.browser.vpn.models.BraveVpnPrefModel;
+import org.chromium.components.user_prefs.UserPrefs;
 
 import java.util.Collections;
 import java.util.Set;
@@ -133,7 +135,8 @@ public class BraveVpnPrefUtils {
         SharedPreferences.Editor sharedPreferencesEditor = mSharedPreferences.edit();
         sharedPreferencesEditor.putString(PREF_BRAVE_VPN_PURCHASE_TOKEN, value);
         sharedPreferencesEditor.apply();
-        BravePrefServiceBridge.getInstance().setPurchaseTokenAndroid(value);
+        UserPrefs.get(Profile.getLastUsedRegularProfile())
+                .setString(BravePref.BRAVE_VPN_PURCHASE_TOKEN_ANDROID, value);
     }
 
     public static String getPurchaseToken() {

@@ -11,6 +11,9 @@
 namespace brave_vpn {
 namespace prefs {
 
+const char kBraveVPNPurchaseTokenAndroid[] =
+    "brave.brave_vpn.purchase_token_android";
+
 void RegisterProfilePrefs(PrefRegistrySimple* registry) {
 #if !BUILDFLAG(IS_ANDROID)
   registry->RegisterBooleanPref(kBraveVPNShowButton, true);
