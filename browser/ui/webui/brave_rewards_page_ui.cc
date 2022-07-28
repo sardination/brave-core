@@ -45,6 +45,11 @@
 #include "content/public/browser/web_ui_message_handler.h"
 #include "content/public/common/bindings_policy.h"
 
+#if !BUILDFLAG(IS_ANDROID)
+#include "brave/browser/brave_rewards/rewards_panel/rewards_panel_coordinator.h"
+#include "chrome/browser/ui/browser_finder.h"
+#endif
+
 #if BUILDFLAG(IS_ANDROID)
 #include "chrome/browser/ui/webui/favicon_source.h"
 #include "components/favicon_base/favicon_url_parser.h"
@@ -81,7 +86,6 @@ class RewardsDOMHandler
   void GetAutoContributeProperties(const base::Value::List& args);
   void FetchPromotions(const base::Value::List& args);
   void ClaimPromotion(const base::Value::List& args);
-  void AttestPromotion(const base::Value::List& args);
   void RecoverWallet(const base::Value::List& args);
   void GetReconcileStamp(const base::Value::List& args);
   void SaveSetting(const base::Value::List& args);
@@ -243,16 +247,6 @@ class RewardsDOMHandler
   void OnAdsEnabled(brave_rewards::RewardsService* rewards_service,
                     bool ads_enabled) override;
 
-  void OnClaimPromotion(const std::string& promotion_id,
-                        const ledger::type::Result result,
-                        const std::string& captcha_image,
-                        const std::string& hint,
-                        const std::string& captcha_id);
-
-  void OnAttestPromotion(const std::string& promotion_id,
-                         const ledger::type::Result result,
-                         ledger::type::PromotionPtr promotion);
-
   void OnUnblindedTokensReady(
       brave_rewards::RewardsService* rewards_service) override;
 
@@ -351,10 +345,6 @@ void RewardsDOMHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback(
       "brave_rewards.claimPromotion",
       base::BindRepeating(&RewardsDOMHandler::ClaimPromotion,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "brave_rewards.attestPromotion",
-      base::BindRepeating(&RewardsDOMHandler::AttestPromotion,
                           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "brave_rewards.recoverWallet",
@@ -621,7 +611,7 @@ void RewardsDOMHandler::IsInitialized(const base::Value::List& args) {
   AllowJavascript();
 
   if (rewards_service_ && rewards_service_->IsInitialized()) {
-    CallJavascriptFunction("brave_rewards.initialized", base::Value(0));
+    CallJavascriptFunction("brave_rewards.initialized");
   }
 }
 
@@ -686,7 +676,7 @@ void RewardsDOMHandler::OnRewardsInitialized(
   if (!IsJavascriptAllowed())
     return;
 
-  CallJavascriptFunction("brave_rewards.initialized", base::Value(0));
+  CallJavascriptFunction("brave_rewards.initialized");
 }
 
 void RewardsDOMHandler::GetAutoContributeProperties(
@@ -777,26 +767,6 @@ void RewardsDOMHandler::FetchPromotions(const base::Value::List& args) {
   }
 }
 
-void RewardsDOMHandler::OnClaimPromotion(const std::string& promotion_id,
-                                         const ledger::type::Result result,
-                                         const std::string& captcha_image,
-                                         const std::string& hint,
-                                         const std::string& captcha_id) {
-  if (!IsJavascriptAllowed()) {
-    return;
-  }
-
-  base::Value::Dict response;
-  response.Set("result", static_cast<int>(result));
-  response.Set("promotionId", promotion_id);
-  response.Set("captchaImage", captcha_image);
-  response.Set("captchaId", captcha_id);
-  response.Set("hint", hint);
-
-  CallJavascriptFunction("brave_rewards.claimPromotion",
-                         base::Value(std::move(response)));
-}
-
 void RewardsDOMHandler::ClaimPromotion(const base::Value::List& args) {
   CHECK_EQ(1U, args.size());
   if (!rewards_service_) {
@@ -808,9 +778,19 @@ void RewardsDOMHandler::ClaimPromotion(const base::Value::List& args) {
   const std::string promotion_id = args[0].GetString();
 
 #if !BUILDFLAG(IS_ANDROID)
-  rewards_service_->ClaimPromotion(
-      promotion_id, base::BindOnce(&RewardsDOMHandler::OnClaimPromotion,
-                                   weak_factory_.GetWeakPtr(), promotion_id));
+  auto* browser =
+      chrome::FindBrowserWithWebContents(web_ui()->GetWebContents());
+  if (!browser) {
+    return;
+  }
+
+  auto* coordinator =
+      brave_rewards::RewardsPanelCoordinator::FromBrowser(browser);
+  if (!coordinator) {
+    return;
+  }
+
+  coordinator->ShowGrantCaptcha(promotion_id);
 #else
   // No need for a callback. The UI receives "brave_rewards.promotionFinish".
   brave_rewards::AttestPromotionCallback callback = base::DoNothing();
@@ -818,36 +798,20 @@ void RewardsDOMHandler::ClaimPromotion(const base::Value::List& args) {
 #endif
 }
 
-void RewardsDOMHandler::AttestPromotion(const base::Value::List& args) {
-  CHECK_EQ(2U, args.size());
-  AllowJavascript();
-
-  if (!rewards_service_) {
-    base::Value::Dict finish;
-    finish.Set("status", 1);
-    CallJavascriptFunction("brave_rewards.promotionFinish",
-                           base::Value(std::move(finish)));
+void RewardsDOMHandler::OnPromotionFinished(
+    brave_rewards::RewardsService* rewards_service,
+    const ledger::type::Result result,
+    ledger::type::PromotionPtr promotion) {
+  if (result != ledger::type::Result::LEDGER_OK) {
     return;
   }
 
-  const std::string promotion_id = args[0].GetString();
-  const std::string solution = args[1].GetString();
-  rewards_service_->AttestPromotion(
-      promotion_id, solution,
-      base::BindOnce(&RewardsDOMHandler::OnAttestPromotion,
-                     weak_factory_.GetWeakPtr(), promotion_id));
-}
-
-void RewardsDOMHandler::OnAttestPromotion(
-    const std::string& promotion_id,
-    const ledger::type::Result result,
-    ledger::type::PromotionPtr promotion) {
   if (!IsJavascriptAllowed()) {
     return;
   }
 
   base::Value::Dict promotion_dict;
-  promotion_dict.Set("promotionId", promotion_id);
+  promotion_dict.Set("promotionId", promotion->id);
 
   if (promotion) {
     promotion_dict.Set("expiresAt", static_cast<double>(promotion->expires_at));
@@ -861,17 +825,6 @@ void RewardsDOMHandler::OnAttestPromotion(
 
   CallJavascriptFunction("brave_rewards.promotionFinish",
                          base::Value(std::move(finish)));
-}
-
-void RewardsDOMHandler::OnPromotionFinished(
-    brave_rewards::RewardsService* rewards_service,
-    const ledger::type::Result result,
-    ledger::type::PromotionPtr promotion) {
-  if (result != ledger::type::Result::LEDGER_OK) {
-    return;
-  }
-
-  OnAttestPromotion(promotion->id, result, promotion->Clone());
 }
 
 void RewardsDOMHandler::RecoverWallet(const base::Value::List& args) {

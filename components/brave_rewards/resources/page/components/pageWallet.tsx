@@ -9,23 +9,29 @@ import { connect } from 'react-redux'
 import {
   ModalActivity,
   ModalBackupRestore,
-  ModalPending,
   ModalQRCode
 } from '../../ui/components'
 import { WalletCard, ExternalWalletAction } from '../../shared/components/wallet_card'
 import { getProviderPayoutStatus } from '../../shared/lib/provider_payout_status'
-import { ExternalWallet, ExternalWalletProvider, ExternalWalletStatus } from '../../shared/lib/external_wallet'
+import { LayoutKind } from '../lib/layout_context'
+
+import {
+  ExternalWallet,
+  ExternalWalletProvider,
+  ExternalWalletStatus,
+  lookupExternalWalletProviderName
+} from '../../shared/lib/external_wallet'
+
 import { Provider } from '../../ui/components/profile'
-import { DetailRow as PendingDetailRow, PendingType } from '../../ui/components/tablePending'
 // Utils
 import { getLocale, getLocaleWithTag } from '../../../../common/locale'
 import * as rewardsActions from '../actions/rewards_actions'
-import * as utils from '../utils'
+import { convertBalance, isPublisherConnectedOrVerified } from './utils'
 import { ExtendedActivityRow, SummaryItem, SummaryType } from '../../ui/components/modalActivity'
 import { DetailRow as TransactionRow } from '../../ui/components/tableTransactions'
 import { ConnectWalletModal } from './connect_wallet_modal'
 import { ManageWalletButton } from './manage_wallet_button'
-import { PageWalletWrapper } from './style'
+import { PendingContributionsModal } from './pending_contributions_modal'
 
 interface State {
   activeTabId: number
@@ -35,8 +41,18 @@ interface State {
   modalQRCode: boolean
 }
 
+function constructBackupString (backupKey: string) {
+  return 'Brave Wallet Recovery Key\n' +
+    `Date created: ${new Date(Date.now()).toLocaleDateString()}\n\n` +
+    `Recovery Key: ${backupKey}\n\n` +
+    'Note: This key is not stored on Brave servers. This key is your only ' +
+    'method of recovering your Brave wallet. Save this key in a safe place, ' +
+    'separate from your Brave browser. Make sure you keep this key private, ' +
+    'or else your wallet will be compromised.'
+}
+
 interface Props extends Rewards.ComponentProps {
-  showManageWalletButton: boolean
+  layout: LayoutKind
 }
 
 class PageWallet extends React.Component<Props, State> {
@@ -65,10 +81,11 @@ class PageWallet extends React.Component<Props, State> {
     this.isDisconnectUrl()
     this.isVerifyUrl()
     this.actions.getMonthlyReportIds()
-    chrome.send('brave_rewards.getExternalWalletProviders')
+    this.actions.getExternalWalletProviders()
   }
 
   onModalBackupClose = () => {
+    // Used the by settings page to clear browsing data.
     if (this.urlHashIs('#manage-wallet')) {
       window.location.hash = ''
     }
@@ -97,7 +114,7 @@ class PageWallet extends React.Component<Props, State> {
     try {
       await navigator.clipboard.writeText(backupKey)
       console.log('Copy successful')
-      chrome.send('brave_rewards.setBackupCompleted')
+      this.actions.setBackupCompleted()
     } catch (e) {
       console.log('Copy failed')
     }
@@ -107,16 +124,16 @@ class PageWallet extends React.Component<Props, State> {
     if (document.location) {
       const win = window.open(document.location.href)
       if (win) {
-        win.document.body.innerText = utils.constructBackupString(backupKey) // this should be text, not HTML
+        win.document.body.innerText = constructBackupString(backupKey) // this should be text, not HTML
         win.print()
         win.close()
-        chrome.send('brave_rewards.setBackupCompleted')
+        this.actions.setBackupCompleted()
       }
     }
   }
 
   onModalBackupOnSaveFile = (backupKey: string) => {
-    const backupString = utils.constructBackupString(backupKey)
+    const backupString = constructBackupString(backupKey)
     const backupFileText = 'brave_wallet_recovery.txt'
     const a = document.createElement('a')
     document.body.appendChild(a)
@@ -127,7 +144,7 @@ class PageWallet extends React.Component<Props, State> {
     a.download = backupFileText
     a.click()
     window.URL.revokeObjectURL(url)
-    chrome.send('brave_rewards.setBackupCompleted')
+    this.actions.setBackupCompleted()
   }
 
   onModalBackupOnRestore = (key: string | MouseEvent) => {
@@ -240,42 +257,8 @@ class PageWallet extends React.Component<Props, State> {
     }
   }
 
-  getPendingRows = (): PendingDetailRow[] => {
-    const { parameters, pendingContributions } = this.props.rewardsData
-    return pendingContributions.map((item: Rewards.PendingContribution) => {
-      const verified = utils.isPublisherConnectedOrVerified(item.status)
-      let faviconUrl = `chrome://favicon/size/64@1x/${item.url}`
-      if (item.favIcon && verified) {
-        faviconUrl = `chrome://favicon/size/64@1x/${item.favIcon}`
-      }
-
-      let type: PendingType = 'ac'
-
-      if (item.type === 8) { // one-time tip
-        type = 'tip'
-      } else if (item.type === 16) { // recurring tip
-        type = 'recurring'
-      }
-
-      return {
-        profile: {
-          name: item.name,
-          verified,
-          provider: (item.provider ? item.provider : undefined) as Provider,
-          src: faviconUrl
-        },
-        url: item.url,
-        type,
-        amount: {
-          tokens: item.amount.toFixed(3),
-          converted: utils.convertBalance(item.amount, parameters.rate)
-        },
-        date: new Date(parseInt(item.expirationDate, 10) * 1000).toLocaleDateString(),
-        onRemove: () => {
-          this.actions.removePendingContribution(item.id)
-        }
-      }
-    })
+  removePendingContribution = (id: number) => {
+    this.actions.removePendingContribution(id)
   }
 
   removeAllPendingContribution = () => {
@@ -300,7 +283,7 @@ class PageWallet extends React.Component<Props, State> {
   }
 
   onConnectWalletContinue = (provider: string) => {
-    chrome.send('brave_rewards.setExternalWalletType', [provider])
+    this.actions.setExternalWalletType(provider)
   }
 
   onVerifyClick = () => {
@@ -411,7 +394,7 @@ class PageWallet extends React.Component<Props, State> {
 
     return {
       value: value.toFixed(3),
-      converted: utils.convertBalance(value, parameters.rate),
+      converted: convertBalance(value, parameters.rate),
       link: externalWallet && externalWallet.status === 2 /* VERIFIED */ && key === 'ads' ? externalWallet.activityUrl : undefined
     }
   }
@@ -458,7 +441,7 @@ class PageWallet extends React.Component<Props, State> {
         records = contribution.publishers
           .map((publisher: Rewards.Publisher): ExtendedActivityRow => {
             let faviconUrl = `chrome://favicon/size/64@1x/${publisher.url}`
-            const verified = utils.isPublisherConnectedOrVerified(publisher.status)
+            const verified = isPublisherConnectedOrVerified(publisher.status)
             if (publisher.favIcon && verified) {
               faviconUrl = `chrome://favicon/size/64@1x/${publisher.favIcon}`
             }
@@ -472,7 +455,7 @@ class PageWallet extends React.Component<Props, State> {
               url: publisher.url,
               amount: {
                 tokens: publisher.weight.toFixed(3),
-                converted: utils.convertBalance(publisher.weight, parameters.rate)
+                converted: convertBalance(publisher.weight, parameters.rate)
               },
               type: this.getSummaryType(contribution.type),
               date: contribution.created_at
@@ -585,7 +568,7 @@ class PageWallet extends React.Component<Props, State> {
           description: this.getTransactionDescription(transaction),
           amount: {
             value: transaction.amount.toFixed(3),
-            converted: utils.convertBalance(transaction.amount, parameters.rate)
+            converted: convertBalance(transaction.amount, parameters.rate)
           }
         }
       })
@@ -602,7 +585,7 @@ class PageWallet extends React.Component<Props, State> {
               description: this.getContributionDescription(contribution),
               amount: {
                 value: contribution.amount.toFixed(3),
-                converted: utils.convertBalance(contribution.amount, parameters.rate),
+                converted: convertBalance(contribution.amount, parameters.rate),
                 isNegative: true
               }
             }
@@ -709,7 +692,10 @@ class PageWallet extends React.Component<Props, State> {
   }
 
   generateExternalWalletProviderList = (walletProviders: string[]) => {
-    return walletProviders.map((type) => ({ type, name: utils.getWalletProviderName(type) }))
+    return walletProviders.map((type) => ({
+      type,
+      name: lookupExternalWalletProviderName(type)
+    }))
   }
 
   onExternalWalletAction = (action: ExternalWalletAction) => {
@@ -744,7 +730,8 @@ class PageWallet extends React.Component<Props, State> {
       externalWallet,
       parameters,
       paymentId,
-      pendingContributionTotal
+      pendingContributionTotal,
+      pendingContributions
     } = this.props.rewardsData
     const { total } = balance
     const { modalBackup } = ui
@@ -774,7 +761,7 @@ class PageWallet extends React.Component<Props, State> {
     }
 
     return (
-      <PageWalletWrapper>
+      <div>
         <WalletCard
           balance={total}
           externalWallet={externalWalletInfo}
@@ -789,9 +776,9 @@ class PageWallet extends React.Component<Props, State> {
           autoContributeEnabled={enabledContribute}
           onExternalWalletAction={this.onExternalWalletAction}
           onViewPendingTips={this.onModalPendingToggle}
-          onViewStatement={this.onModalActivityToggle}
+          onViewStatement={this.props.layout === 'wide' ? this.onModalActivityToggle : undefined}
         />
-        { this.props.showManageWalletButton && <ManageWalletButton onClick={this.onModalBackupOpen} /> }
+        { this.props.layout === 'wide' && <ManageWalletButton onClick={this.onModalBackupOpen} /> }
         {
           modalBackup
             ? <ModalBackupRestore
@@ -813,13 +800,14 @@ class PageWallet extends React.Component<Props, State> {
             : null
         }
         {
-          this.state.modalPendingContribution
-            ? <ModalPending
-              onClose={this.onModalPendingToggle}
-              rows={this.getPendingRows()}
-              onRemoveAll={this.removeAllPendingContribution}
-            />
-            : null
+          this.state.modalPendingContribution && (
+            <PendingContributionsModal
+              contributions={pendingContributions}
+              exchangeRate={parameters.rate}
+              exchangeCurrency='USD'
+              onDelete={this.removePendingContribution}
+              onClose={this.onModalPendingToggle} />
+          )
         }
         {
           this.state.modalVerify
@@ -844,7 +832,7 @@ class PageWallet extends React.Component<Props, State> {
           />
           : null
         }
-      </PageWalletWrapper>
+      </div>
     )
   }
 }

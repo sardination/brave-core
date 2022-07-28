@@ -3,9 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import { action } from 'typesafe-actions'
-
-// Constant
-import { types } from '../constants/rewards_types'
+import { types } from './rewards_types'
 
 export const isInitialized = () => action(types.IS_INITIALIZED)
 
@@ -38,22 +36,8 @@ export const claimPromotion = (promotionId: string) => action(types.CLAIM_PROMOT
   promotionId
 })
 
-export const onClaimPromotion = (properties: Rewards.Captcha) => action(types.ON_CLAIM_PROMOTION, {
-  properties
-})
-
-export const attestPromotion = (promotionId: string, x: number, y: number) => action(types.ATTEST_PROMOTION, {
-  promotionId,
-  x,
-  y
-})
-
 export const onPromotionFinish = (properties: Rewards.PromotionFinish) => action(types.ON_PROMOTION_FINISH, {
   properties
-})
-
-export const resetPromotion = (promotionId: string) => action(types.RESET_PROMOTION, {
-  promotionId
 })
 
 export const deletePromotion = (promotionId: string) => action(types.DELETE_PROMOTION, {
@@ -71,6 +55,8 @@ export const onRecoverWalletData = (result: number) => action(types.ON_RECOVER_W
 export const onModalBackupClose = () => action(types.ON_MODAL_BACKUP_CLOSE)
 
 export const onModalBackupOpen = () => action(types.ON_MODAL_BACKUP_OPEN)
+
+export const setBackupCompleted = () => action(types.SET_BACKUP_COMPLETED)
 
 export const onClearAlert = (property: string) => action(types.ON_CLEAR_ALERT, {
   property
@@ -96,6 +82,10 @@ export const onBalanceReport = (properties: {month: number, year: number, report
 
 export const onExternalWalletProviderList = (list: Rewards.ExternalWalletProvider[]) => action(types.ON_EXTERNAL_WALLET_PROVIDER_LIST, {
   list
+})
+
+export const setExternalWalletType = (provider: string) => action(types.SET_EXTERNAL_WALLET_TYPE, {
+  provider
 })
 
 export const getBalanceReport = (month: number, year: number) => action(types.GET_BALANCE_REPORT, {
@@ -248,6 +238,8 @@ export const onBalance = (status: number, balance: Rewards.Balance) => action(ty
 
 export const getExternalWallet = () => action(types.GET_EXTERNAL_WALLET)
 
+export const getExternalWalletProviders = () => action(types.GET_EXTERNAL_WALLET_PROVIDERS)
+
 export const onExternalWallet = (result: number, wallet: Rewards.ExternalWallet) => action(types.ON_EXTERNAL_WALLET, {
   result,
   wallet
@@ -294,9 +286,7 @@ export const onCountryCode = (countryCode: string) => action(types.ON_COUNTRY_CO
   countryCode
 })
 
-export const onInitialized = (result: boolean) => action(types.ON_INITIALIZED, {
-  result
-})
+export const onInitialized = () => action(types.ON_INITIALIZED)
 
 export const completeReset = () => action(types.COMPLETE_RESET)
 

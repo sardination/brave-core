@@ -1,7 +1,8 @@
 module.exports = {
   stories: [
-    '../components/**/stories/*.tsx',
-    '../components/**/*.stories.tsx'
+    '../components/brave_rewards/**/stories/*.tsx'
+    // '../components/**/stories/*.tsx',
+    // '../components/**/*.stories.tsx'
   ],
   addons: [
     '@storybook/addon-knobs',

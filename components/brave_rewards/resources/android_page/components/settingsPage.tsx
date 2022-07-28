@@ -24,7 +24,7 @@ import MonthlyTipsBox from './monthlyTipsBox'
 import * as rewardsActions from '../actions/rewards_actions'
 import Promotion from './promotion'
 import { getLocale } from '../../../../common/locale'
-import { getActivePromos, getPromo, PromoType } from '../../page/promos'
+import { getActivePromos, getPromo, PromoType } from '../../page/components/promos'
 import { getWalletProviderName } from '../utils'
 
 export interface Props extends Rewards.ComponentProps {

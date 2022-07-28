@@ -3,12 +3,17 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react'
+import { createStore } from 'redux'
+import { Provider } from 'react-redux'
 
 import { ConnectWalletModal } from '../components/connect_wallet_modal'
 import { ClaimGrantView } from '../components/claim_grant_view'
+import { Settings } from '../components/settings'
 import { LocaleContext } from '../../shared/lib/locale_context'
+import { LayoutContext } from '../lib/layout_context'
 import { WithThemeVariables } from '../../shared/components/with_theme_variables'
 import { localeStrings } from './locale_strings'
+import { reduxState } from './redux_state'
 
 export default {
   title: 'Rewards/Settings'
@@ -71,5 +76,20 @@ export function Claim () {
         </div>
       </WithThemeVariables>
     </LocaleContext.Provider>
+  )
+}
+
+export function Page () {
+  const store = createStore((state) => state, reduxState)
+  return (
+    <Provider store={store}>
+      <LocaleContext.Provider value={locale}>
+        <WithThemeVariables>
+          <LayoutContext.Provider value='narrow'>
+            <Settings />
+          </LayoutContext.Provider>
+        </WithThemeVariables>
+      </LocaleContext.Provider>
+    </Provider>
   )
 }

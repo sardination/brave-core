@@ -4,14 +4,6 @@
 
 import styled from 'styled-components'
 
-export const TourPromoWrapper = styled('div')<{}>`
-  margin-top: 30px;
-`
-
-export const PageWalletWrapper = styled.div`
-  width: 373px;
-`
-
 export const PaymentStatus = styled.div`
   margin-bottom: 8px;
   color: var(--brave-palette-neutral900);

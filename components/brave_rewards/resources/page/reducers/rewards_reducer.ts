@@ -5,10 +5,8 @@
 import { Reducer } from 'redux'
 
 import { OnboardingCompletedStore } from '../../shared/lib/onboarding_completed_store'
-
-// Constant
-import { types } from '../constants/rewards_types'
-import { defaultState } from '../storage'
+import { types } from '../actions/rewards_types'
+import { defaultState } from './default_state'
 
 const onboardingCompletedStore = new OnboardingCompletedStore()
 
@@ -90,6 +88,10 @@ const rewardsReducer: Reducer<Rewards.State | undefined> = (state: Rewards.State
         ...state,
         ui
       }
+      break
+    }
+    case types.SET_BACKUP_COMPLETED: {
+      chrome.send('brave_rewards.setBackupCompleted')
       break
     }
     case types.ON_CLEAR_ALERT: {
