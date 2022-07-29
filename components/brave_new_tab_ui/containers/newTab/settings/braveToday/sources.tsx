@@ -76,7 +76,6 @@ function Category (props: CategoryProps) {
 }
 
 const categoryNameAll = getLocale('braveTodayCategoryNameAll')
-const categoryNameDirectFeeds = 'User feeds'
 
 type SourcesProps = Props & {
   category: string
@@ -91,20 +90,19 @@ export default function Sources (props: SourcesProps) {
     if (!props.publishers) {
       return result
     }
+
     for (const publisher of Object.values(props.publishers)) {
-      // Do not include user feeds, as they are separated
-      if (publisher.categoryName === categoryNameDirectFeeds) {
-        continue
-      }
       const forAll = result.get(categoryNameAll) || []
       forAll.push(publisher)
       result.set(categoryNameAll, forAll)
-      if (publisher.categoryName) {
-        const forCategory = result.get(publisher.categoryName) || []
-        forCategory.push(publisher)
-        result.set(publisher.categoryName, forCategory)
+
+      for (const category of publisher.categoryIds) {
+        const forCategory = result.get(category) || [];
+        forCategory.push(publisher);
+        result.set(category, forCategory);
       }
     }
+
     // Sort all publishers alphabetically
     for (const publishers of result.values()) {
       publishers.sort((a, b) => a.publisherName.toLocaleLowerCase().localeCompare(b.publisherName.toLocaleLowerCase()))

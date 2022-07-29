@@ -37,7 +37,13 @@ bool ParseCombinedPublisherList(const std::string& json,
     publisher->publisher_id = *publisher_raw.FindStringKey("publisher_id");
     publisher->type = mojom::PublisherType::COMBINED_SOURCE;
     publisher->publisher_name = *publisher_raw.FindStringKey("publisher_name");
-    publisher->category_name = *publisher_raw.FindStringKey("category");
+
+    // TODO: When the backend updates to actually give us a list of categories,
+    // use those instead.
+    std::vector<std::string> category_ids;
+    category_ids.push_back(*publisher_raw.FindStringKey("category"));
+    publisher->category_ids = std::move(category_ids);
+
     publisher->is_enabled = publisher_raw.FindBoolKey("enabled").value_or(true);
     // TODO(petemill): Validate
     publishers->insert_or_assign(publisher->publisher_id, std::move(publisher));

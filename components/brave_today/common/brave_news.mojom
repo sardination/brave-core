@@ -89,7 +89,7 @@ struct Publisher {
   string publisher_id;
   PublisherType type;
   string publisher_name;
-  string category_name;
+  array<string> category_ids;
   bool is_enabled;
   // Only really used for direct feeds, though this information would
   // be useful for combined-source feeds so that the user doesn't add
