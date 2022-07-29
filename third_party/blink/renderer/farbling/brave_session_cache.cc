@@ -1,20 +1,22 @@
-
 /* Copyright (c) 2020 The Brave Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "brave/third_party/blink/renderer/core/brave_session_cache.h"
+#include "brave/third_party/blink/renderer/farbling/brave_session_cache.h"
 
 #include "base/command_line.h"
+#include "base/feature_list.h"
 #include "base/sequence_checker.h"
 #include "base/strings/string_number_conversions.h"
 #include "brave/third_party/blink/renderer/brave_farbling_constants.h"
 #include "brave/third_party/blink/renderer/brave_font_whitelist.h"
+#include "build/build_config.h"
 #include "crypto/hmac.h"
 #include "third_party/blink/public/common/features.h"
 #include "third_party/blink/public/platform/web_content_settings_client.h"
 #include "third_party/blink/renderer/core/dom/document.h"
+#include "third_party/blink/renderer/core/execution_context/execution_context.h"
 #include "third_party/blink/renderer/core/frame/local_dom_window.h"
 #include "third_party/blink/renderer/core/frame/local_frame.h"
 #include "third_party/blink/renderer/core/workers/worker_global_scope.h"
@@ -27,11 +29,15 @@
 #include "third_party/blink/renderer/platform/language.h"
 #include "third_party/blink/renderer/platform/network/network_utils.h"
 #include "third_party/blink/renderer/platform/supplementable.h"
+#include "third_party/blink/renderer/platform/weborigin/security_origin.h"
+#include "third_party/blink/renderer/platform/wtf/casting.h"
 #include "third_party/blink/renderer/platform/wtf/text/string_builder.h"
+#include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
 
 namespace {
 
-const uint64_t zero = 0;
+constexpr uint64_t zero = 0;
+constexpr double maxUInt64AsDouble = UINT64_MAX;
 
 inline uint64_t lfsr_next(uint64_t v) {
   return ((v >> 1) | (((v << 62) ^ (v << 61)) & (~(~zero << 63) << 62)));
@@ -47,7 +53,6 @@ float ConstantMultiplier(double fudge_factor, float value, size_t index) {
 
 float PseudoRandomSequence(uint64_t seed, float value, size_t index) {
   static uint64_t v;
-  static const double maxUInt64AsDouble = 18446744073709551615.0;
   if (index == 0) {
     // start of loop, reset to initial seed which was passed in and is based on
     // the domain key
@@ -79,7 +84,7 @@ blink::WebContentSettingsClient* GetContentSettingsClientFor(
   if (!context)
     return settings;
   // Avoid blocking fingerprinting in WebUI pages.
-  auto protocol = context->GetSecurityContext().GetSecurityOrigin()->Protocol();
+  const String protocol = context->GetSecurityOrigin()->Protocol();
   if (protocol != "https" && protocol != "http") {
     return settings;
   }

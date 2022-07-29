@@ -6,6 +6,10 @@
 #ifndef BRAVE_CHROMIUM_SRC_THIRD_PARTY_BLINK_RENDERER_CORE_PAGE_CREATE_WINDOW_H_
 #define BRAVE_CHROMIUM_SRC_THIRD_PARTY_BLINK_RENDERER_CORE_PAGE_CREATE_WINDOW_H_
 
+#include "third_party/blink/public/web/web_window_features.h"
+#include "third_party/blink/renderer/core/frame/local_dom_window.h"
+#include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
+
 #define GetWindowFeaturesFromString                                      \
   GetWindowFeaturesFromString_ChromiumImpl(const String& feature_string, \
                                            LocalDOMWindow* dom_window);  \

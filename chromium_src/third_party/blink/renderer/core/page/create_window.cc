@@ -5,10 +5,12 @@
 
 #include "third_party/blink/renderer/core/page/create_window.h"
 
-#include "brave/third_party/blink/renderer/core/brave_session_cache.h"
+#include "brave/third_party/blink/renderer/farbling/brave_session_cache.h"
 #include "third_party/blink/public/web/web_window_features.h"
+#include "third_party/blink/renderer/core/execution_context/execution_context.h"
 #include "third_party/blink/renderer/core/frame/local_dom_window.h"
 #include "third_party/blink/renderer/core/frame/screen.h"
+#include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
 
 // Because we are spoofing screenX and screenY, we need to offset the position
 // when a page script opens a new window in screen coordinates. And because

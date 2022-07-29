@@ -3,16 +3,11 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef BRAVE_CHROMIUM_SRC_THIRD_PARTY_BLINK_RENDERER_CORE_CSS_MEDIA_VALUES_CC_
-#define BRAVE_CHROMIUM_SRC_THIRD_PARTY_BLINK_RENDERER_CORE_CSS_MEDIA_VALUES_CC_
-
 #include "third_party/blink/renderer/core/css/media_values.h"
 
-#include "brave/third_party/blink/renderer/core/brave_session_cache.h"
+#include "brave/third_party/blink/renderer/farbling/brave_session_cache.h"
 #include "third_party/blink/renderer/core/frame/local_dom_window.h"
 #include "third_party/blink/renderer/core/frame/screen.h"
-
-#include "brave/third_party/blink/renderer/core/brave_session_cache.h"
 
 #define CalculateDeviceWidth                                                   \
   CalculateDeviceWidth(LocalFrame* frame) {                                    \
@@ -37,6 +32,3 @@
 
 #undef CalculateDeviceWidth
 #undef CalculateDeviceHeight
-
-// BRAVE_CHROMIUM_SRC_THIRD_PARTY_BLINK_RENDERER_CORE_CSS_MEDIA_VALUES_CC_
-#endif

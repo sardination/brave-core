@@ -3,8 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef BRAVE_THIRD_PARTY_BLINK_RENDERER_CORE_BRAVE_SESSION_CACHE_H_
-#define BRAVE_THIRD_PARTY_BLINK_RENDERER_CORE_BRAVE_SESSION_CACHE_H_
+#ifndef BRAVE_THIRD_PARTY_BLINK_RENDERER_FARBLING_BRAVE_SESSION_CACHE_H_
+#define BRAVE_THIRD_PARTY_BLINK_RENDERER_FARBLING_BRAVE_SESSION_CACHE_H_
 
 #include <map>
 #include <string>
@@ -102,4 +102,4 @@ class CORE_EXPORT BraveSessionCache final
 
 }  // namespace brave
 
-#endif  // BRAVE_THIRD_PARTY_BLINK_RENDERER_CORE_BRAVE_SESSION_CACHE_H_
+#endif  // BRAVE_THIRD_PARTY_BLINK_RENDERER_FARBLING_BRAVE_SESSION_CACHE_H_
