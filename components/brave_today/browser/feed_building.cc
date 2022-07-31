@@ -263,6 +263,7 @@ bool BuildFeed(const std::vector<mojom::FeedItemPtr>& feed_items,
   std::list<mojom::DealPtr> deals;
   std::hash<std::string> hasher;
   for (auto& item : feed_items) {
+    // TODO: Pretty sure this is where we would decide if the category is being shown.
     if (!ShouldDisplayFeedItem(item, publishers)) {
       continue;
     }
