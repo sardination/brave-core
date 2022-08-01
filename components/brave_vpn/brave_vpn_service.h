@@ -80,6 +80,8 @@ class BraveVpnService :
   }
   void BindInterface(mojo::PendingReceiver<mojom::ServiceHandler> receiver);
 
+  void ReloadPurchasedState();
+
 #if !BUILDFLAG(IS_ANDROID)
   void ToggleConnection();
   void RemoveVPNConnnection();
@@ -87,7 +89,7 @@ class BraveVpnService :
     return connection_state_ == mojom::ConnectionState::CONNECTED;
   }
   mojom::ConnectionState connection_state() const { return connection_state_; }
-  void ReloadPurchasedState();
+  void BindInterface(mojo::PendingReceiver<mojom::ServiceHandler> receiver);
 
   // mojom::vpn::ServiceHandler
   void GetConnectionState(GetConnectionStateCallback callback) override;

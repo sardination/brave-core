@@ -172,6 +172,14 @@ public class BraveVpnNativeWorker {
                 mNativeBraveVpnNativeWorker, purchaseToken, productId, productType, packageName);
     }
 
+    public void reloadPurchasedState() {
+        BraveVpnNativeWorkerJni.get().reloadPurchasedState(mNativeBraveVpnNativeWorker);
+    }
+
+    public boolean isPurchasedUser() {
+        return BraveVpnNativeWorkerJni.get().isPurchasedUser(mNativeBraveVpnNativeWorker);
+    }
+
     @NativeMethods
     interface Natives {
         void init(BraveVpnNativeWorker caller);
@@ -190,5 +198,7 @@ public class BraveVpnNativeWorker {
                 String packageName);
         void verifyPurchaseToken(long nativeBraveVpnNativeWorker, String purchaseToken,
                 String productId, String productType, String packageName);
+        void reloadPurchasedState(long nativeBraveVpnNativeWorker);
+        boolean isPurchasedUser(long nativeBraveVpnNativeWorker);
     }
 }
