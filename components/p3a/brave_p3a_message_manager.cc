@@ -9,11 +9,11 @@
 #include "base/json/json_writer.h"
 #include "base/logging.h"
 #include "base/strings/string_number_conversions.h"
-#include "brave/components/p3a/brave_p3a_new_uploader.h"
 #include "brave/components/p3a/brave_p3a_rotation_scheduler.h"
 #include "brave/components/p3a/brave_p3a_scheduler.h"
 #include "brave/components/p3a/brave_p3a_star.h"
 #include "brave/components/p3a/brave_p3a_star_log_store.h"
+#include "brave/components/p3a/brave_p3a_uploader.h"
 #include "brave/components/p3a/pref_names.h"
 #include "components/metrics/log_store.h"
 #include "components/prefs/pref_registry_simple.h"
@@ -57,7 +57,7 @@ void BraveP3AMessageManager::RegisterPrefs(PrefRegistrySimple* registry) {
 void BraveP3AMessageManager::Init(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory) {
   // Init other components.
-  new_uploader_.reset(new BraveP3ANewUploader(
+  uploader_.reset(new BraveP3AUploader(
       url_loader_factory,
       base::BindRepeating(&BraveP3AMessageManager::OnLogUploadComplete,
                           base::Unretained(this)),
@@ -206,7 +206,7 @@ void BraveP3AMessageManager::StartScheduledUpload(bool is_star) {
                                        : json_log_store_->staged_log_type();
   VLOG(2) << logging_prefix << " - Uploading " << log.size() << " bytes "
           << "of type " << log_type;
-  new_uploader_->UploadLog(log, log_type, is_star);
+  uploader_->UploadLog(log, log_type, is_star);
 }
 
 void BraveP3AMessageManager::StartScheduledStarPrep() {

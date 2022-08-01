@@ -26,7 +26,7 @@ namespace brave {
 
 struct BraveP3AConfig;
 
-class BraveP3ANewUploader;
+class BraveP3AUploader;
 class BraveP3AStarLogStore;
 class BraveP3ARotationScheduler;
 class BraveP3AScheduler;
@@ -82,8 +82,8 @@ class BraveP3AMessageManager : public BraveP3AMetricLogStore::Delegate {
   std::unique_ptr<BraveP3AMetricLogStore> star_prep_log_store_;
   std::unique_ptr<BraveP3AStarLogStore> star_send_log_store_;
 
-  // See `brave_p3a_new_uploader.h`
-  std::unique_ptr<BraveP3ANewUploader> new_uploader_;
+  // See `brave_p3a_uploader.h`
+  std::unique_ptr<BraveP3AUploader> uploader_;
   std::unique_ptr<BraveP3AScheduler> json_upload_scheduler_;
   std::unique_ptr<BraveP3AScheduler> star_prep_scheduler_;
   std::unique_ptr<BraveP3AScheduler> star_upload_scheduler_;

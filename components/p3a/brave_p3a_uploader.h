@@ -3,8 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef BRAVE_COMPONENTS_P3A_BRAVE_P3A_NEW_UPLOADER_H_
-#define BRAVE_COMPONENTS_P3A_BRAVE_P3A_NEW_UPLOADER_H_
+#ifndef BRAVE_COMPONENTS_P3A_BRAVE_P3A_UPLOADER_H_
+#define BRAVE_COMPONENTS_P3A_BRAVE_P3A_UPLOADER_H_
 
 #include <memory>
 #include <string>
@@ -25,24 +25,20 @@ namespace brave {
 
 struct BraveP3AConfig;
 
-// This will replace the "normal" uploader when the server-side is ready.
-// The difference is only in endpoint, mime and lack of base64 encoding.
-// Also this one doesn't report the upload status back (since this one is for
-// testing the new endpoint).
-class BraveP3ANewUploader {
+class BraveP3AUploader {
  public:
   using UploadCompleteCallback = base::RepeatingCallback<
       void(bool is_ok, int response_code, bool is_star)>;
 
-  BraveP3ANewUploader(
+  BraveP3AUploader(
       scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
       UploadCompleteCallback upload_callback,
       BraveP3AConfig* config);
 
-  BraveP3ANewUploader(const BraveP3ANewUploader&) = delete;
-  BraveP3ANewUploader& operator=(const BraveP3ANewUploader&) = delete;
+  BraveP3AUploader(const BraveP3AUploader&) = delete;
+  BraveP3AUploader& operator=(const BraveP3AUploader&) = delete;
 
-  ~BraveP3ANewUploader();
+  ~BraveP3AUploader();
 
   // From metrics::MetricsLogUploader
   void UploadLog(const std::string& compressed_log_data,
@@ -64,4 +60,4 @@ class BraveP3ANewUploader {
 
 }  // namespace brave
 
-#endif  // BRAVE_COMPONENTS_P3A_BRAVE_P3A_NEW_UPLOADER_H_
+#endif  // BRAVE_COMPONENTS_P3A_BRAVE_P3A_UPLOADER_H_

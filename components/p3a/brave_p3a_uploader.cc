@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "brave/components/p3a/brave_p3a_new_uploader.h"
+#include "brave/components/p3a/brave_p3a_uploader.h"
 
 #include <utility>
 
@@ -17,7 +17,7 @@
 
 namespace brave {
 
-BraveP3ANewUploader::BraveP3ANewUploader(
+BraveP3AUploader::BraveP3AUploader(
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory,
     UploadCompleteCallback upload_callback,
     BraveP3AConfig* config)
@@ -25,11 +25,11 @@ BraveP3ANewUploader::BraveP3ANewUploader(
       config_(config),
       upload_callback_(upload_callback) {}
 
-BraveP3ANewUploader::~BraveP3ANewUploader() = default;
+BraveP3AUploader::~BraveP3AUploader() = default;
 
-void BraveP3ANewUploader::UploadLog(const std::string& compressed_log_data,
-                                    const std::string& log_type,
-                                    bool is_star) {
+void BraveP3AUploader::UploadLog(const std::string& compressed_log_data,
+                                 const std::string& log_type,
+                                 bool is_star) {
   auto resource_request = std::make_unique<network::ResourceRequest>();
   if (log_type == "p2a") {
     resource_request->url =
@@ -53,11 +53,11 @@ void BraveP3ANewUploader::UploadLog(const std::string& compressed_log_data,
 
   url_loader_->DownloadHeadersOnly(
       url_loader_factory_.get(),
-      base::BindOnce(&BraveP3ANewUploader::OnUploadComplete,
+      base::BindOnce(&BraveP3AUploader::OnUploadComplete,
                      base::Unretained(this), is_star));
 }
 
-void BraveP3ANewUploader::OnUploadComplete(
+void BraveP3AUploader::OnUploadComplete(
     bool is_star,
     scoped_refptr<net::HttpResponseHeaders> headers) {
   int response_code = -1;
