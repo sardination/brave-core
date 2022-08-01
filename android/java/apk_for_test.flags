@@ -86,6 +86,7 @@
 -keep class org.chromium.chrome.browser.search_engines.settings.SearchEngineAdapter {
     *** getSearchEngineSourceType(...);
     *** sortAndFilterUnnecessaryTemplateUrl(...);
+    *** didSearchEnginesChange(...);
 }
 
 -keep class org.chromium.chrome.browser.search_engines.settings.SearchEngineSettings {

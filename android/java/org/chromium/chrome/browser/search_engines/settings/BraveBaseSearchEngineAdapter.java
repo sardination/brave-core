@@ -12,9 +12,12 @@ import android.widget.BaseAdapter;
 
 import androidx.annotation.StringRes;
 
+import org.chromium.chrome.browser.search_engines.TemplateUrlServiceFactory;
 import org.chromium.chrome.browser.search_engines.settings.SearchEngineAdapter;
 import org.chromium.components.search_engines.TemplateUrl;
+import org.chromium.components.search_engines.TemplateUrlService;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
@@ -81,5 +84,69 @@ public class BraveBaseSearchEngineAdapter extends BaseAdapter {
         } else {
             return SearchEngineAdapter.TemplateUrlSourceType.RECENT;
         }
+    }
+
+    // Fields and empty methods below are to satisfy java compiler and will be
+    // removed by bytecode asm
+    public List<TemplateUrl> mPrepopulatedSearchEngines = new ArrayList<>();
+    public List<TemplateUrl> mRecentSearchEngines = new ArrayList<>();
+    public int mSelectedSearchEnginePosition = -1;
+
+    public static boolean containsTemplateUrl(
+            List<TemplateUrl> templateUrls, TemplateUrl targetTemplateUrl) {
+        assert false;
+        return true;
+    }
+
+    public int computeStartIndexForRecentSearchEngines() {
+        assert false;
+        return -1;
+    }
+
+    public boolean didSearchEnginesChange(List<TemplateUrl> templateUrls) {
+        if (templateUrls.size()
+                != mPrepopulatedSearchEngines.size() + mRecentSearchEngines.size()) {
+            return true;
+        }
+        for (int i = 0; i < templateUrls.size(); i++) {
+            TemplateUrl templateUrl = templateUrls.get(i);
+            if (!containsTemplateUrl(mPrepopulatedSearchEngines, templateUrl)
+                    && !containsTemplateUrl(mRecentSearchEngines, templateUrl)) {
+                return true;
+            }
+        }
+        // Till this line it is a straight copy of SearchEngineAdapter.didSearchEnginesChange.
+        // The original method does not give true when the set of engines wasn't
+        // changed but the selected default search engine - was changed. This
+        // happened because Chromium does not sync the DSE.
+        // The code below is in fact part of SearchEngineAdapter.refreshData
+        // which detects new mSelectedSearchEnginePosition
+
+        TemplateUrlService templateUrlService = TemplateUrlServiceFactory.get();
+        assert templateUrlService.isLoaded();
+
+        TemplateUrl defaultSearchEngineTemplateUrl =
+                templateUrlService.getDefaultSearchEngineTemplateUrl();
+
+        if (mSelectedSearchEnginePosition == -1) {
+            return false;
+        }
+
+        // Convert the TemplateUrl index into an index of mSearchEngines.
+        int selectedSearchEnginePosition = -1;
+        for (int i = 0; i < mPrepopulatedSearchEngines.size(); ++i) {
+            if (mPrepopulatedSearchEngines.get(i).equals(defaultSearchEngineTemplateUrl)) {
+                selectedSearchEnginePosition = i;
+            }
+        }
+
+        for (int i = 0; i < mRecentSearchEngines.size(); ++i) {
+            if (mRecentSearchEngines.get(i).equals(defaultSearchEngineTemplateUrl)) {
+                // Add one to offset the title for the recent search engine list.
+                selectedSearchEnginePosition = i + computeStartIndexForRecentSearchEngines();
+            }
+        }
+
+        return selectedSearchEnginePosition != mSelectedSearchEnginePosition;
     }
 }
