@@ -50,6 +50,11 @@ class P3AMessageManagerTest : public testing::Test {
 
  protected:
   void SetUp() override {
+    base::Time future_mock_time;
+    if (base::Time::FromString("2050-01-04", &future_mock_time)) {
+      task_environment_.AdvanceClock(future_mock_time - base::Time::Now());
+    }
+
     p3a_config.disable_star_attestation = true;
     p3a_config.star_randomness_host = kTestHost;
     p3a_config.randomize_upload_interval = false;
@@ -109,7 +114,7 @@ class P3AMessageManagerTest : public testing::Test {
         }));
 
     message_manager.reset(new BraveP3AMessageManager(&local_state, &p3a_config,
-                                                     "release", "2022-01-01"));
+                                                     "release", "2049-01-01"));
 
     message_manager->Init(shared_url_loader_factory);
 

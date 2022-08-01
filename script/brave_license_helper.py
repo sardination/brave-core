@@ -144,8 +144,6 @@ def AddBraveCredits(prune_paths, special_cases, prune_dirs, additional_paths):
         'chromium_src',  # Brave's overrides, covered by main notice.
         'node_modules',  # See brave/third_party/npm-* instead.
         '.vscode',       # Automatically added by Visual Studio.
-        'NIST',
-        'fiat',
     ]
     prune_dirs = tuple(prune_list)
 

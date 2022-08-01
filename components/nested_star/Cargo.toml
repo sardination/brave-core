@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-nested-sta-rs = { path = "../../../../../nested-sta-rs" }
+nested-sta-rs = { git = "https://github.com/brave-experiments/nested-sta-rs", rev = "ea1ba9cea5ac64c1150b3ad16706b3e2423f46d6" }
 cxx = { path = "../../../third_party/rust/cxx/v1/crate" }
 # Use following cxx dep if compiling example via Makefile
 # cxx = "1.0"
@@ -17,3 +17,5 @@ name = "nested_star_cxx"
 crate-type = ["rlib"]
 # Use following crate type setting if compiling example via Makefile
 # crate-type = ["staticlib"]
+
+# Also, if compiling example, rename build.example.rs to build.rs
