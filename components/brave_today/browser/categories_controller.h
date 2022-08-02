@@ -25,7 +25,8 @@ class CategoriesController {
   static Categories GetCategoriesFromPublishers(const Publishers& publishers,
                                                 PrefService* prefs);
   void GetAllCategories(CategoriesCallback callback);
-  void SetCategorySubscribed(const std::string& category_id, bool subscribed);
+  mojom::CategoryPtr SetCategorySubscribed(const std::string& category_id,
+                                           bool subscribed);
   bool GetCategorySubscribed(const std::string& category_id);
 
  private:

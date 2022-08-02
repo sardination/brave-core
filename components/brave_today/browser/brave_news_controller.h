@@ -70,6 +70,10 @@ class BraveNewsController : public KeyedService,
   void GetPublishers(GetPublishersCallback callback) override;
   void FindFeeds(const GURL& possible_feed_or_site_url,
                  FindFeedsCallback callback) override;
+  void GetCategories(GetCategoriesCallback callback) override;
+  void SetCategorySubscribed(const std::string& category_id,
+                             bool subscribed,
+                             SetCategorySubscribedCallback callback) override;
   void SubscribeToNewDirectFeed(
       const GURL& feed_url,
       SubscribeToNewDirectFeedCallback callback) override;

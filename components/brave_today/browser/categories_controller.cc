@@ -7,6 +7,7 @@
 #include "base/containers/flat_map.h"
 #include "brave/components/brave_today/browser/brave_news_controller.h"
 #include "brave/components/brave_today/browser/publishers_controller.h"
+#include "brave/components/brave_today/common/brave_news.mojom-forward.h"
 #include "brave/components/brave_today/common/brave_news.mojom.h"
 #include "brave/components/brave_today/common/pref_names.h"
 #include "components/prefs/pref_service.h"
@@ -55,10 +56,17 @@ void CategoriesController::GetAllCategories(CategoriesCallback callback) {
       std::move(callback), base::Unretained(prefs_)));
 }
 
-void CategoriesController::SetCategorySubscribed(const std::string& category_id,
+mojom::CategoryPtr CategoriesController::SetCategorySubscribed(const std::string& category_id,
                                                  bool subscribed) {
   DictionaryPrefUpdate update(prefs_, prefs::kBraveNewsSubscriptions);
   update->SetBoolKey(category_id, subscribed);
+
+  // TODO: Maybe look this up somehow instead?
+  auto result = mojom::Category::New();
+  result->category_name = category_id;
+  result->category_id = category_id;
+  result->subscribed = subscribed;
+  return result;
 }
 
 bool CategoriesController::GetCategorySubscribed(

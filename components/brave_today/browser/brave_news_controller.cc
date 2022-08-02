@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <memory>
+#include <string>
 #include <unordered_set>
 #include <utility>
 #include <vector>
@@ -135,6 +136,15 @@ void BraveNewsController::FindFeeds(const GURL& possible_feed_or_site_url,
                                     FindFeedsCallback callback) {
   direct_feed_controller_.FindFeeds(possible_feed_or_site_url,
                                     std::move(callback));
+}
+
+void BraveNewsController::GetCategories(GetCategoriesCallback callback) {
+  categories_controller_.GetAllCategories(std::move(callback));
+}
+
+void BraveNewsController::SetCategorySubscribed(const std::string& category_id, bool subscribed, SetCategorySubscribedCallback callback) {
+  auto result = categories_controller_.SetCategorySubscribed(category_id, subscribed);
+  std::move(callback).Run(std::move(result));
 }
 
 void BraveNewsController::SubscribeToNewDirectFeed(

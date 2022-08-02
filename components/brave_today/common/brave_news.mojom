@@ -129,6 +129,8 @@ struct FeedSearchResultItem {
 interface BraveNewsController {
   GetFeed() => (Feed feed);
   GetPublishers() => (map<string, Publisher> publishers);
+  GetCategories() => (map<string, Category> categories);
+  SetCategorySubscribed(string category_id, bool subscribed) => (Category updated);
   // Look at the incoming url and return results
   //  - if it's a feed url then return the feed item
   //  - if it's an html document url, then search for related feed items in the html
