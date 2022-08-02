@@ -1,7 +1,6 @@
-import { EthereumSignedTx } from 'trezor-connect/lib/typescript' // TODO replace EthereumSignedTx with EthSignTransactionResponsePayload from eth-messages.ts
 import { BraveWallet } from '../../constants/types'
 import { SignedLotusMessage } from '@glif/filecoin-message'
-import { LedgerError } from './ledgerjs/ledger-messages'
+import { LedgerError, EthereumSignedTx } from './ledgerjs/ledger-messages'
 
 export const FilecoinNetworkTypes = [
   BraveWallet.FILECOIN_MAINNET, BraveWallet.FILECOIN_TESTNET
