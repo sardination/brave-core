@@ -73,7 +73,8 @@ BraveNewsController::BraveNewsController(
       feed_controller_(&publishers_controller_,
                        &direct_feed_controller_,
                        history_service,
-                       &api_request_helper_),
+                       &api_request_helper_,
+                       prefs),
       weak_ptr_factory_(this) {
   DCHECK(prefs);
   // Set up preference listeners

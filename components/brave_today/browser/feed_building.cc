@@ -25,6 +25,7 @@
 #include "brave/components/brave_today/common/brave_news.mojom-shared.h"
 #include "brave/components/brave_today/common/brave_news.mojom.h"
 #include "components/history/core/browser/history_service.h"
+#include "components/prefs/pref_service.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 
 namespace brave_news {
@@ -226,7 +227,7 @@ mojom::FeedItemMetadataPtr& MetadataFromFeedItem(
 }  // namespace
 
 bool ShouldDisplayFeedItem(const mojom::FeedItemPtr& feed_item,
-                           const Publishers* publishers) {
+                           const Publishers* publishers, PrefService* prefs) {
   // Filter out articles from publishers we're ignoring
   const auto& data = MetadataFromFeedItem(feed_item);
   if (!publishers->contains(data->publisher_id)) {
@@ -257,14 +258,15 @@ bool ShouldDisplayFeedItem(const mojom::FeedItemPtr& feed_item,
 bool BuildFeed(const std::vector<mojom::FeedItemPtr>& feed_items,
                const std::unordered_set<std::string>& history_hosts,
                Publishers* publishers,
-               mojom::Feed* feed) {
+               mojom::Feed* feed,
+               PrefService* prefs) {
   std::list<mojom::ArticlePtr> articles;
   std::list<mojom::PromotedArticlePtr> promoted_articles;
   std::list<mojom::DealPtr> deals;
   std::hash<std::string> hasher;
   for (auto& item : feed_items) {
     // TODO: Pretty sure this is where we would decide if the category is being shown.
-    if (!ShouldDisplayFeedItem(item, publishers)) {
+    if (!ShouldDisplayFeedItem(item, publishers, prefs)) {
       continue;
     }
     auto& metadata = MetadataFromFeedItem(item);
