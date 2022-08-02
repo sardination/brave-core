@@ -54,6 +54,7 @@ void BraveNewsController::RegisterProfilePrefs(PrefRegistrySimple* registry) {
                                 brave_news_enabled_default);
   registry->RegisterBooleanPref(prefs::kBraveTodayOptedIn, false);
   registry->RegisterDictionaryPref(prefs::kBraveTodaySources);
+  registry->RegisterDictionaryPref(prefs::kBraveNewsSubscriptions);
   registry->RegisterDictionaryPref(prefs::kBraveTodayDirectFeeds);
 
   p3a::RegisterProfilePrefs(registry);
@@ -89,6 +90,13 @@ BraveNewsController::BraveNewsController(
       prefs::kBraveTodayOptedIn,
       base::BindRepeating(&BraveNewsController::ConditionallyStartOrStopTimer,
                           base::Unretained(this)));
+
+  auto* subscriptions = prefs_->GetDictionary(prefs::kBraveNewsSubscriptions);
+  if (subscriptions->DictEmpty()) {
+    constexpr char kDefaultCategory[] = "Top News";
+    DictionaryPrefUpdate default_subscriptions(prefs_, prefs::kBraveNewsSubscriptions);
+    default_subscriptions->SetBoolKey(kDefaultCategory, true);
+  }
 
   p3a::RecordAtInit(prefs);
   // Monitor kBraveTodaySources and update feed / publisher cache

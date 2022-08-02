@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "base/containers/flat_map.h"
+#include "brave/components/brave_today/browser/categories_controller.h"
 #include "brave/components/brave_today/browser/publishers_parsing.h"
 #include "brave/components/brave_today/common/brave_news.mojom-forward.h"
 #include "brave/components/brave_today/common/brave_news.mojom.h"
@@ -27,7 +28,7 @@ bool BuildFeed(const std::vector<mojom::FeedItemPtr>& feed_items,
 // Exposed for testing
 bool ShouldDisplayFeedItem(const mojom::FeedItemPtr& feed_item,
                            const Publishers* publishers,
-                           PrefService* prefs);
+                           const Categories& categories);
 
 }  // namespace brave_news
 

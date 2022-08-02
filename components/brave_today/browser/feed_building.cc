@@ -20,6 +20,7 @@
 #include "base/strings/string_number_conversions.h"
 #include "base/strings/stringprintf.h"
 #include "base/time/time.h"
+#include "brave/components/brave_today/browser/categories_controller.h"
 #include "brave/components/brave_today/browser/feed_parsing.h"
 #include "brave/components/brave_today/common/brave_news.mojom-forward.h"
 #include "brave/components/brave_today/common/brave_news.mojom-shared.h"
@@ -227,7 +228,8 @@ mojom::FeedItemMetadataPtr& MetadataFromFeedItem(
 }  // namespace
 
 bool ShouldDisplayFeedItem(const mojom::FeedItemPtr& feed_item,
-                           const Publishers* publishers, PrefService* prefs) {
+                           const Publishers* publishers,
+                           const Categories& categories) {
   // Filter out articles from publishers we're ignoring
   const auto& data = MetadataFromFeedItem(feed_item);
   if (!publishers->contains(data->publisher_id)) {
@@ -243,11 +245,24 @@ bool ShouldDisplayFeedItem(const mojom::FeedItemPtr& feed_item,
     return false;
   }
   if (publisher->user_enabled_status ==
-          brave_news::mojom::UserEnabled::NOT_MODIFIED &&
-      publisher->is_enabled == false) {
-    VLOG(2) << "Hiding article for disabled-by-default publisher "
-            << data->publisher_id << ": " << publisher->publisher_name;
-    return false;
+      brave_news::mojom::UserEnabled::NOT_MODIFIED) {
+    // If the publisher is NOT_MODIFIED then display it if any of the categories
+    // it belongs to are subscribed to.
+    for (const auto& category_id : publisher->category_ids) {
+      const auto& category = categories.at(category_id);
+      if (category->subscribed) {
+        VLOG(2) << "Showing article because publisher " << data->publisher_id
+                << ": " << publisher->publisher_name << " is in category "
+                << category_id << " which is subscribed to.";
+        return true;
+      }
+    }
+
+    if (!publisher->is_enabled) {
+      VLOG(2) << "Hiding article for disabled-by-default publisher "
+              << data->publisher_id << ": " << publisher->publisher_name;
+      return false;
+    }
   }
   // None of the filters match, we can display
   VLOG(2) << "None of the filters matched, will display item for publisher "
@@ -260,13 +275,17 @@ bool BuildFeed(const std::vector<mojom::FeedItemPtr>& feed_items,
                Publishers* publishers,
                mojom::Feed* feed,
                PrefService* prefs) {
+  Categories categories =
+      CategoriesController::GetCategoriesFromPublishers(*publishers, prefs);
+
   std::list<mojom::ArticlePtr> articles;
   std::list<mojom::PromotedArticlePtr> promoted_articles;
   std::list<mojom::DealPtr> deals;
   std::hash<std::string> hasher;
   for (auto& item : feed_items) {
-    // TODO: Pretty sure this is where we would decide if the category is being shown.
-    if (!ShouldDisplayFeedItem(item, publishers, prefs)) {
+    // TODO: Pretty sure this is where we would decide if the category is being
+    // shown.
+    if (!ShouldDisplayFeedItem(item, publishers, categories)) {
       continue;
     }
     auto& metadata = MetadataFromFeedItem(item);
