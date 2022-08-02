@@ -20,6 +20,7 @@ export default function getBraveNewsController () {
   // but ultimately don't fetch any data.
   if (!braveNewsControllerInstance) {
     braveNewsControllerInstance = BraveNews.BraveNewsController.getRemote()
+    window['news'] = braveNewsControllerInstance;
   }
   return braveNewsControllerInstance
 }
