@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Copyright (c) 2022 The Brave Authors. All rights reserved.
+     This Source Code Form is subject to the terms of the Mozilla Public
+     License, v. 2.0. If a copy of the MPL was not distributed with this file,
+     You can obtain one at http://mozilla.org/MPL/2.0/.
+-->
+<LinearLayout
+     xmlns:android="http://schemas.android.com/apk/res/android"
+     xmlns:app="http://schemas.android.com/apk/res-auto"
+     android:layout_width="match_parent"
+     android:layout_height="wrap_content"
+     android:orientation="vertical"
+     android:paddingTop="20dp"
+     android:paddingBottom="44dp"
+     android:paddingStart="10dp"
+     android:paddingEnd="10dp"
+     android:background="@drawable/ad_free_card_bg">
+
+     <ImageView
+          android:id="@+id/cancel_imageview"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:contentDescription="@null"
+          android:layout_gravity="end|top"
+          android:layout_marginEnd="10dp"
+          app:tint="@color/ad_free_card_cancel_color"
+          app:srcCompat="@drawable/btn_close"/>
+
+     <ImageView
+          android:id="@+id/confetti_imageview"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:contentDescription="@null"
+          android:src="@drawable/ic_ad_free_videos"/>
+
+     <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:text="@string/ad_free_video"
+          android:textSize="28sp"
+          android:textColor="@color/brave_stats_text_color"
+          android:textStyle="bold" />
+
+     <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/no_ads_before_video"
+          app:drawableStartCompat="@drawable/ic_basic_check"
+          app:drawableTint="@color/ad_free_check_color"
+          android:drawablePadding="4dp"
+          android:textSize="16sp"
+          android:layout_marginTop="24dp"
+          android:layout_marginStart="50dp"
+          android:layout_marginEnd="50dp"
+          android:textColor="@color/brave_stats_text_color"/>
+
+     <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/no_ads_during_video"
+          app:drawableStartCompat="@drawable/ic_basic_check"
+          app:drawableTint="@color/ad_free_check_color"
+          android:drawablePadding="4dp"
+          android:textSize="16sp"
+          android:layout_marginTop="8dp"
+          android:layout_marginStart="50dp"
+          android:layout_marginEnd="50dp"
+          android:textColor="@color/brave_stats_text_color"/>
+
+     <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/no_ads_on_page"
+          app:drawableStartCompat="@drawable/ic_basic_check"
+          app:drawableTint="@color/ad_free_check_color"
+          android:drawablePadding="4dp"
+          android:textSize="16sp"
+          android:layout_marginTop="8dp"
+          android:layout_marginStart="50dp"
+          android:layout_marginEnd="50dp"
+          android:textColor="@color/brave_stats_text_color"/>
+
+     <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/no_interruptions"
+          app:drawableStartCompat="@drawable/ic_basic_check"
+          app:drawableTint="@color/ad_free_check_color"
+          android:drawablePadding="4dp"
+          android:textSize="16sp"
+          android:layout_marginTop="8dp"
+          android:layout_marginStart="50dp"
+          android:layout_marginEnd="50dp"
+          android:textColor="@color/brave_stats_text_color"/>
+
+     <Button
+          android:id="@+id/btn_youtube"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginStart="30dp"
+          android:layout_marginEnd="30dp"
+          android:background="@drawable/blue_48_rounded_bg"
+          app:backgroundTint="@null"
+          android:text="@string/go_to_youtube"
+          android:textAllCaps="false"
+          android:textColor="@android:color/white"
+          android:textSize="16sp"
+          android:layout_marginTop="24dp"
+          android:paddingTop="4dp"
+          android:paddingBottom="4dp"
+          android:minHeight="0dp"
+          style="?android:attr/borderlessButtonStyle"/>
+
+</LinearLayout>

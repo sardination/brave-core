@@ -75,6 +75,7 @@ import org.chromium.brave_wallet.mojom.SwapService;
 import org.chromium.brave_wallet.mojom.TxService;
 import org.chromium.chrome.R;
 import org.chromium.chrome.browser.ApplicationLifetime;
+import org.chromium.chrome.browser.BraveAdFreeCalloutDialogFragment;
 import org.chromium.chrome.browser.BraveHelper;
 import org.chromium.chrome.browser.BraveRelaunchUtils;
 import org.chromium.chrome.browser.BraveRewardsHelper;
@@ -852,7 +853,10 @@ public abstract class BraveActivity<C extends ChromeActivityComponent> extends C
         checkFingerPrintingOnUpgrade();
         compositorView = null;
 
-        if (BraveVpnUtils.isBraveVpnFeatureEnable()
+        String countryCode = Locale.getDefault().getCountry();
+
+        if (!countryCode.equals(BraveConstants.INDIA_COUNTRY_CODE)
+                && BraveVpnUtils.isBraveVpnFeatureEnable()
                 && InAppPurchaseWrapper.getInstance().isSubscriptionSupported()) {
             if (BraveVpnPrefUtils.shouldShowCallout() && !BraveVpnPrefUtils.isSubscriptionPurchase()
                             && (SharedPreferencesManager.getInstance().readInt(
@@ -889,6 +893,19 @@ public abstract class BraveActivity<C extends ChromeActivityComponent> extends C
             showSearchBoxTooltip();
         }
         mNativeInitialized = true;
+
+        if (countryCode.equals(BraveConstants.INDIA_COUNTRY_CODE)
+                && SharedPreferencesManager.getInstance().readBoolean(
+                        BravePreferenceKeys.BRAVE_AD_FREE_CALLOUT_DIALOG, true)
+                && getActivityTab() != null && getActivityTab().getUrl().getSpec() != null
+                && UrlUtilities.isNTPUrl(getActivityTab().getUrl().getSpec())
+                && (SharedPreferencesManager.getInstance().readBoolean(
+                            BravePreferenceKeys.BRAVE_OPENED_YOUTUBE, false)
+                        || SharedPreferencesManager.getInstance().readInt(
+                                   BravePreferenceKeys.BRAVE_APP_OPEN_COUNT)
+                                == 7)) {
+            showAdFreeCalloutDialog();
+        }
     }
 
     private void showSearchBoxTooltip() {
@@ -923,7 +940,7 @@ public abstract class BraveActivity<C extends ChromeActivityComponent> extends C
                             .build();
 
             String countryCode = Locale.getDefault().getCountry();
-            if (countryCode.equals("IN")) {
+            if (countryCode.equals(BraveConstants.INDIA_COUNTRY_CODE)) {
                 TextView toolTipBody = popupWindowTooltip.findViewById(R.id.tv_tooltip_title);
                 toolTipBody.setText(getResources().getString(R.string.searchbox_onboarding_india));
             }
@@ -946,6 +963,17 @@ public abstract class BraveActivity<C extends ChromeActivityComponent> extends C
         braveVpnCalloutDialogFragment.setCancelable(false);
         braveVpnCalloutDialogFragment.show(
                 getSupportFragmentManager(), "BraveVpnCalloutDialogFragment");
+    }
+
+    private void showAdFreeCalloutDialog() {
+        SharedPreferencesManager.getInstance().writeBoolean(
+                BravePreferenceKeys.BRAVE_AD_FREE_CALLOUT_DIALOG, false);
+
+        BraveAdFreeCalloutDialogFragment braveAdFreeCalloutDialogFragment =
+                new BraveAdFreeCalloutDialogFragment();
+        braveAdFreeCalloutDialogFragment.setCancelable(false);
+        braveAdFreeCalloutDialogFragment.show(
+                getSupportFragmentManager(), "BraveAdFreeCalloutDialogFragment");
     }
 
     // Sets NTP background

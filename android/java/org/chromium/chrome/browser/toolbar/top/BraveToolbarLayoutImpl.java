@@ -90,6 +90,8 @@ import org.chromium.chrome.browser.onboarding.v2.HighlightItem;
 import org.chromium.chrome.browser.onboarding.v2.HighlightView;
 import org.chromium.chrome.browser.preferences.BravePref;
 import org.chromium.chrome.browser.preferences.BravePrefServiceBridge;
+import org.chromium.chrome.browser.preferences.BravePreferenceKeys;
+import org.chromium.chrome.browser.preferences.SharedPreferencesManager;
 import org.chromium.chrome.browser.preferences.website.BraveShieldsContentSettings;
 import org.chromium.chrome.browser.preferences.website.BraveShieldsContentSettingsObserver;
 import org.chromium.chrome.browser.profiles.Profile;
@@ -116,6 +118,7 @@ import org.chromium.chrome.browser.toolbar.menu_button.MenuButtonCoordinator;
 import org.chromium.chrome.browser.toolbar.top.NavigationPopup.HistoryDelegate;
 import org.chromium.chrome.browser.toolbar.top.ToolbarLayout;
 import org.chromium.chrome.browser.toolbar.top.ToolbarTablet.OfflineDownloader;
+import org.chromium.chrome.browser.util.BraveConstants;
 import org.chromium.chrome.browser.util.PackageUtils;
 import org.chromium.components.browser_ui.styles.ChromeColors;
 import org.chromium.components.embedder_support.util.UrlConstants;
@@ -410,6 +413,15 @@ public abstract class BraveToolbarLayoutImpl extends ToolbarLayout
                         checkForTooltip(tab);
                     }
                 }
+
+                String countryCode = Locale.getDefault().getCountry();
+                if (countryCode.equals(BraveConstants.INDIA_COUNTRY_CODE)
+                        && url.domainIs("youtube.com")
+                        && SharedPreferencesManager.getInstance().readBoolean(
+                                BravePreferenceKeys.BRAVE_AD_FREE_CALLOUT_DIALOG, true)) {
+                    SharedPreferencesManager.getInstance().writeBoolean(
+                            BravePreferenceKeys.BRAVE_OPENED_YOUTUBE, true);
+                }
             }
 
             @Override
@@ -520,9 +532,17 @@ public abstract class BraveToolbarLayoutImpl extends ToolbarLayout
 
             String trackerText = "";
             if (!displayTrackerName.isEmpty()) {
-                trackerText = String.format(getContext().getResources().getString(
-                                                    R.string.shield_bigtech_tracker_blocked),
-                        displayTrackerName, String.valueOf(adsTrackersCount - 1));
+                if (adsTrackersCount - 1 == 0) {
+                    trackerText =
+                            String.format(getContext().getResources().getString(
+                                                  R.string.shield_bigtech_tracker_only_blocked),
+                                    displayTrackerName);
+
+                } else {
+                    trackerText = String.format(getContext().getResources().getString(
+                                                        R.string.shield_bigtech_tracker_blocked),
+                            displayTrackerName, String.valueOf(adsTrackersCount - 1));
+                }
             } else {
                 trackerText = String.format(
                         getContext().getResources().getString(R.string.shield_tracker_blocked),
