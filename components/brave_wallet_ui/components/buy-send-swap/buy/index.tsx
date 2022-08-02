@@ -24,12 +24,14 @@ import { SelectBuyOption } from '../select-buy-option/select-buy-option'
 export interface Props {
   selectedAsset: BraveWallet.BlockchainToken
   onChangeBuyView: (view: BuySendSwapViewTypes, option?: ToOrFromType) => void
+  onShowCurrencySelection: () => void
 }
 
 function Buy (props: Props) {
   const {
     selectedAsset,
-    onChangeBuyView
+    onChangeBuyView,
+    onShowCurrencySelection
   } = props
 
   const [buyAmount, setBuyAmount] = React.useState('')
@@ -96,10 +98,6 @@ function Buy (props: Props) {
   const onBack = React.useCallback(() => {
     setShowBuyOptions(false)
   }, [])
-
-  const onShowCurrencySelection = React.useCallback(() => {
-    onChangeBuyView('currencies', 'from')
-  }, [onChangeBuyView])
 
   const isSelectedNetworkSupported = React.useMemo(() => {
     // Test networks are not supported in buy tab
