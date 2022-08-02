@@ -1663,7 +1663,7 @@ void AdsServiceImpl::ShowScheduledCaptchaNotification(
       payment_id, captcha_id, snooze_count == 0,
       base::BindOnce(&AdsServiceImpl::ShowScheduledCaptcha, AsWeakPtr()),
       base::BindOnce(&AdsServiceImpl::SnoozeScheduledCaptcha, AsWeakPtr()));
-  #endif
+#endif
 #endif
 }
 
