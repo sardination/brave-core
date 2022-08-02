@@ -274,6 +274,9 @@ public class BytecodeTest {
                 "org/chromium/chrome/browser/search_engines/settings/SearchEngineAdapter",
                 "sortAndFilterUnnecessaryTemplateUrl", false, null));
         Assert.assertTrue(methodExists(
+                "org/chromium/chrome/browser/search_engines/settings/SearchEngineAdapter",
+                "didSearchEnginesChange", false, null));
+        Assert.assertTrue(methodExists(
                 "org/chromium/base/CommandLineInitUtil", "initCommandLine", false, null));
         Assert.assertTrue(methodExists(
                 "org/chromium/chrome/browser/ui/appmenu/AppMenu", "getPopupPosition", false, null));
@@ -728,6 +731,19 @@ public class BytecodeTest {
                 "org/chromium/chrome/browser/ntp/NewTabPageLayout", "mMvTilesContainerLayout"));
         Assert.assertTrue(
                 fieldExists("org/chromium/chrome/browser/dom_distiller/ReaderModeManager", "mTab"));
+
+        Assert.assertFalse(fieldExists(
+                "org/chromium/chrome/browser/search_engines/settings/BraveBaseSearchEngineAdapter",
+                "mPrepopulatedSearchEngines"));
+        Assert.assertFalse(fieldExists(
+                "org/chromium/chrome/browser/search_engines/settings/BraveBaseSearchEngineAdapter",
+                "mRecentSearchEngines"));
+        Assert.assertFalse(fieldExists(
+                "org/chromium/chrome/browser/search_engines/settings/BraveBaseSearchEngineAdapter",
+                "mSelectedSearchEnginePosition"));
+        Assert.assertFalse(fieldExists(
+                "org/chromium/chrome/browser/search_engines/settings/BraveBaseSearchEngineAdapter",
+                ""));
     }
 
     @Test
