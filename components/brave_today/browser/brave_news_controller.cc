@@ -21,6 +21,7 @@
 #include "brave/components/brave_private_cdn/private_cdn_helper.h"
 #include "brave/components/brave_private_cdn/private_cdn_request_helper.h"
 #include "brave/components/brave_today/browser/brave_news_p3a.h"
+#include "brave/components/brave_today/browser/categories_controller.h"
 #include "brave/components/brave_today/browser/direct_feed_controller.h"
 #include "brave/components/brave_today/browser/network.h"
 #include "brave/components/brave_today/common/brave_news.mojom-forward.h"
@@ -75,6 +76,7 @@ BraveNewsController::BraveNewsController(
                        history_service,
                        &api_request_helper_,
                        prefs),
+      categories_controller_(prefs, &publishers_controller_),
       weak_ptr_factory_(this) {
   DCHECK(prefs);
   // Set up preference listeners

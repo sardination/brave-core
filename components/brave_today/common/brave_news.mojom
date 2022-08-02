@@ -76,6 +76,13 @@ enum UserEnabled {
   DISABLED,
 };
 
+struct Category {
+  string category_id;
+  string category_name;
+
+  bool subscribed;
+};
+
 enum PublisherType {
   // Remote single feed of feed items combinging all default-provided feeds.
   COMBINED_SOURCE,
