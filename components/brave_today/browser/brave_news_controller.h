@@ -15,7 +15,7 @@
 #include "base/timer/timer.h"
 #include "brave/components/api_request_helper/api_request_helper.h"
 #include "brave/components/brave_private_cdn/private_cdn_request_helper.h"
-#include "brave/components/brave_today/browser/categories_controller.h"
+#include "brave/components/brave_today/browser/channels_controller.h"
 #include "brave/components/brave_today/browser/direct_feed_controller.h"
 #include "brave/components/brave_today/browser/feed_controller.h"
 #include "brave/components/brave_today/browser/publishers_controller.h"
@@ -70,10 +70,10 @@ class BraveNewsController : public KeyedService,
   void GetPublishers(GetPublishersCallback callback) override;
   void FindFeeds(const GURL& possible_feed_or_site_url,
                  FindFeedsCallback callback) override;
-  void GetCategories(GetCategoriesCallback callback) override;
-  void SetCategorySubscribed(const std::string& category_id,
+  void GetChannels(GetChannelsCallback callback) override;
+  void SetChannelSubscribed(const std::string& channel_id,
                              bool subscribed,
-                             SetCategorySubscribedCallback callback) override;
+                             SetChannelSubscribedCallback callback) override;
   void SubscribeToNewDirectFeed(
       const GURL& feed_url,
       SubscribeToNewDirectFeedCallback callback) override;
@@ -114,7 +114,7 @@ class BraveNewsController : public KeyedService,
   PublishersController publishers_controller_;
   DirectFeedController direct_feed_controller_;
   FeedController feed_controller_;
-  CategoriesController categories_controller_;
+  ChannelsController channels_controller_;
 
   PrefChangeRegistrar pref_change_registrar_;
   base::OneShotTimer timer_prefetch_;

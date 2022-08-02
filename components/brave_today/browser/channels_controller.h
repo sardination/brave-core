@@ -11,23 +11,23 @@
 #include "components/prefs/pref_service.h"
 
 namespace brave_news {
-using Categories = base::flat_map<std::string, mojom::CategoryPtr>;
-using CategoriesCallback = base::OnceCallback<void(Categories)>;
+using Channels = base::flat_map<std::string, mojom::ChannelPtr>;
+using ChannelsCallback = base::OnceCallback<void(Channels)>;
 
-class CategoriesController {
+class ChannelsController {
  public:
-  explicit CategoriesController(PrefService* prefs,
+  explicit ChannelsController(PrefService* prefs,
                                 PublishersController* publishers_controller);
-  ~CategoriesController();
-  CategoriesController(const CategoriesController&) = delete;
-  CategoriesController& operator=(const CategoriesController&) = delete;
+  ~ChannelsController();
+  ChannelsController(const ChannelsController&) = delete;
+  ChannelsController& operator=(const ChannelsController&) = delete;
 
-  static Categories GetCategoriesFromPublishers(const Publishers& publishers,
+  static Channels GetChannelsFromPublishers(const Publishers& publishers,
                                                 PrefService* prefs);
-  void GetAllCategories(CategoriesCallback callback);
-  mojom::CategoryPtr SetCategorySubscribed(const std::string& category_id,
+  void GetAllChannels(ChannelsCallback callback);
+  mojom::ChannelPtr SetChannelSubscribed(const std::string& channel_id,
                                            bool subscribed);
-  bool GetCategorySubscribed(const std::string& category_id);
+  bool GetChannelSubscribed(const std::string& channel_id);
 
  private:
   raw_ptr<PrefService> prefs_;

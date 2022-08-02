@@ -76,10 +76,8 @@ enum UserEnabled {
   DISABLED,
 };
 
-struct Category {
-  string category_id;
-  string category_name;
-
+struct Channel {
+  string channel_name;
   bool subscribed;
 };
 
@@ -96,7 +94,8 @@ struct Publisher {
   string publisher_id;
   PublisherType type;
   string publisher_name;
-  array<string> category_ids;
+  string category;
+  array<string> channels;
   bool is_enabled;
   // Only really used for direct feeds, though this information would
   // be useful for combined-source feeds so that the user doesn't add
@@ -129,8 +128,8 @@ struct FeedSearchResultItem {
 interface BraveNewsController {
   GetFeed() => (Feed feed);
   GetPublishers() => (map<string, Publisher> publishers);
-  GetCategories() => (map<string, Category> categories);
-  SetCategorySubscribed(string category_id, bool subscribed) => (Category updated);
+  GetChannels() => (map<string, Channel> channels);
+  SetChannelSubscribed(string channel_id, bool subscribed) => (Channel updated);
   // Look at the incoming url and return results
   //  - if it's a feed url then return the feed item
   //  - if it's an html document url, then search for related feed items in the html

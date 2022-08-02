@@ -22,7 +22,7 @@
 #include "brave/components/brave_private_cdn/private_cdn_helper.h"
 #include "brave/components/brave_private_cdn/private_cdn_request_helper.h"
 #include "brave/components/brave_today/browser/brave_news_p3a.h"
-#include "brave/components/brave_today/browser/categories_controller.h"
+#include "brave/components/brave_today/browser/channels_controller.h"
 #include "brave/components/brave_today/browser/direct_feed_controller.h"
 #include "brave/components/brave_today/browser/network.h"
 #include "brave/components/brave_today/common/brave_news.mojom-forward.h"
@@ -78,7 +78,7 @@ BraveNewsController::BraveNewsController(
                        history_service,
                        &api_request_helper_,
                        prefs),
-      categories_controller_(prefs, &publishers_controller_),
+      channels_controller_(prefs, &publishers_controller_),
       weak_ptr_factory_(this) {
   DCHECK(prefs);
   // Set up preference listeners
@@ -138,12 +138,12 @@ void BraveNewsController::FindFeeds(const GURL& possible_feed_or_site_url,
                                     std::move(callback));
 }
 
-void BraveNewsController::GetCategories(GetCategoriesCallback callback) {
-  categories_controller_.GetAllCategories(std::move(callback));
+void BraveNewsController::GetChannels(GetChannelsCallback callback) {
+  channels_controller_.GetAllChannels(std::move(callback));
 }
 
-void BraveNewsController::SetCategorySubscribed(const std::string& category_id, bool subscribed, SetCategorySubscribedCallback callback) {
-  auto result = categories_controller_.SetCategorySubscribed(category_id, subscribed);
+void BraveNewsController::SetChannelSubscribed(const std::string& channel_id, bool subscribed, SetChannelSubscribedCallback callback) {
+  auto result = channels_controller_.SetChannelSubscribed(channel_id, subscribed);
   std::move(callback).Run(std::move(result));
 }
 
