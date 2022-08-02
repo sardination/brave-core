@@ -26,6 +26,11 @@ std::string GetHostname() {
 }
 
 std::string GetRegionUrlPart() {
+  std::string region_switch =
+      base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
+          switches::kBraveNewsRegion);
+  if (!region_switch.empty()) return region_switch;
+
   const std::string locale =
       brave_l10n::LocaleHelper::GetInstance()->GetLocale();
   const std::string language_code = brave_l10n::GetLanguageCode(locale);

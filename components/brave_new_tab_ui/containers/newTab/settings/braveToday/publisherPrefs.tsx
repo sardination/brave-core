@@ -6,24 +6,27 @@
 import * as React from 'react'
 import AutoSizer from '@brave/react-virtualized-auto-sizer'
 import { VariableSizeList } from 'react-window'
-import { Publisher, UserEnabled } from '../../../../api/brave_news'
+import getBraveNewsController, { Channels, Publisher, UserEnabled } from '../../../../api/brave_news'
 import {
   SettingsRow,
   SettingsText
 } from '../../../../components/default'
 import { Toggle } from '../../../../components/toggle'
 import * as s from './style'
+import usePromise from '../../../../hooks/usePromise'
 
-function isPublisherContentAllowed (publisher: Publisher): boolean {
-  // Either the publisher is enabled-by-default (remotely) and the user has
-  // not overriden that default, or the user has made a choice.
-  if (publisher.userEnabledStatus === UserEnabled.ENABLED) {
-    return true
-  }
-  if (publisher.isEnabled && publisher.userEnabledStatus !== UserEnabled.DISABLED) {
-    return true
-  }
-  return false
+/**
+ * Determines whether a publishers content is show nin the feed. This might mean
+ * it belongs to an active channel, or that the user has explicitly turned it on
+ * or off.
+ * @param publisher The publisher to check.
+ * @param channels All the current channels, with up to date subscriptions
+ * @returns Whether the publisher is current enabled.
+ */
+function isPublisherContentAllowed(publisher: Publisher, channels: Channels): boolean {
+  return publisher.userEnabledStatus == UserEnabled.ENABLED
+    || (publisher.userEnabledStatus == UserEnabled.NOT_MODIFIED &&
+      publisher.channels.some(c => channels[c]?.subscribed));
 }
 
 export const DynamicListContext = React.createContext<
@@ -40,12 +43,13 @@ type ListItemProps = {
   width: number
   data: Publisher[]
   style: React.CSSProperties
+  channels: Channels
   setPublisherPref: (publisherId: string, enabled: boolean) => any
 }
 
 // Component for each item. Measures height to let virtual
 // list know.
-function ListItem (props: ListItemProps) {
+function ListItem(props: ListItemProps) {
   const { setSize } = React.useContext(DynamicListContext)
   const rowRoot = React.useRef<null | HTMLDivElement>(null)
 
@@ -58,7 +62,9 @@ function ListItem (props: ListItemProps) {
   }, [props.index, setSize, props.width])
 
   const publisher = props.data[props.index]
-  const isChecked = publisher ? isPublisherContentAllowed(publisher) : false
+  const isChecked = publisher
+    ? isPublisherContentAllowed(publisher, props.channels)
+    : false
 
   const onChange = React.useCallback(() => {
     if (!publisher) {
@@ -86,9 +92,14 @@ function ListItem (props: ListItemProps) {
   )
 }
 
-export default function PublisherPrefs (props: PublisherPrefsProps) {
+// TODO: When we can subscribe to channels, make sure we use the most up to date
+// channels. For now though, this is fine.
+const channelsPromise = getBraveNewsController().getChannels().then(r => r.channels as Channels);
+
+export default function PublisherPrefs(props: PublisherPrefsProps) {
   const listRef = React.useRef<VariableSizeList | null>(null)
   const sizeMap = React.useRef<{ [key: string]: number }>({})
+  const { result: channels = {} } = usePromise(() => channelsPromise, []);
 
   const setSize = React.useCallback((index: number, size: number) => {
     // Performance: Only update the sizeMap and reset cache if an actual value changed
@@ -131,6 +142,7 @@ export default function PublisherPrefs (props: PublisherPrefsProps) {
                   <ListItem
                     {...itemProps}
                     width={width}
+                    channels={channels}
                     setPublisherPref={props.setPublisherPref}
                   />
                 )

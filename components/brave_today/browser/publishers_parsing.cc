@@ -38,7 +38,7 @@ bool ParseCombinedPublisherList(const std::string& json,
     publisher->type = mojom::PublisherType::COMBINED_SOURCE;
     publisher->publisher_name = *publisher_raw.FindStringKey("publisher_name");
 
-    publisher->category = *publisher_raw.FindStringKey("category");
+    publisher->category_name = *publisher_raw.FindStringKey("category");
     auto* channels_raw = publisher_raw.FindListKey("channels");
     if (channels_raw) {
       for (const auto& channel : channels_raw->GetList()) {

@@ -94,7 +94,7 @@ struct Publisher {
   string publisher_id;
   PublisherType type;
   string publisher_name;
-  string category;
+  string category_name;
   array<string> channels;
   bool is_enabled;
   // Only really used for direct feeds, though this information would

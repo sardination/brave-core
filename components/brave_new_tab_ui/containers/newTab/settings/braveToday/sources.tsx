@@ -96,7 +96,7 @@ export default function Sources (props: SourcesProps) {
       forAll.push(publisher)
       result.set(categoryNameAll, forAll)
 
-      for (const channel of publisher.channels.concat([publisher.category])) {
+      for (const channel of publisher.channels) {
         const forCategory = result.get(channel) || [];
         forCategory.push(publisher);
         result.set(channel, forCategory);

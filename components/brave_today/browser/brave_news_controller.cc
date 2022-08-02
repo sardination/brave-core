@@ -94,7 +94,7 @@ BraveNewsController::BraveNewsController(
 
   auto* subscriptions = prefs_->GetDictionary(prefs::kBraveNewsSubscriptions);
   if (subscriptions->DictEmpty()) {
-    constexpr char kDefaultCategory[] = "Top News";
+    constexpr char kDefaultCategory[] = "Top Sources";
     DictionaryPrefUpdate default_subscriptions(prefs_, prefs::kBraveNewsSubscriptions);
     default_subscriptions->SetBoolKey(kDefaultCategory, true);
   }
