@@ -52,7 +52,13 @@
 
 #if defined(TOOLKIT_VIEWS)
 #include "brave/browser/ui/tabs/features.h"
-#endif
+#include "chrome/common/channel_info.h"
+#include "components/version_info/version_info.h"
+
+#if BUILDFLAG(IS_WIN)
+#include "chrome/install_static/install_details.h"
+#endif  // BUILDFLAG(IS_WIN)
+#endif  // defined(TOOLKIT_VIEWS)
 
 using brave_shields::features::kBraveAdblockCnameUncloaking;
 using brave_shields::features::kBraveAdblockCollapseBlockedElements;
@@ -497,11 +503,27 @@ constexpr char kBraveVerticalTabsDescription[] =
 #endif
 
 #if defined(TOOLKIT_VIEWS)
+uint16_t AllowForDevVersion(uint16_t os) {
+#if BUILDFLAG(IS_WIN)
+  if (!install_static::InstallDetails::IsSet()) {
+    // During unit test, this can happen.
+    return 0;
+  }
+#endif
+  if (auto channel = chrome::GetChannel();
+      channel == version_info::Channel::STABLE ||
+      channel == version_info::Channel::BETA) {
+    return 0;
+  }
+
+  return os;
+}
+
 #define BRAVE_VERTICAL_TABS_FEATURE_ENTRY \
     {kBraveVerticalTabsFeatureInternalName,  \
     flag_descriptions::kBraveVerticalTabsName, \
     flag_descriptions::kBraveVerticalTabsDescription, \
-    kOsWin | kOsMac, \
+    AllowForDevVersion(kOsWin | kOsMac), \
     FEATURE_VALUE_TYPE(tabs::features::kBraveVerticalTabs)},
 #else
 #define BRAVE_VERTICAL_TABS_FEATURE_ENTRY
