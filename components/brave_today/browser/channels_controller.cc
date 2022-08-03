@@ -59,7 +59,6 @@ mojom::ChannelPtr ChannelsController::SetChannelSubscribed(
   DictionaryPrefUpdate update(prefs_, prefs::kBraveNewsSubscriptions);
   update->SetBoolKey(channel_id, subscribed);
 
-  // TODO: Maybe look this up somehow instead?
   auto result = mojom::Channel::New();
   result->channel_name = channel_id;
   result->subscribed = subscribed;

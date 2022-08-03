@@ -33,7 +33,6 @@ handler.on<Actions.RefreshPayload>(Actions.refresh.getType(), async (store, payl
       getBraveNewsController().getFeed(),
       getBraveNewsController().getPublishers()
     ])
-    console.log("Recieved feed:", feed);
     console.debug('Brave News: ...data received.')
     store.dispatch(Actions.dataReceived({ feed, publishers }))
   } catch (e) {
