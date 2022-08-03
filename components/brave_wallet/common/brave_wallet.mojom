@@ -648,6 +648,11 @@ interface KeyringService {
   // Validate password for default keyring.
   ValidatePassword(string password) => (bool result);
 
+  // Validate password for default keyring.
+  // default is_legacy_wallet should be set to false and will be automatically updated
+  // if the first decryption proceses fails
+  UpdatePassword(string old_password, string new_password, bool is_legacy_password) => (bool result);
+
   // Get the checksume'd EthAddress for the specified address
   GetChecksumEthAddress(string address) => (string checksum_address);
 

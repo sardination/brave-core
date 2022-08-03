@@ -43,6 +43,8 @@ export const usePasswordAttempts = ({
       result: isPasswordValid
     } = await keyringService.validatePassword(password)
 
+    
+
     if (!isPasswordValid) {
       const newAttempts = attempts + 1
       if (newAttempts >= maxAttempts) {
@@ -52,6 +54,10 @@ export const usePasswordAttempts = ({
         return false
       }
 
+      if(migratedWalletIterations) {
+        keyringService.updatePassword(password, password, false);
+        
+      }
       // increase attempts count
       dispatch(WalletActions.setPasswordAttempts(newAttempts))
       return false

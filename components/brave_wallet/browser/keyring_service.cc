@@ -116,7 +116,8 @@ namespace brave_wallet {
 namespace {
 const size_t kSaltSize = 32;
 const size_t kNonceSize = 12;
-const int kPbkdf2Iterations = 100000;
+const int kPbkdf2LegacyIterations = 100000;
+const int kPbkdf2Iterations = 310000;
 const int kPbkdf2KeySize = 256;
 const char kRootPath[] = "m/44'/{coin}'";
 const char kPasswordEncryptorSalt[] = "password_encryptor_salt";
@@ -2127,6 +2128,83 @@ void KeyringService::ValidatePassword(const std::string& password,
     return;
   }
   std::move(callback).Run(!mnemonic.empty());
+}
+
+void KeyringService::UpdatePassword(
+  const std::string& old_password,
+  const std::string& new_password,
+  bool is_legacy_password
+) {
+
+  const std::string keyring_id = mojom::kDefaultKeyringId;
+
+  std::vector<uint8_t> salt(kSaltSize);
+  if (!GetPrefInBytesForKeyring(kPasswordEncryptorSalt, &salt, keyring_id)) {
+    return;
+  }
+
+  // derive old key from password
+  int iterations = is_legacy_wallet ? kPbkdf2LegacyIterations : kPbkdf2Iterations;
+  auto old_encryptor = PasswordEncryptor::DeriveKeyFromPasswordUsingPbkdf2(
+      password, salt, iterations, kPbkdf2KeySize);
+  if (!old_encryptor) {
+    return;
+  }
+
+  // get old mnemonic
+  std::vector<uint8_t> old_encrypted_mnemonic;
+  if (!GetPrefInBytesForKeyring(kEncryptedMnemonic, &old_encrypted_mnemonic,
+                                keyring_id)) {
+    return;
+  }
+
+// get old nonce
+  std::vector<uint8_t> old_nonce(kNonceSize);
+  if (!GetPrefInBytesForKeyring(kPasswordEncryptorNonce, &nonce, keyring_id)) {
+    return;
+  }
+
+  // decrypt mnemonic
+  std::vector<uint8_t> mnemonic;
+  if (!old_encryptor->Decrypt(old_encrypted_mnemonic, nonce, &mnemonic)) {
+    // retry with old number of iterations
+    if(!is_legacy_password) {
+      UpdatePassword(&old_password, &new_password, true);
+      return;
+    }
+    return;
+  }
+
+// new salt
+ std::vector<uint8_t> salt(kSaltSize);
+  if (!GetPrefInBytesForKeyring(kPasswordEncryptorSalt, &salt, keyring_id)) {
+    return;
+  }
+
+// begin re-encrypting keyring
+  auto new_encryptor = PasswordEncryptor::DeriveKeyFromPasswordUsingPbkdf2(
+      new_password, salt, kPbkdf2Iterations, kPbkdf2KeySize);
+  if (!new_encryptor) {
+    return;
+  }
+
+  // update nonce
+  std::vector<uint8_t> new_nonce(kNonceSize);
+  crypto::RandBytes(new_nonce);
+  SetPrefInBytesForKeyring(kPasswordEncryptorNonce, new_nonce, id);
+
+  // re-encrypt mnemonic
+  std::vector<uint8_t> new_encrypted_mnemonic;
+  if (!new_encryptor[keyring_id]->Encrypt(mnemonic, new_nonce,
+                                        &new_encrypted_mnemonic)) {
+    std::move(callback).Run(false);
+    return;
+  }
+
+  SetPrefInBytesForKeyring(kEncryptedMnemonic, new_encrypted_mnemonic, keyring_id);
+
+  UpdateLastUnlockPref(prefs_);
+  return;
 }
 
 void KeyringService::GetChecksumEthAddress(
