@@ -492,7 +492,7 @@ ControlType GetCookieControlType(
   DCHECK(map);
   DCHECK(cookie_settings);
 
-  auto result = CookieRules::Get(map, url, ContentSettingsType::COOKIES);
+  auto result = CookieRules::Get(map, url, ContentSettingsType::BRAVE_COOKIES);
   if (result.HasDefault()) {
     const auto default_rules = CookieRules::GetDefault(cookie_settings);
     result.Merge(default_rules);
