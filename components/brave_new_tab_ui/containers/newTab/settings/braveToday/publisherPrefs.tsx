@@ -16,17 +16,42 @@ import * as s from './style'
 import usePromise from '../../../../hooks/usePromise'
 
 /**
- * Determines whether a publishers content is show nin the feed. This might mean
+ * Determines whether a publishers content is shown in the feed. This might mean
  * it belongs to an active channel, or that the user has explicitly turned it on
- * or off.
+ * or off, or that the feed is enabled by default (if channels are not available).
  * @param publisher The publisher to check.
  * @param channels All the current channels, with up to date subscriptions
  * @returns Whether the publisher is current enabled.
  */
 function isPublisherContentAllowed (publisher: Publisher, channels: Channels): boolean {
-  return publisher.userEnabledStatus === UserEnabled.ENABLED ||
-    (publisher.userEnabledStatus === UserEnabled.NOT_MODIFIED &&
-      publisher.channels.some(c => channels[c]?.subscribed))
+  // If the user has an explicit preference for this feed, use that.
+  if (publisher.userEnabledStatus === UserEnabled.ENABLED) return true
+  if (publisher.userEnabledStatus === UserEnabled.DISABLED) return false
+
+  // If there are no channels, we're using the old API, so content is allowed
+  // if the source is default enabled.
+  if (Object.keys(channels).length === 0) return publisher.isEnabled
+
+  // Otherwise, we're using the channels API - the publisher is allowed if it's
+  // in one of the channels we're subscribed to.
+  return publisher.channels.some(c => channels[c]?.subscribed)
+}
+
+/**
+ * While we're in the process of migrating to the new sources system, we may or
+ * may not have channels specified, so we use this function to decide whether
+ * to return the category, or the channels.
+ *
+ * Each source should be in at least one channel, so if there are no channels
+ * then it's safe to assume we aren't receiving channels from the server (and
+ * thus, that we're on the old sources.json).
+ *
+ * Once we've turned on the new sources.json for everyone, we can simply remove
+ * this function and always use channels.
+ * @param publisher The publisher to get channels for.
+ */
+export function getPublisherChannels (publisher: Publisher) {
+  return publisher.channels.length ? publisher.channels : [publisher.categoryName]
 }
 
 export const DynamicListContext = React.createContext<

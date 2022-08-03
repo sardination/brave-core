@@ -6,7 +6,7 @@
 import * as React from 'react'
 import { CaratRightIcon, PlusIcon } from 'brave-ui/components/icons'
 import { getLocale } from '../../../../../common/locale'
-import { Publisher } from '../../../../api/brave_news'
+import { Publisher, PublisherType } from '../../../../api/brave_news'
 import {
   SettingsRow,
   SettingsText,
@@ -16,7 +16,7 @@ import Button, { ButtonIconContainer } from '$web-components/button'
 import NavigateBack from '../../../../components/default/settings/navigateBack'
 import DirectFeedItemMenu from './directFeedMenu'
 import { Props } from './'
-import PublisherPrefs from './publisherPrefs'
+import PublisherPrefs, { getPublisherChannels } from './publisherPrefs'
 import * as Styled from './style'
 import useManageDirectFeeds, { FeedInputValidity } from './useManageDirectFeeds'
 
@@ -26,7 +26,7 @@ type CategoryListProps = {
 }
 
 function CategoryList (props: CategoryListProps) {
-  type ClickFunctions = { [category: string]: () => any}
+  type ClickFunctions = { [category: string]: () => any }
   const clickFunctions: ClickFunctions = React.useMemo(() => {
     const functions = {}
     for (const category of props.categories) {
@@ -76,7 +76,6 @@ function Category (props: CategoryProps) {
 }
 
 const categoryNameAll = getLocale('braveTodayCategoryNameAll')
-const categoryNameDirectFeeds = 'User feeds'
 
 type SourcesProps = Props & {
   category: string
@@ -85,7 +84,7 @@ type SourcesProps = Props & {
 
 export default function Sources (props: SourcesProps) {
   // Memoisze list of publishers by category
-  const publishersByCategory = React.useMemo<Map<string, Publisher[]>>(() => {
+  const publishersByCategory = React.useMemo(() => {
     const result = new Map<string, Publisher[]>()
     result.set(categoryNameAll, [])
     if (!props.publishers) {
@@ -94,15 +93,12 @@ export default function Sources (props: SourcesProps) {
 
     for (const publisher of Object.values(props.publishers)) {
       // Do not include user feeds, as they are separated
-      if (publisher.categoryName === categoryNameDirectFeeds) {
-        continue
-      }
+      if (publisher.type === PublisherType.DIRECT_SOURCE) continue
 
-      const forAll = result.get(categoryNameAll) || []
+      const forAll = result.get(categoryNameAll)!
       forAll.push(publisher)
-      result.set(categoryNameAll, forAll)
 
-      for (const channel of publisher.channels) {
+      for (const channel of getPublisherChannels(publisher)) {
         const forCategory = result.get(channel) || []
         forCategory.push(publisher)
         result.set(channel, forCategory)
@@ -178,22 +174,22 @@ export default function Sources (props: SourcesProps) {
             <Styled.FeedSearchResults>
               Multiple feeds were found:
               <Styled.ResultItems>
-              {feedSearchResults.map(result => (
-                <Styled.ResultItem key={result.feedUrl.url}>
-                  <span title={result.feedUrl.url}>{result.feedTitle}</span>
-                  <Button
-                    ariaLabel={`Add the feed at ${result.feedUrl.url}`}
-                    scale={'tiny'}
-                    isDisabled={result.status !== FeedInputValidity.Valid}
-                    isLoading={result.status === FeedInputValidity.Pending}
-                    onClick={onAddSource.bind(undefined, result.feedUrl.url)}
-                  >
-                    <ButtonIconContainer>
-                      <PlusIcon />
-                    </ButtonIconContainer>
-                  </Button>
-                </Styled.ResultItem>
-              ))}
+                {feedSearchResults.map(result => (
+                  <Styled.ResultItem key={result.feedUrl.url}>
+                    <span title={result.feedUrl.url}>{result.feedTitle}</span>
+                    <Button
+                      ariaLabel={`Add the feed at ${result.feedUrl.url}`}
+                      scale={'tiny'}
+                      isDisabled={result.status !== FeedInputValidity.Valid}
+                      isLoading={result.status === FeedInputValidity.Pending}
+                      onClick={onAddSource.bind(undefined, result.feedUrl.url)}
+                    >
+                      <ButtonIconContainer>
+                        <PlusIcon />
+                      </ButtonIconContainer>
+                    </Button>
+                  </Styled.ResultItem>
+                ))}
               </Styled.ResultItems>
             </Styled.FeedSearchResults>
           }
