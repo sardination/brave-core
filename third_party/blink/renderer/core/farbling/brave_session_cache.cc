@@ -1,9 +1,10 @@
+
 /* Copyright (c) 2020 The Brave Authors. All rights reserved.
  * This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "brave/third_party/blink/renderer/farbling/brave_session_cache.h"
+#include "brave/third_party/blink/renderer/core/farbling/brave_session_cache.h"
 
 #include "base/command_line.h"
 #include "base/feature_list.h"
@@ -33,11 +34,12 @@
 #include "third_party/blink/renderer/platform/wtf/casting.h"
 #include "third_party/blink/renderer/platform/wtf/text/string_builder.h"
 #include "third_party/blink/renderer/platform/wtf/text/wtf_string.h"
+#include "url/url_constants.h"
 
 namespace {
 
 constexpr uint64_t zero = 0;
-constexpr double maxUInt64AsDouble = UINT64_MAX;
+constexpr double maxUInt64AsDouble = static_cast<double>(UINT64_MAX);
 
 inline uint64_t lfsr_next(uint64_t v) {
   return ((v >> 1) | (((v << 62) ^ (v << 61)) & (~(~zero << 63) << 62)));
@@ -85,7 +87,7 @@ blink::WebContentSettingsClient* GetContentSettingsClientFor(
     return settings;
   // Avoid blocking fingerprinting in WebUI pages.
   const String protocol = context->GetSecurityOrigin()->Protocol();
-  if (protocol != "https" && protocol != "http") {
+  if (protocol != url::kHttpsScheme && protocol != url::kHttpScheme) {
     return settings;
   }
   if (auto* window = blink::DynamicTo<blink::LocalDOMWindow>(context)) {
@@ -245,7 +247,6 @@ AudioFarblingCallback BraveSessionCache::GetAudioFarblingCallback(
       }
       case BraveFarblingLevel::BALANCED: {
         const uint64_t* fudge = reinterpret_cast<const uint64_t*>(domain_key_);
-        const double maxUInt64AsDouble = static_cast<double>(UINT64_MAX);
         double fudge_factor = 0.99 + ((*fudge / maxUInt64AsDouble) / 100);
         VLOG(1) << "audio fudge factor (based on session token) = "
                 << fudge_factor;
@@ -394,12 +395,9 @@ bool BraveSessionCache::AllowFontFamily(
 }
 
 FarblingPRNG BraveSessionCache::MakePseudoRandomGenerator(FarbleKey key) {
-  uint64_t seed = *reinterpret_cast<uint64_t*>(domain_key_) ^ (unsigned int)key;
+  uint64_t seed =
+      *reinterpret_cast<uint64_t*>(domain_key_) ^ static_cast<uint64_t>(key);
   return FarblingPRNG(seed);
-}
-
-FarblingPRNG BraveSessionCache::MakePseudoRandomGenerator() {
-  return MakePseudoRandomGenerator(FarbleKey::NONE);
 }
 
 }  // namespace brave

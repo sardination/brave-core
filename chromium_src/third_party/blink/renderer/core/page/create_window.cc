@@ -5,7 +5,7 @@
 
 #include "third_party/blink/renderer/core/page/create_window.h"
 
-#include "brave/third_party/blink/renderer/farbling/brave_session_cache.h"
+#include "brave/third_party/blink/renderer/core/farbling/brave_session_cache.h"
 #include "third_party/blink/public/web/web_window_features.h"
 #include "third_party/blink/renderer/core/execution_context/execution_context.h"
 #include "third_party/blink/renderer/core/frame/local_dom_window.h"
@@ -18,13 +18,14 @@
 // window size to that width and height as well, so that window.open can't
 // be used to probe the screen size.
 
-namespace blink {
+namespace {
 
-WebWindowFeatures MaybeFarbleWindowFeatures(const String& feature_string,
-                                            LocalDOMWindow* dom_window) {
-  WebWindowFeatures window_features =
+blink::WebWindowFeatures MaybeFarbleWindowFeatures(
+    const String& feature_string,
+    blink::LocalDOMWindow* dom_window) {
+  blink::WebWindowFeatures window_features =
       GetWindowFeaturesFromString_ChromiumImpl(feature_string, dom_window);
-  ExecutionContext* context = dom_window->GetExecutionContext();
+  blink::ExecutionContext* context = dom_window->GetExecutionContext();
   if (brave::BlockScreenFingerprinting(context)) {
     if (window_features.x_set) {
       window_features.x += dom_window->screenX_ChromiumImpl();
@@ -48,7 +49,7 @@ WebWindowFeatures MaybeFarbleWindowFeatures(const String& feature_string,
   return window_features;
 }
 
-}  // namespace blink
+}  // namespace
 
 #define GetWindowFeaturesFromString                               \
   GetWindowFeaturesFromString(const String& feature_string,       \

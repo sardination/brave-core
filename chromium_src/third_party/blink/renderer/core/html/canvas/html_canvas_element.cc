@@ -4,7 +4,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 #include "base/auto_reset.h"
-#include "brave/third_party/blink/renderer/farbling/brave_session_cache.h"
+#include "brave/third_party/blink/renderer/core/farbling/brave_session_cache.h"
 #include "third_party/blink/public/platform/web_content_settings_client.h"
 
 #define BRAVE_TO_DATA_URL_INTERNAL                                     \

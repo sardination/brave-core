@@ -3,8 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef BRAVE_THIRD_PARTY_BLINK_RENDERER_FARBLING_BRAVE_SESSION_CACHE_H_
-#define BRAVE_THIRD_PARTY_BLINK_RENDERER_FARBLING_BRAVE_SESSION_CACHE_H_
+#ifndef BRAVE_THIRD_PARTY_BLINK_RENDERER_CORE_FARBLING_BRAVE_SESSION_CACHE_H_
+#define BRAVE_THIRD_PARTY_BLINK_RENDERER_CORE_FARBLING_BRAVE_SESSION_CACHE_H_
 
 #include <map>
 #include <string>
@@ -29,7 +29,7 @@ using blink::GarbageCollected;
 using blink::MakeGarbageCollected;
 using blink::Supplement;
 
-enum FarbleKey {
+enum FarbleKey : uint64_t {
   NONE,
   WINDOW_INNERWIDTH,
   WINDOW_INNERHEIGHT,
@@ -88,8 +88,7 @@ class CORE_EXPORT BraveSessionCache final
                      int max_random_offset);
   bool AllowFontFamily(blink::WebContentSettingsClient* settings,
                        const AtomicString& family_name);
-  FarblingPRNG MakePseudoRandomGenerator();
-  FarblingPRNG MakePseudoRandomGenerator(FarbleKey key);
+  FarblingPRNG MakePseudoRandomGenerator(FarbleKey key = FarbleKey::NONE);
 
  private:
   bool farbling_enabled_;
@@ -102,4 +101,4 @@ class CORE_EXPORT BraveSessionCache final
 
 }  // namespace brave
 
-#endif  // BRAVE_THIRD_PARTY_BLINK_RENDERER_FARBLING_BRAVE_SESSION_CACHE_H_
+#endif  // BRAVE_THIRD_PARTY_BLINK_RENDERER_CORE_FARBLING_BRAVE_SESSION_CACHE_H_

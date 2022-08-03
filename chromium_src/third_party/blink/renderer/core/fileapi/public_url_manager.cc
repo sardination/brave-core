@@ -3,7 +3,7 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this file,
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#include "brave/third_party/blink/renderer/farbling/brave_session_cache.h"
+#include "brave/third_party/blink/renderer/core/farbling/brave_session_cache.h"
 #include "net/base/features.h"
 #include "third_party/blink/public/mojom/blob/blob_registry.mojom-blink.h"
 #include "third_party/blink/public/platform/web_content_settings_client.h"

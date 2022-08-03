@@ -5,14 +5,14 @@
 
 #include "src/third_party/blink/renderer/core/page/chrome_client_impl.cc"
 
-#include "brave/third_party/blink/renderer/farbling/brave_session_cache.h"
-#include "src/third_party/blink/renderer/core/execution_context/execution_context.h"
-#include "src/third_party/blink/renderer/core/frame/local_dom_window.h"
-#include "src/third_party/blink/renderer/core/frame/local_frame.h"
-#include "src/third_party/blink/renderer/core/frame/screen.h"
-#include "src/ui/display/screen_info.h"
-#include "src/ui/display/screen_infos.h"
-#include "src/ui/gfx/geometry/rect.h"
+#include "brave/third_party/blink/renderer/core/farbling/brave_session_cache.h"
+#include "third_party/blink/renderer/core/execution_context/execution_context.h"
+#include "third_party/blink/renderer/core/frame/local_dom_window.h"
+#include "third_party/blink/renderer/core/frame/local_frame.h"
+#include "third_party/blink/renderer/core/frame/screen.h"
+#include "ui/display/screen_info.h"
+#include "ui/display/screen_infos.h"
+#include "ui/gfx/geometry/rect.h"
 
 namespace blink {
 

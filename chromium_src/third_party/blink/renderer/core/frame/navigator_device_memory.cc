@@ -6,7 +6,7 @@
 #include "third_party/abseil-cpp/absl/random/random.h"
 
 #include "brave/third_party/blink/renderer/brave_farbling_constants.h"
-#include "brave/third_party/blink/renderer/farbling/brave_session_cache.h"
+#include "brave/third_party/blink/renderer/core/farbling/brave_session_cache.h"
 #include "third_party/blink/public/common/device_memory/approximated_device_memory.h"
 #include "third_party/blink/public/platform/web_content_settings_client.h"
 #include "third_party/blink/renderer/core/frame/navigator_device_memory.h"
