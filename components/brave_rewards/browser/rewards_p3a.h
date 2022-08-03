@@ -20,19 +20,6 @@ class PrefService;
 namespace brave_rewards {
 namespace p3a {
 
-struct WalletState {
-  bool wallet_created = false;
-  bool rewards_enabled = false;
-  bool grants_claimed = false;
-  bool funds_added = false;
-};
-
-void RecordWalletState(const WalletState& state);
-
-void RecordWalletBalance(bool wallet_created,
-                         bool rewards_enabled,
-                         size_t balance);
-
 enum class AutoContributionsState {
   kNoWallet,
   kRewardsDisabled,
@@ -82,11 +69,6 @@ enum class AdsEnabledDuration {
 };
 
 void RecordAdsEnabledDuration(PrefService* prefs, bool ads_enabled);
-
-double CalcWalletBalance(base::flat_map<std::string, double> wallets,
-                         double user_funds);
-
-void ExtractAndLogStats(const base::Value::Dict& dict);
 
 }  // namespace p3a
 }  // namespace brave_rewards

@@ -31,13 +31,8 @@ void RewardsService::RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterStringPref(prefs::kNotifications, "");
   registry->RegisterTimeDeltaPref(prefs::kNotificationTimerInterval,
                                   base::Days(1));
-  registry->RegisterTimeDeltaPref(prefs::kBackupNotificationInterval,
-                                  base::Days(30));
   registry->RegisterTimeDeltaPref(prefs::kNotificationStartupDelay,
                                   base::Seconds(30));
-  registry->RegisterBooleanPref(prefs::kBackupSucceeded, false);
-  registry->RegisterBooleanPref(prefs::kUserHasFunded, false);
-  registry->RegisterBooleanPref(prefs::kUserHasClaimedGrant, false);
   registry->RegisterTimePref(prefs::kAddFundsNotification, base::Time());
   registry->RegisterBooleanPref(prefs::kEnabled, false);
   registry->RegisterTimePref(prefs::kAdsEnabledTimestamp, base::Time());
@@ -78,7 +73,6 @@ void RewardsService::RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterStringPref(prefs::kParametersTipChoices, "");
   registry->RegisterStringPref(prefs::kParametersMonthlyTipChoices, "");
   registry->RegisterStringPref(prefs::kParametersPayoutStatus, "");
-  registry->RegisterBooleanPref(prefs::kFetchOldBalance, true);
   registry->RegisterBooleanPref(prefs::kEmptyBalanceChecked, false);
   registry->RegisterStringPref(prefs::kWalletBrave, "");
   registry->RegisterStringPref(prefs::kWalletUphold, "");

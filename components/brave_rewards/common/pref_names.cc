@@ -14,13 +14,8 @@ const char kEnabled[] = "brave.rewards.enabled";
 const char kAdsEnabledTimeDelta[] = "brave.rewards.ads_enabled_time_delta";
 const char kAdsEnabledTimestamp[] = "brave.rewards.ads_enabled_timestamp";
 const char kNotifications[] = "brave.rewards.notifications";
-const char kNotificationTimerInterval[]=
+const char kNotificationTimerInterval[] =
     "brave.rewards.notification_timer_interval";
-const char kBackupNotificationInterval[] =
-    "brave.rewards.backup_notification_interval";
-const char kBackupSucceeded[] = "brave.rewards.backup_succeeded";
-const char kUserHasFunded[] = "brave.rewards.user_has_funded";
-const char kUserHasClaimedGrant[] = "brave.rewards.user_has_claimed_grant";
 const char kAddFundsNotification[] =
     "brave.rewards.add_funds_notification";
 const char kNotificationStartupDelay[] =
@@ -65,8 +60,6 @@ const char kParametersTipChoices[] =
 const char kParametersMonthlyTipChoices[] =
     "brave.rewards.parameters.tip.monthly_choices";
 const char kParametersPayoutStatus[] = "brave.rewards.parameters.payout_status";
-const char kFetchOldBalance[] =
-    "brave.rewards.fetch_old_balance";
 const char kEmptyBalanceChecked[] =
     "brave.rewards.empty_balance_checked";
 const char kWalletBrave[] =

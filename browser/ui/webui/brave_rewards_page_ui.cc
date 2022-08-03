@@ -111,7 +111,6 @@ class RewardsDOMHandler
   void ToggleFlaggedAd(const base::Value::List& args);
   void OnToggleFlaggedAd(const std::string& json);
   void SaveAdsSetting(const base::Value::List& args);
-  void SetBackupCompleted(const base::Value::List& args);
   void OnGetContributionAmount(double amount);
   void OnGetAutoContributeProperties(
       ledger::type::AutoContributePropertiesPtr properties);
@@ -440,10 +439,6 @@ void RewardsDOMHandler::RegisterMessages() {
   web_ui()->RegisterMessageCallback(
       "brave_rewards.saveAdsSetting",
       base::BindRepeating(&RewardsDOMHandler::SaveAdsSetting,
-                          base::Unretained(this)));
-  web_ui()->RegisterMessageCallback(
-      "brave_rewards.setBackupCompleted",
-      base::BindRepeating(&RewardsDOMHandler::SetBackupCompleted,
                           base::Unretained(this)));
   web_ui()->RegisterMessageCallback(
       "brave_rewards.getPendingContributionsTotal",
@@ -1498,13 +1493,6 @@ void RewardsDOMHandler::SaveAdsSetting(const base::Value::List& args) {
   }
 
   GetAdsData(base::Value::List());
-}
-
-void RewardsDOMHandler::SetBackupCompleted(const base::Value::List& args) {
-  if (rewards_service_) {
-    AllowJavascript();
-    rewards_service_->SetBackupCompleted();
-  }
 }
 
 void RewardsDOMHandler::GetPendingContributionsTotal(

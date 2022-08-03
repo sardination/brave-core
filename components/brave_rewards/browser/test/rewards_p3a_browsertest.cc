@@ -180,7 +180,6 @@ IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest, RewardsDisabled) {
   rewards_browsertest_util::StartProcess(rewards_service_);
   WaitForRewardsInitialization();
 
-  histogram_tester_->ExpectBucketCount("Brave.Rewards.WalletBalance.3", 1, 1);
   histogram_tester_->ExpectBucketCount("Brave.Rewards.AutoContributionsState.2",
                                        1, 1);
   histogram_tester_->ExpectBucketCount("Brave.Rewards.TipsState.2", 1, 1);
@@ -262,98 +261,6 @@ IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest, Duration) {
   prefs->SetBoolean(ads::prefs::kEnabled, false);
   histogram_tester_->ExpectBucketCount("Brave.Rewards.AdsEnabledDuration",
                                        AdsEnabledDuration::kQuarters, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest,
-                       WalletStateWalletCreatedNoGrantsClaimedNoFundsAdded) {
-  TurnOnRewards();
-  FetchBalance();
-  histogram_tester_->ExpectBucketCount("Brave.Rewards.WalletState", 1, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest,
-                       WalletStateWalletCreatedGrantsClaimedNoFundsAdded) {
-  TurnOnRewards();
-  context_helper_->LoadRewardsPage();
-  contribution_->AddBalance(promotion_->ClaimPromotionViaCode());
-
-  FetchBalance();
-
-  histogram_tester_->ExpectBucketCount("Brave.Rewards.WalletState", 2, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest,
-                       WalletStateWalletCreatedNoGrantsClaimedFundsAdded) {
-  response_->SetUserFundsBalance(20.0);
-  TurnOnRewards();
-  FetchBalance();
-
-  EXPECT_GT(histogram_tester_->GetBucketCount("Brave.Rewards.WalletState", 3),
-            0);
-}
-
-IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest,
-                       WalletStateWalletCreatedGrantsClaimedFundsAdded) {
-  response_->SetUserFundsBalance(20.0);
-
-  TurnOnRewards();
-  context_helper_->LoadRewardsPage();
-  contribution_->AddBalance(promotion_->ClaimPromotionViaCode());
-
-  FetchBalance();
-
-  EXPECT_GT(histogram_tester_->GetBucketCount("Brave.Rewards.WalletState", 4),
-            0);
-}
-
-IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest,
-                       WalletStateWalletDisabledAfterCreation) {
-  rewards_browsertest_util::CreateWallet(rewards_service_);
-
-  rewards_service_->SetAdsEnabled(false);
-  rewards_service_->SetAutoContributeEnabled(false);
-
-  histogram_tester_->ExpectBucketCount("Brave.Rewards.WalletState", 5, 1);
-}
-
-IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest, WalletBalanceZeroBAT) {
-  response_->SetUserFundsBalance(0.0);
-
-  TurnOnRewards();
-  FetchBalance();
-
-  EXPECT_GT(
-      histogram_tester_->GetBucketCount("Brave.Rewards.WalletBalance.3", 2), 0);
-}
-
-IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest, WalletBalanceLessThan10BAT) {
-  response_->SetUserFundsBalance(9.0);
-
-  TurnOnRewards();
-  FetchBalance();
-
-  EXPECT_GT(
-      histogram_tester_->GetBucketCount("Brave.Rewards.WalletBalance.3", 3), 0);
-}
-
-IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest, WalletBalanceLessThan50BAT) {
-  response_->SetUserFundsBalance(20.0);
-
-  TurnOnRewards();
-  FetchBalance();
-
-  EXPECT_GT(
-      histogram_tester_->GetBucketCount("Brave.Rewards.WalletBalance.3", 4), 0);
-}
-
-IN_PROC_BROWSER_TEST_F(RewardsP3ABrowserTest, WalletBalanceMoreThan50BAT) {
-  response_->SetUserFundsBalance(60.0);
-
-  TurnOnRewards();
-  FetchBalance();
-
-  EXPECT_GT(
-      histogram_tester_->GetBucketCount("Brave.Rewards.WalletBalance.3", 5), 0);
 }
 
 }  // namespace rewards_browsertest

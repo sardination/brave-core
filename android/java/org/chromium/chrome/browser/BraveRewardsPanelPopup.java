@@ -1079,7 +1079,6 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
         case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_GRANT:
         case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_GRANT_ADS:
         case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_INSUFFICIENT_FUNDS:
-        case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_BACKUP_WALLET:
         case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_TIPS_PROCESSED:
         case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_ADS_ONBOARDING:
         case REWARDS_NOTIFICATION_NO_INTERNET:
@@ -1229,12 +1228,6 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
             notification_icon.setImageResource(R.drawable.notification_icon);
             title = root.getResources().getString(R.string.brave_ui_insufficient_funds_msg);
             description = root.getResources().getString(R.string.brave_ui_insufficient_funds_desc);
-            break;
-        case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_BACKUP_WALLET:
-            btClaimOk.setText(root.getResources().getString(R.string.ok));
-            notification_icon.setImageResource(R.drawable.notification_icon);
-            title = root.getResources().getString(R.string.brave_ui_backup_wallet_msg);
-            description = root.getResources().getString(R.string.brave_ui_backup_wallet_desc);
             break;
         case BraveRewardsNativeWorker.REWARDS_NOTIFICATION_TIPS_PROCESSED:
             btClaimOk.setText(root.getResources().getString(R.string.ok));
@@ -1581,16 +1574,7 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
     public void OnNotificationsCount(int count) {}
 
     @Override
-    public void OnGetLatestNotification(String id, int type, long timestamp,
-                                        String[] args) {
-        if (type == BraveRewardsNativeWorker.REWARDS_NOTIFICATION_BACKUP_WALLET) {
-            if (mBraveRewardsNativeWorker != null) {
-                mBraveRewardsNativeWorker.DeleteNotification(id);
-                mBraveRewardsNativeWorker.GetAllNotifications();
-            }
-            return;
-        }
-
+    public void OnGetLatestNotification(String id, int type, long timestamp, String[] args) {
         // This is to make sure that user saw promotion error message before showing the
         // rest of messages
         if (!currentNotificationId.equals(REWARDS_PROMOTION_CLAIM_ERROR_ID)) {
@@ -1962,25 +1946,18 @@ public class BraveRewardsPanelPopup implements BraveRewardsObserver, BraveReward
         publisherVerified.setVisibility(View.VISIBLE);
 
         // show |brave_ui_panel_connected_text| text if
-        // publisher is CONNECTED and user doesn't have any Brave funds (anonymous or
-        // blinded wallets)
+        // publisher is CONNECTED and user doesn't have any Brave funds (blinded wallet)
         String verified_description = "";
         if (pubStatus == BraveRewardsPublisher.CONNECTED) {
             BraveRewardsBalance balance_obj = mBraveRewardsNativeWorker.GetWalletBalance();
             if (balance_obj != null) {
                 double braveFunds =
-                    ((balance_obj.mWallets.containsKey(BraveRewardsBalance.WALLET_ANONYMOUS)
-                      && balance_obj.mWallets.get(BraveRewardsBalance.WALLET_ANONYMOUS)
-                      != null)
-                     ? balance_obj.mWallets.get(
-                         BraveRewardsBalance.WALLET_ANONYMOUS)
-                     : .0)
-                    + ((balance_obj.mWallets.containsKey(BraveRewardsBalance.WALLET_BLINDED)
-                        && balance_obj.mWallets.get(BraveRewardsBalance.WALLET_BLINDED)
-                        != null)
-                       ? balance_obj.mWallets.get(
-                           BraveRewardsBalance.WALLET_BLINDED)
-                       : .0);
+                        ((balance_obj.mWallets.containsKey(BraveRewardsBalance.WALLET_BLINDED)
+                                 && balance_obj.mWallets.get(BraveRewardsBalance.WALLET_BLINDED)
+                                         != null)
+                                        ? balance_obj.mWallets.get(
+                                                BraveRewardsBalance.WALLET_BLINDED)
+                                        : .0);
                 if (braveFunds <= 0) {
                     verified_description =
                         root.getResources().getString(R.string.brave_ui_panel_connected_text);
