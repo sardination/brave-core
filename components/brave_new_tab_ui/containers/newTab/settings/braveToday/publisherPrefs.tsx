@@ -23,10 +23,10 @@ import usePromise from '../../../../hooks/usePromise'
  * @param channels All the current channels, with up to date subscriptions
  * @returns Whether the publisher is current enabled.
  */
-function isPublisherContentAllowed(publisher: Publisher, channels: Channels): boolean {
-  return publisher.userEnabledStatus == UserEnabled.ENABLED
-    || (publisher.userEnabledStatus == UserEnabled.NOT_MODIFIED &&
-      publisher.channels.some(c => channels[c]?.subscribed));
+function isPublisherContentAllowed (publisher: Publisher, channels: Channels): boolean {
+  return publisher.userEnabledStatus === UserEnabled.ENABLED ||
+    (publisher.userEnabledStatus === UserEnabled.NOT_MODIFIED &&
+      publisher.channels.some(c => channels[c]?.subscribed))
 }
 
 export const DynamicListContext = React.createContext<
@@ -49,7 +49,7 @@ type ListItemProps = {
 
 // Component for each item. Measures height to let virtual
 // list know.
-function ListItem(props: ListItemProps) {
+function ListItem (props: ListItemProps) {
   const { setSize } = React.useContext(DynamicListContext)
   const rowRoot = React.useRef<null | HTMLDivElement>(null)
 
@@ -94,12 +94,12 @@ function ListItem(props: ListItemProps) {
 
 // TODO: When we can subscribe to channels, make sure we use the most up to date
 // channels. For now though, this is fine.
-const channelsPromise = getBraveNewsController().getChannels().then(r => r.channels as Channels);
+const channelsPromise = getBraveNewsController().getChannels().then(r => r.channels as Channels)
 
-export default function PublisherPrefs(props: PublisherPrefsProps) {
+export default function PublisherPrefs (props: PublisherPrefsProps) {
   const listRef = React.useRef<VariableSizeList | null>(null)
   const sizeMap = React.useRef<{ [key: string]: number }>({})
-  const { result: channels = {} } = usePromise(() => channelsPromise, []);
+  const { result: channels = {} } = usePromise(() => channelsPromise, [])
 
   const setSize = React.useCallback((index: number, size: number) => {
     // Performance: Only update the sizeMap and reset cache if an actual value changed

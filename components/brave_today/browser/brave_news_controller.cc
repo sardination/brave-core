@@ -95,7 +95,8 @@ BraveNewsController::BraveNewsController(
   auto* subscriptions = prefs_->GetDictionary(prefs::kBraveNewsSubscriptions);
   if (subscriptions->DictEmpty()) {
     constexpr char kDefaultCategory[] = "Top Sources";
-    DictionaryPrefUpdate default_subscriptions(prefs_, prefs::kBraveNewsSubscriptions);
+    DictionaryPrefUpdate default_subscriptions(prefs_,
+                                               prefs::kBraveNewsSubscriptions);
     default_subscriptions->SetBoolKey(kDefaultCategory, true);
   }
 
@@ -142,8 +143,12 @@ void BraveNewsController::GetChannels(GetChannelsCallback callback) {
   channels_controller_.GetAllChannels(std::move(callback));
 }
 
-void BraveNewsController::SetChannelSubscribed(const std::string& channel_id, bool subscribed, SetChannelSubscribedCallback callback) {
-  auto result = channels_controller_.SetChannelSubscribed(channel_id, subscribed);
+void BraveNewsController::SetChannelSubscribed(
+    const std::string& channel_id,
+    bool subscribed,
+    SetChannelSubscribedCallback callback) {
+  auto result =
+      channels_controller_.SetChannelSubscribed(channel_id, subscribed);
   std::move(callback).Run(std::move(result));
 }
 

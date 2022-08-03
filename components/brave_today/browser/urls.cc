@@ -29,7 +29,8 @@ std::string GetRegionUrlPart() {
   std::string region_switch =
       base::CommandLine::ForCurrentProcess()->GetSwitchValueASCII(
           switches::kBraveNewsRegion);
-  if (!region_switch.empty()) return region_switch;
+  if (!region_switch.empty())
+    return region_switch;
 
   const std::string locale =
       brave_l10n::LocaleHelper::GetInstance()->GetLocale();

@@ -72,8 +72,8 @@ class BraveNewsController : public KeyedService,
                  FindFeedsCallback callback) override;
   void GetChannels(GetChannelsCallback callback) override;
   void SetChannelSubscribed(const std::string& channel_id,
-                             bool subscribed,
-                             SetChannelSubscribedCallback callback) override;
+                            bool subscribed,
+                            SetChannelSubscribedCallback callback) override;
   void SubscribeToNewDirectFeed(
       const GURL& feed_url,
       SubscribeToNewDirectFeedCallback callback) override;

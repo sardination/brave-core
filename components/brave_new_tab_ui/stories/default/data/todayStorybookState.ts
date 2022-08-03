@@ -27,7 +27,7 @@ import { BraveTodayState } from '../../../reducers/today'
 //   return ii
 // })})))
 
-export default function getTodayState(): BraveTodayState {
+export default function getTodayState (): BraveTodayState {
   const hasDataError = boolean('Today data fetch error?', false)
   return {
     isFetching: boolean('Today is fetching?', false),

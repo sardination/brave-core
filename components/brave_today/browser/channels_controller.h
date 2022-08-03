@@ -1,5 +1,10 @@
-#ifndef BRAVE_COMPONENTS_BRAVE_TODAY_BROWSER_CATEGORIES_CONTROLLER_H_
-#define BRAVE_COMPONENTS_BRAVE_TODAY_BROWSER_CATEGORIES_CONTROLLER_H_
+// Copyright (c) 2022 The Brave Authors. All rights reserved.
+// This Source Code Form is subject to the terms of the Mozilla Public
+// License, v. 2.0. If a copy of the MPL was not distributed with this file,
+// you can obtain one at http://mozilla.org/MPL/2.0/.
+
+#ifndef BRAVE_COMPONENTS_BRAVE_TODAY_BROWSER_CHANNELS_CONTROLLER_H_
+#define BRAVE_COMPONENTS_BRAVE_TODAY_BROWSER_CHANNELS_CONTROLLER_H_
 
 #include <string>
 #include <vector>
@@ -17,16 +22,16 @@ using ChannelsCallback = base::OnceCallback<void(Channels)>;
 class ChannelsController {
  public:
   explicit ChannelsController(PrefService* prefs,
-                                PublishersController* publishers_controller);
+                              PublishersController* publishers_controller);
   ~ChannelsController();
   ChannelsController(const ChannelsController&) = delete;
   ChannelsController& operator=(const ChannelsController&) = delete;
 
   static Channels GetChannelsFromPublishers(const Publishers& publishers,
-                                                PrefService* prefs);
+                                            PrefService* prefs);
   void GetAllChannels(ChannelsCallback callback);
   mojom::ChannelPtr SetChannelSubscribed(const std::string& channel_id,
-                                           bool subscribed);
+                                         bool subscribed);
   bool GetChannelSubscribed(const std::string& channel_id);
 
  private:
@@ -35,4 +40,4 @@ class ChannelsController {
 };
 }  // namespace brave_news
 
-#endif  // BRAVE_COMPONENTS_BRAVE_TODAY_BROWSER_CATEGORIES_CONTROLLER_H_
+#endif  // BRAVE_COMPONENTS_BRAVE_TODAY_BROWSER_CHANNELS_CONTROLLER_H_

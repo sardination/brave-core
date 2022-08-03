@@ -76,6 +76,7 @@ function Category (props: CategoryProps) {
 }
 
 const categoryNameAll = getLocale('braveTodayCategoryNameAll')
+const categoryNameDirectFeeds = 'User feeds'
 
 type SourcesProps = Props & {
   category: string
@@ -92,14 +93,19 @@ export default function Sources (props: SourcesProps) {
     }
 
     for (const publisher of Object.values(props.publishers)) {
+      // Do not include user feeds, as they are separated
+      if (publisher.categoryName === categoryNameDirectFeeds) {
+        continue
+      }
+
       const forAll = result.get(categoryNameAll) || []
       forAll.push(publisher)
       result.set(categoryNameAll, forAll)
 
       for (const channel of publisher.channels) {
-        const forCategory = result.get(channel) || [];
-        forCategory.push(publisher);
-        result.set(channel, forCategory);
+        const forCategory = result.get(channel) || []
+        forCategory.push(publisher)
+        result.set(channel, forCategory)
       }
     }
 
