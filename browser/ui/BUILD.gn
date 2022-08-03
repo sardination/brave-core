@@ -688,7 +688,7 @@ source_set("ui") {
     deps += [ "//brave/components/ftx/common" ]
   }
 
-  if (enable_playlist) {
+  if (enable_playlist && !is_android) {
     sources += [
       "webui/playlist_page_handler.cc",
       "webui/playlist_page_handler.h",

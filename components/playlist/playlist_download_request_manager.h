@@ -14,6 +14,7 @@
 #include "base/callback.h"
 #include "base/memory/weak_ptr.h"
 #include "base/scoped_observation.h"
+#include "base/timer/timer.h"
 #include "brave/components/playlist/media_detector_component_manager.h"
 #include "brave/components/playlist/playlist_types.h"
 #include "content/public/browser/web_contents.h"
@@ -47,7 +48,8 @@ class PlaylistDownloadRequestManager
     Request(Request&&) noexcept;
     ~Request();
 
-    std::string url;
+    absl::variant<std::string, base::WeakPtr<content::WebContents>>
+        url_or_contents;
     Callback callback = base::NullCallback();
   };
 
@@ -112,7 +114,7 @@ class PlaylistDownloadRequestManager
   base::ScopedObservation<MediaDetectorComponentManager,
                           MediaDetectorComponentManager::Observer>
       observed_{this};
-  std::unique_ptr<base::OneShotTimer> web_contents_destroy_timer_;
+  std::unique_ptr<base::RetainingOneShotTimer> web_contents_destroy_timer_;
 
   base::WeakPtrFactory<PlaylistDownloadRequestManager> weak_factory_{this};
 };

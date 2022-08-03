@@ -18,6 +18,7 @@
 #include "brave/components/brave_wayback_machine/buildflags.h"
 #include "brave/components/greaselion/browser/buildflags/buildflags.h"
 #include "brave/components/ipfs/buildflags/buildflags.h"
+#include "brave/components/playlist/buildflags/buildflags.h"
 #include "brave/components/speedreader/common/buildflags.h"
 #include "brave/components/tor/buildflags/buildflags.h"
 #include "build/build_config.h"
@@ -64,6 +65,10 @@
 
 #if BUILDFLAG(ENABLE_EXTENSIONS)
 #include "brave/browser/web_discovery/web_discovery_tab_helper.h"
+#endif
+
+#if BUILDFLAG(ENABLE_PLAYLIST)
+#include "brave/components/playlist/playlist_tab_helper.h"
 #endif
 
 namespace brave {
@@ -124,6 +129,10 @@ void AttachTabHelpers(content::WebContents* web_contents) {
   }
 
   brave_wallet::BraveWalletTabHelper::CreateForWebContents(web_contents);
+
+#if BUILDFLAG(ENABLE_PLAYLIST)
+  playlist::PlaylistTabHelper::CreateForWebContents(web_contents);
+#endif
 }
 
 }  // namespace brave

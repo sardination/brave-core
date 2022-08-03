@@ -30,6 +30,8 @@ source_set("playlist") {
     "playlist_service_helper.cc",
     "playlist_service_helper.h",
     "playlist_service_observer.h",
+    "playlist_tab_helper.cc",
+    "playlist_tab_helper.h",
     "playlist_thumbnail_downloader.cc",
     "playlist_thumbnail_downloader.h",
     "playlist_types.cc",
