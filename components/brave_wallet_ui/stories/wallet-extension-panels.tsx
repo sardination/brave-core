@@ -725,6 +725,10 @@ export const _ConnectedPanel = (args: { locked: boolean }) => {
     console.log(selectedTransaction)
   }
 
+  const onShowCurrencySelection = React.useCallback(() => {
+    navigateTo('currencies')
+  }, [])
+
   return (
     <Provider store={store}>
       <StyledExtensionWrapper>
@@ -817,6 +821,7 @@ export const _ConnectedPanel = (args: { locked: boolean }) => {
                         <Buy
                           onChangeBuyView={onChangeSendView}
                           selectedAsset={selectedWyreAsset}
+                          onShowCurrencySelection={onShowCurrencySelection}
                         />
                       }
                       {selectedPanel === 'sitePermissions' &&
