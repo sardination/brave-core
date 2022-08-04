@@ -229,11 +229,12 @@ class SolanaTxManagerUnitTest : public testing::Test {
                              absl::nullopt, meta_id);
   }
 
-  void AddUnapprovedTransaction(mojom::SolanaTxDataPtr solana_tx_data,
-                                const std::string& from,
-                                const absl::optional<url::Origin>& origin,
-                                const absl::optional<std::string>& group_id,
-                                std::string* meta_id) {
+  void AddUnapprovedTransaction(
+      mojom::SolanaTxDataPtr solana_tx_data,
+      const std::string& from,
+      const absl::optional<url::Origin>& origin,
+      std::string* meta_id,
+      const absl::optional<std::string>& group_id = absl::nullopt) {
     auto tx_data_union =
         mojom::TxDataUnion::NewSolanaTxData(std::move(solana_tx_data));
 
@@ -522,7 +523,7 @@ TEST_F(SolanaTxManagerUnitTest, WalletOrigin) {
 
   std::string meta_id;
   AddUnapprovedTransaction(std::move(system_transfer_data), from, absl::nullopt,
-                           absl::nullopt, &meta_id);
+                           &meta_id);
 
   auto tx_meta = solana_tx_manager()->GetTxForTesting(meta_id);
   ASSERT_TRUE(tx_meta);
@@ -541,7 +542,7 @@ TEST_F(SolanaTxManagerUnitTest, SomeSiteOrigin) {
   std::string meta_id;
   AddUnapprovedTransaction(std::move(system_transfer_data), from,
                            url::Origin::Create(GURL("https://some.site.com")),
-                           absl::nullopt, &meta_id);
+                           &meta_id);
 
   auto tx_meta = solana_tx_manager()->GetTxForTesting(meta_id);
   ASSERT_TRUE(tx_meta);
@@ -560,7 +561,7 @@ TEST_F(SolanaTxManagerUnitTest, AddUnapprovedTransactionWithGroupId) {
 
   std::string meta_id;
   AddUnapprovedTransaction(std::move(system_transfer_data), from, absl::nullopt,
-                           "mockGroupId", &meta_id);
+                           &meta_id, "mockGroupId");
 
   auto tx_meta = solana_tx_manager()->GetTxForTesting(meta_id);
   ASSERT_TRUE(tx_meta);

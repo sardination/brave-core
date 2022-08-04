@@ -302,9 +302,9 @@ class EthTxManagerUnitTest : public testing::Test {
       const std::vector<uint8_t>& data,
       const std::string& orig_meta_id,
       mojom::TransactionStatus status,
-      const absl::optional<std::string>& group_id,
       bool cancel,
-      std::string* tx_meta_id) {
+      std::string* tx_meta_id,
+      const absl::optional<std::string>& group_id = absl::nullopt) {
     auto tx_data =
         mojom::TxData::New(nonce, gas_price, "0x0974",
                            "0xbe862ad9abfe6f22bcb087716c7d89a26051f74c",
@@ -338,9 +338,9 @@ class EthTxManagerUnitTest : public testing::Test {
       const std::string& max_fee_per_gas,
       const std::string& orig_meta_id,
       mojom::TransactionStatus status,
-      const absl::optional<std::string>& group_id,
       bool cancel,
-      std::string* tx_meta_id) {
+      std::string* tx_meta_id,
+      const absl::optional<std::string>& group_id = absl::nullopt) {
     auto tx_data1559 = mojom::TxData1559::New(
         mojom::TxData::New(nonce, "", "0x0974",
                            "0xbe862ad9abfe6f22bcb087716c7d89a26051f74c",
@@ -1778,7 +1778,7 @@ TEST_F(EthTxManagerUnitTest, SpeedupTransaction) {
   std::string tx_meta_id;
   DoSpeedupOrCancelTransactionSuccess(
       "0x05", "0xa", std::vector<uint8_t>(), orig_meta_id,
-      mojom::TransactionStatus::Submitted, absl::nullopt, false, &tx_meta_id);
+      mojom::TransactionStatus::Submitted, false, &tx_meta_id);
 
   auto expected_tx_meta = eth_tx_manager()->GetTxForTesting(orig_meta_id);
   ASSERT_TRUE(expected_tx_meta);
@@ -1796,7 +1796,7 @@ TEST_F(EthTxManagerUnitTest, SpeedupTransaction) {
   orig_meta_id = "002";
   DoSpeedupOrCancelTransactionSuccess("0x06", "0xa", data_, orig_meta_id,
                                       mojom::TransactionStatus::Submitted,
-                                      absl::nullopt, false, &tx_meta_id);
+                                      false, &tx_meta_id);
 
   expected_tx_meta = eth_tx_manager()->GetTxForTesting(orig_meta_id);
   ASSERT_TRUE(expected_tx_meta);
@@ -1814,7 +1814,7 @@ TEST_F(EthTxManagerUnitTest, SpeedupTransaction) {
   orig_meta_id = "003";
   DoSpeedupOrCancelTransactionSuccess(
       "0x07", "0x174876e800", data_, orig_meta_id,
-      mojom::TransactionStatus::Submitted, absl::nullopt, false, &tx_meta_id);
+      mojom::TransactionStatus::Submitted, false, &tx_meta_id);
 
   expected_tx_meta = eth_tx_manager()->GetTxForTesting(orig_meta_id);
   ASSERT_TRUE(expected_tx_meta);
@@ -1827,7 +1827,7 @@ TEST_F(EthTxManagerUnitTest, SpeedupTransaction) {
   orig_meta_id = "004";
   DoSpeedupOrCancelTransactionSuccess(
       "0x05", "0xa", std::vector<uint8_t>(), orig_meta_id,
-      mojom::TransactionStatus::Submitted, "mockGroupId", false, &tx_meta_id);
+      mojom::TransactionStatus::Submitted, false, &tx_meta_id, "mockGroupId");
   tx_meta = eth_tx_manager()->GetTxForTesting(tx_meta_id);
   ASSERT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->group_id(), "mockGroupId");
@@ -1849,8 +1849,7 @@ TEST_F(EthTxManagerUnitTest, Speedup1559Transaction) {
   std::string tx_meta_id;
   DoSpeedupOrCancel1559TransactionSuccess(
       "0x05", data_, "0x77359400" /* 2 Gwei */, "0xb2d05e000" /* 48 Gwei */,
-      orig_meta_id, mojom::TransactionStatus::Submitted, absl::nullopt, false,
-      &tx_meta_id);
+      orig_meta_id, mojom::TransactionStatus::Submitted, false, &tx_meta_id);
 
   auto expected_tx_meta = eth_tx_manager()->GetTxForTesting(orig_meta_id);
   ASSERT_TRUE(expected_tx_meta);
@@ -1869,8 +1868,7 @@ TEST_F(EthTxManagerUnitTest, Speedup1559Transaction) {
   orig_meta_id = "002";
   DoSpeedupOrCancel1559TransactionSuccess(
       "0x06", data_, "0x7735940" /* 0.125 Gwei */, "0xb2d05e00" /* 3 Gwei */,
-      orig_meta_id, mojom::TransactionStatus::Submitted, absl::nullopt, false,
-      &tx_meta_id);
+      orig_meta_id, mojom::TransactionStatus::Submitted, false, &tx_meta_id);
 
   expected_tx_meta = eth_tx_manager()->GetTxForTesting(orig_meta_id);
   ASSERT_TRUE(expected_tx_meta);
@@ -1887,8 +1885,8 @@ TEST_F(EthTxManagerUnitTest, Speedup1559Transaction) {
   orig_meta_id = "003";
   DoSpeedupOrCancel1559TransactionSuccess(
       "0x05", data_, "0x77359400" /* 2 Gwei */, "0xb2d05e000" /* 48 Gwei */,
-      orig_meta_id, mojom::TransactionStatus::Submitted, "mockGroupId", false,
-      &tx_meta_id);
+      orig_meta_id, mojom::TransactionStatus::Submitted, false, &tx_meta_id,
+      "mockGroupId");
   tx_meta = eth_tx_manager()->GetTxForTesting(tx_meta_id);
   ASSERT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->group_id(), "mockGroupId");
@@ -1914,7 +1912,7 @@ TEST_F(EthTxManagerUnitTest, CancelTransaction) {
   std::string tx_meta_id;
   DoSpeedupOrCancelTransactionSuccess(
       "0x06", "0x2540BE4000" /* 160 gwei */, data_, orig_meta_id,
-      mojom::TransactionStatus::Submitted, absl::nullopt, true, &tx_meta_id);
+      mojom::TransactionStatus::Submitted, true, &tx_meta_id);
 
   auto orig_tx_meta = eth_tx_manager()->GetTxForTesting(orig_meta_id);
   ASSERT_TRUE(orig_tx_meta);
@@ -1935,8 +1933,8 @@ TEST_F(EthTxManagerUnitTest, CancelTransaction) {
   //    eth_getGasPrice => 0x17fcf18321 (103 Gwei)
   orig_meta_id = "002";
   DoSpeedupOrCancelTransactionSuccess("0x07", "0x1", data_, orig_meta_id,
-                                      mojom::TransactionStatus::Submitted,
-                                      absl::nullopt, true, &tx_meta_id);
+                                      mojom::TransactionStatus::Submitted, true,
+                                      &tx_meta_id);
 
   orig_tx_meta = eth_tx_manager()->GetTxForTesting(orig_meta_id);
   ASSERT_TRUE(orig_tx_meta);
@@ -1952,8 +1950,8 @@ TEST_F(EthTxManagerUnitTest, CancelTransaction) {
   // Cancel should reuse group_id
   orig_meta_id = "003";
   DoSpeedupOrCancelTransactionSuccess("0x07", "0x1", data_, orig_meta_id,
-                                      mojom::TransactionStatus::Submitted,
-                                      "mockGroupId", true, &tx_meta_id);
+                                      mojom::TransactionStatus::Submitted, true,
+                                      &tx_meta_id, "mockGroupId");
   tx_meta = eth_tx_manager()->GetTxForTesting(tx_meta_id);
   ASSERT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->group_id(), "mockGroupId");
@@ -1964,8 +1962,7 @@ TEST_F(EthTxManagerUnitTest, CancelTransaction) {
   orig_meta_id = "004";
   DoSpeedupOrCancel1559TransactionSuccess(
       "0x08", data_, "0x77359400" /* 2 Gwei */, "0xb2d05e000" /* 48 Gwei */,
-      orig_meta_id, mojom::TransactionStatus::Submitted, absl::nullopt, true,
-      &tx_meta_id);
+      orig_meta_id, mojom::TransactionStatus::Submitted, true, &tx_meta_id);
 
   orig_tx_meta = eth_tx_manager()->GetTxForTesting(orig_meta_id);
   ASSERT_TRUE(orig_tx_meta);
@@ -1985,8 +1982,8 @@ TEST_F(EthTxManagerUnitTest, CancelTransaction) {
   // Cancel should reuse group_id
   DoSpeedupOrCancel1559TransactionSuccess(
       "0x08", data_, "0x77359400" /* 2 Gwei */, "0xb2d05e000" /* 48 Gwei */,
-      orig_meta_id, mojom::TransactionStatus::Submitted, "mockGroupId", true,
-      &tx_meta_id);
+      orig_meta_id, mojom::TransactionStatus::Submitted, true, &tx_meta_id,
+      "mockGroupId");
   tx_meta = eth_tx_manager()->GetTxForTesting(tx_meta_id);
   ASSERT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->group_id(), "mockGroupId");

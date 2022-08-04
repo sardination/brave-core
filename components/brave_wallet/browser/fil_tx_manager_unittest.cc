@@ -158,11 +158,12 @@ class FilTxManagerUnitTest : public testing::Test {
     return url::Origin::Create(GURL("https://brave.com"));
   }
 
-  void AddUnapprovedTransaction(mojom::FilTxDataPtr tx_data,
-                                const std::string& from,
-                                const absl::optional<url::Origin>& origin,
-                                const absl::optional<std::string>& group_id,
-                                std::string* meta_id) {
+  void AddUnapprovedTransaction(
+      mojom::FilTxDataPtr tx_data,
+      const std::string& from,
+      const absl::optional<url::Origin>& origin,
+      std::string* meta_id,
+      const absl::optional<std::string>& group_id = absl::nullopt) {
     auto tx_data_union = mojom::TxDataUnion::NewFilTxData(std::move(tx_data));
 
     base::RunLoop run_loop;
@@ -253,7 +254,7 @@ TEST_F(FilTxManagerUnitTest, SubmitTransactions) {
 
   std::string meta_id1;
   AddUnapprovedTransaction(tx_data.Clone(), from_account, absl::nullopt,
-                           absl::nullopt, &meta_id1);
+                           &meta_id1);
 
   auto tx_meta1 = fil_tx_manager()->GetTxForTesting(meta_id1);
   EXPECT_TRUE(tx_meta1);
@@ -266,7 +267,7 @@ TEST_F(FilTxManagerUnitTest, SubmitTransactions) {
 
   std::string meta_id2;
   AddUnapprovedTransaction(tx_data.Clone(), from_account, absl::nullopt,
-                           absl::nullopt, &meta_id2);
+                           &meta_id2);
   auto tx_meta2 = fil_tx_manager()->GetTxForTesting(meta_id2);
   ASSERT_TRUE(tx_meta2);
   EXPECT_EQ(tx_meta2->from(), from_account);
@@ -321,7 +322,7 @@ TEST_F(FilTxManagerUnitTest, SubmitTransactionError) {
 
   std::string meta_id1;
   AddUnapprovedTransaction(tx_data.Clone(), from_account, absl::nullopt,
-                           absl::nullopt, &meta_id1);
+                           &meta_id1);
 
   auto tx_meta1 = fil_tx_manager()->GetTxForTesting(meta_id1);
   EXPECT_TRUE(tx_meta1);
@@ -372,7 +373,7 @@ TEST_F(FilTxManagerUnitTest, SubmitTransactionConfirmed) {
 
   std::string meta_id1;
   AddUnapprovedTransaction(tx_data.Clone(), from_account, absl::nullopt,
-                           absl::nullopt, &meta_id1);
+                           &meta_id1);
 
   auto tx_meta1 = fil_tx_manager()->GetTxForTesting(meta_id1);
   EXPECT_TRUE(tx_meta1);
@@ -428,7 +429,7 @@ TEST_F(FilTxManagerUnitTest, WalletOrigin) {
       "" /* gas_limit */, "" /* max_fee */, to_account, from_account, "11");
   std::string meta_id;
   AddUnapprovedTransaction(std::move(tx_data), from_account, absl::nullopt,
-                           absl::nullopt, &meta_id);
+                           &meta_id);
 
   auto tx_meta = fil_tx_manager()->GetTxForTesting(meta_id);
   ASSERT_TRUE(tx_meta);
@@ -446,7 +447,7 @@ TEST_F(FilTxManagerUnitTest, SomeSiteOrigin) {
   std::string meta_id;
   AddUnapprovedTransaction(std::move(tx_data), from_account,
                            url::Origin::Create(GURL("https://some.site.com")),
-                           absl::nullopt, &meta_id);
+                           &meta_id);
 
   auto tx_meta = fil_tx_manager()->GetTxForTesting(meta_id);
   ASSERT_TRUE(tx_meta);
@@ -465,14 +466,14 @@ TEST_F(FilTxManagerUnitTest, AddUnapprovedTransactionWithGroupId) {
 
   // Transaction with group_id
   AddUnapprovedTransaction(tx_data.Clone(), from_account, absl::nullopt,
-                           "mockGroupId", &meta_id);
+                           &meta_id, "mockGroupId");
   auto tx_meta = fil_tx_manager()->GetTxForTesting(meta_id);
   ASSERT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->group_id(), "mockGroupId");
 
   // Transaction with empty group_id
   AddUnapprovedTransaction(tx_data.Clone(), from_account, absl::nullopt,
-                           absl::nullopt, &meta_id);
+                           &meta_id);
   tx_meta = fil_tx_manager()->GetTxForTesting(meta_id);
   ASSERT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->group_id(), absl::nullopt);
@@ -488,7 +489,7 @@ TEST_F(FilTxManagerUnitTest, GetTransactionMessageToSign) {
         "4" /* gas_limit */, "" /* max_fee */, to_account, from_account, "11");
     std::string meta_id;
     AddUnapprovedTransaction(std::move(tx_data), from_account, absl::nullopt,
-                             absl::nullopt, &meta_id);
+                             &meta_id);
     auto tx_meta = fil_tx_manager()->GetTxForTesting(meta_id);
     ASSERT_TRUE(tx_meta);
     EXPECT_EQ(tx_meta->from(), from_account);
@@ -519,7 +520,7 @@ TEST_F(FilTxManagerUnitTest, GetTransactionMessageToSign) {
         "4" /* gas_limit */, "" /* max_fee */, to_account, from_account, "11");
     std::string meta_id;
     AddUnapprovedTransaction(std::move(tx_data), from_account, absl::nullopt,
-                             absl::nullopt, &meta_id);
+                             &meta_id);
     auto tx_meta = fil_tx_manager()->GetTxForTesting(meta_id);
     ASSERT_TRUE(tx_meta);
     EXPECT_EQ(tx_meta->from(), from_account);
@@ -553,7 +554,7 @@ TEST_F(FilTxManagerUnitTest, ProcessHardwareSignature) {
       "4" /* gas_limit */, "" /* max_fee */, to_account, from_account, "11");
   std::string meta_id;
   AddUnapprovedTransaction(std::move(tx_data), from_account, absl::nullopt,
-                           absl::nullopt, &meta_id);
+                           &meta_id);
   auto tx_meta = fil_tx_manager()->GetTxForTesting(meta_id);
   ASSERT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->from(), from_account);
@@ -617,7 +618,7 @@ TEST_F(FilTxManagerUnitTest, ProcessHardwareSignatureError) {
       "4" /* gas_limit */, "" /* max_fee */, to_account, from_account, "11");
   std::string meta_id;
   AddUnapprovedTransaction(std::move(tx_data), from_account, absl::nullopt,
-                           absl::nullopt, &meta_id);
+                           &meta_id);
   auto tx_meta = fil_tx_manager()->GetTxForTesting(meta_id);
   ASSERT_TRUE(tx_meta);
   EXPECT_EQ(tx_meta->from(), from_account);
