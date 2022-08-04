@@ -91,16 +91,19 @@ class CookieRules {
     const base::Value& first_party_value =
         map->GetWebsiteSetting(url, url, content_type, &first_party_info);
 
-    const ContentSettingsPattern& wildcard = ContentSettingsPattern::Wildcard();
-    if (general_info.primary_pattern == wildcard &&
-        general_info.secondary_pattern == wildcard &&
-        first_party_info.primary_pattern == wildcard &&
-        first_party_info.secondary_pattern == wildcard) {
-      return {CONTENT_SETTING_DEFAULT, CONTENT_SETTING_DEFAULT};
-    }
+    const auto normalize_value = [](const content_settings::SettingInfo& info,
+                                    const base::Value& value) {
+      const ContentSettingsPattern& wildcard =
+          ContentSettingsPattern::Wildcard();
+      if (info.primary_pattern == wildcard &&
+          info.secondary_pattern == wildcard) {
+        return CONTENT_SETTING_DEFAULT;
+      }
+      return content_settings::ValueToContentSetting(value);
+    };
 
-    return {content_settings::ValueToContentSetting(general_value),
-            content_settings::ValueToContentSetting(first_party_value)};
+    return {normalize_value(general_info, general_value),
+            normalize_value(first_party_info, first_party_value)};
   }
 
   static CookieRules GetDefault(
@@ -503,6 +506,24 @@ ControlType GetCookieControlType(
   if (result.first_party_setting() != CONTENT_SETTING_BLOCK)
     return ControlType::BLOCK_THIRD_PARTY;
   return ControlType::BLOCK;
+}
+
+CookiesState GetOverallCookiesState(
+    HostContentSettingsMap* map,
+    content_settings::CookieSettings* cookie_settings,
+    const GURL& url) {
+  auto result = CookieRules::Get(map, url, ContentSettingsType::COOKIES);
+  if (result.HasDefault()) {
+    const auto default_rules = CookieRules::GetDefault(cookie_settings);
+    result.Merge(default_rules);
+  }
+
+  const bool first_party_blocked =
+      result.first_party_setting() == CONTENT_SETTING_BLOCK;
+  const bool third_party_blocked =
+      result.general_setting() == CONTENT_SETTING_BLOCK;
+
+  return {first_party_blocked, third_party_blocked};
 }
 
 bool AreReferrersAllowed(HostContentSettingsMap* map, const GURL& url) {

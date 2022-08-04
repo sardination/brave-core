@@ -36,6 +36,11 @@ enum ControlType {
   AGGRESSIVE
 };
 
+struct CookiesState {
+  bool block_first_party = false;
+  bool block_third_party = false;
+};
+
 // List of possible blocking modes when accessing blocked websites.
 enum class DomainBlockingType {
   // Don't block a website, open as is.
@@ -92,6 +97,10 @@ void SetCookieControlType(HostContentSettingsMap* map,
                           const GURL& url,
                           PrefService* local_state = nullptr);
 ControlType GetCookieControlType(
+    HostContentSettingsMap* map,
+    content_settings::CookieSettings* cookie_settings,
+    const GURL& url);
+CookiesState GetOverallCookiesState(
     HostContentSettingsMap* map,
     content_settings::CookieSettings* cookie_settings,
     const GURL& url);
