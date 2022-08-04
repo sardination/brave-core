@@ -226,7 +226,7 @@ class SolanaTxManagerUnitTest : public testing::Test {
                                 const std::string& from,
                                 std::string* meta_id) {
     AddUnapprovedTransaction(std::move(solana_tx_data), from, GetOrigin(),
-                             absl::nullopt, meta_id);
+                             meta_id, absl::nullopt);
   }
 
   void AddUnapprovedTransaction(
