@@ -16,9 +16,9 @@ namespace brave_wallet {
 
 namespace internal {
 
-base::Value::Dict ComposeRpcDict(const base::StringPiece method);
+base::Value::Dict ComposeRpcDict(base::StringPiece method);
 
-}
+}  // namespace internal
 
 template <typename T>
 base::Value::Dict GetJsonRpcDictionary(base::StringPiece method, T params) {

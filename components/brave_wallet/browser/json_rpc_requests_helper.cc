@@ -13,7 +13,7 @@ namespace brave_wallet {
 
 namespace internal {
 
-base::Value::Dict ComposeRpcDict(const base::StringPiece method) {
+base::Value::Dict ComposeRpcDict(base::StringPiece method) {
   base::Value::Dict dict;
   dict.Set("jsonrpc", "2.0");
   dict.Set("method", method);
@@ -32,8 +32,8 @@ std::string GetJSON(base::ValueView dict) {
 }
 
 void AddKeyIfNotEmpty(base::Value::Dict* dict,
-                      const base::StringPiece name,
-                      const base::StringPiece val) {
+                      base::StringPiece name,
+                      base::StringPiece val) {
   if (!val.empty()) {
     dict->Set(name, val);
   }
