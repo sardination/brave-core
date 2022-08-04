@@ -10,3 +10,20 @@ source_set("sync") {
     "//components/sync_device_info",
   ]
 }
+
+source_set("unit_tests") {
+  testonly = true
+
+  sources = []
+  deps = []
+
+  if (is_android || !is_android) {
+    sources += [ "brave_sync_client_unittest.cc" ]
+    deps += [
+      "//chrome/browser",
+      "//chrome/browser/profiles:profile",
+      "//chrome/test:test_support",
+      "//testing/gtest",
+    ]
+  }
+}
