@@ -802,6 +802,12 @@ TEST_F(SolanaTxManagerUnitTest, MakeTxDataFromBase64EncodedTransaction) {
       "not a base64 message", mojom::TransactionType::SolanaSwap, nullptr,
       nullptr, mojom::SolanaProviderError::kInternalError,
       l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));
+
+  // KO: valid base64 message, but invalid transaction bytes
+  TestMakeTxDataFromBase64EncodedTransaction(
+      "YW5p", mojom::TransactionType::SolanaSwap, nullptr, nullptr,
+      mojom::SolanaProviderError::kInternalError,
+      l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));
 }
 
 TEST_F(SolanaTxManagerUnitTest, GetEstimatedTxFee) {

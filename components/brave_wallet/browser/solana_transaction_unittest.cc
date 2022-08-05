@@ -315,13 +315,7 @@ TEST_F(SolanaTransactionUnitTest, FromSignedTransactionBytes) {
        67,  136, 209, 219, 42,  6,   169, 240, 137, 142, 185, 169, 6,   17,
        87,  123, 6,   42,  55,  162, 64,  120, 91,  1,   2,   2,   0,   1,
        12,  2,   0,   0,   0,   128, 150, 152, 0,   0,   0,   0,   0});
-  const std::vector<uint8_t> empty_signatures(
-      {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0});
+  const std::vector<uint8_t> empty_signatures(128, 0);
 
   for (size_t i = 1; i < valid_signed_tx_with_two_signer.size(); ++i) {
     EXPECT_FALSE(SolanaTransaction::FromSignedTransactionBytes(

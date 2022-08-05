@@ -380,6 +380,13 @@ void SolanaTxManager::MakeTxDataFromBase64EncodedTransaction(
 
   auto transaction =
       SolanaTransaction::FromSignedTransactionBytes(*transaction_bytes);
+  if (!transaction) {
+    std::move(callback).Run(
+        nullptr, mojom::SolanaProviderError::kInternalError,
+        l10n_util::GetStringUTF8(IDS_WALLET_INTERNAL_ERROR));
+    return;
+  }
+
   transaction->set_tx_type(std::move(tx_type));
 
   if (send_options) {
