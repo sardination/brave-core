@@ -17,7 +17,8 @@
 
 namespace brave_wallet {
 
-std::string EncodeJupiterTransactionParams(mojom::JupiterSwapParamsPtr params) {
+absl::optional<std::string> EncodeJupiterTransactionParams(
+    mojom::JupiterSwapParamsPtr params) {
   DCHECK(params);
   base::Value::Dict tx_params;
 
@@ -26,12 +27,10 @@ std::string EncodeJupiterTransactionParams(mojom::JupiterSwapParamsPtr params) {
   absl::optional<std::string> associated_token_account =
       SolanaKeyring::GetAssociatedTokenAccount(
           params->output_mint, brave_wallet::kSolanaFeeRecipient);
-  if (!associated_token_account) {
-    tx_params.Set("feeAccount", brave_wallet::kSolanaFeeRecipient);
-  } else {
-    tx_params.Set("feeAccount", *associated_token_account);
-  }
+  if (!associated_token_account)
+    return absl::nullopt;
 
+  tx_params.Set("feeAccount", *associated_token_account);
   tx_params.Set("userPublicKey", params->user_public_key);
 
   base::Value::Dict route;
