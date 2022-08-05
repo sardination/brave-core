@@ -64,13 +64,19 @@ import {
   PriceText,
   ShowBalanceButton,
   StyledWrapper,
-  TopRow
+  TopRow,
+  MoreButton
 } from './style'
 import { Skeleton } from '../../../shared/loading-skeleton/styles'
+import { AssetMorePopup } from './components/asset-more-popup'
+import { TokenDetailsModal } from './components/token-details-modal/token-details-modal'
 
 const AssetIconWithPlaceholder = withPlaceholderIcon(AssetIcon, { size: 'big', marginLeft: 0, marginRight: 12 })
 
 export const PortfolioAsset = () => {
+  const [showMore, setShowMore] = React.useState<boolean>(false)
+  const [showTokenDetailsModal, setShowTokenDetailsModal] = React.useState<boolean>(false)
+
   // routing
   const history = useHistory()
   const { id: assetId, tokenId } = useParams<{ id?: string, tokenId?: string }>()
@@ -295,6 +301,20 @@ export const PortfolioAsset = () => {
 
   const onNftDetailsLoad = React.useCallback(() => setNftIframeLoaded(true), [])
 
+  const onShowMore = React.useCallback((e: React.MouseEvent<HTMLButtonElement>) => {
+    e.stopPropagation()
+    setShowMore(true)
+  }, [])
+
+  const onHideMore = React.useCallback((e: React.MouseEvent<HTMLDivElement>) => {
+    e.stopPropagation()
+    setShowMore(false)
+  }, [])
+
+  const onShowTokenDetailsModal = React.useCallback(() => setShowTokenDetailsModal(true), [])
+
+  const onHideTokenDetailsModal = React.useCallback(() => setShowTokenDetailsModal(false), [])
+
   // effects
   React.useEffect(() => {
     setfilteredAssetList(userAssetList)
@@ -360,7 +380,7 @@ export const PortfolioAsset = () => {
 
   // render
   return (
-    <StyledWrapper>
+    <StyledWrapper onClick={onHideMore}>
       <TopRow>
         <BalanceRow>
           <BackButton onSubmit={goBack} />
@@ -377,6 +397,10 @@ export const PortfolioAsset = () => {
             hideBalances={hideBalances}
             onClick={onToggleHideBalances}
           />
+          <MoreButton onClick={onShowMore}/>
+          {showMore &&
+            <AssetMorePopup onClickTokenDetails={onShowTokenDetailsModal}/>
+          }
         </BalanceRow>
       </TopRow>
 
@@ -423,6 +447,14 @@ export const PortfolioAsset = () => {
           onUpdateBalance={onUpdateBalance}
           isLoading={selectedAsset ? isLoading : parseFloat(fullPortfolioFiatBalance) === 0 ? false : isFetchingPortfolioPriceHistory}
           isDisabled={selectedAsset ? false : parseFloat(fullPortfolioFiatBalance) === 0}
+        />
+      }
+
+      {showTokenDetailsModal && selectedAsset && selectedAssetsNetwork &&
+        <TokenDetailsModal
+          onClose={onHideTokenDetailsModal}
+          selectedAsset={selectedAsset}
+          selectedAssetNetwork={selectedAssetsNetwork}
         />
       }
 

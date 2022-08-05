@@ -578,5 +578,8 @@ provideStrings({
 
   // Help Center
   braveWalletHelpCenter: 'Help Center',
-  braveWalletHelpCenterText: 'Need help? See'
+  braveWalletHelpCenterText: 'Need help? See',
+
+  // Portfolio Asset More Popup
+  braveWalletPortfolioTokenDetailsMenuLabel: 'Token details'
 })
