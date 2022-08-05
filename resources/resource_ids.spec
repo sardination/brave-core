@@ -208,5 +208,10 @@
   "<(SHARED_INTERMEDIATE_DIR)/brave/web-ui-cookie_list_opt_in/cookie_list_opt_in.grd": {
     "META": {"sizes": {"includes": [30]}},
     "includes": [59770]
+  },
+  # This file is generated during the build.
+  "<(SHARED_INTERMEDIATE_DIR)/brave/web-ui-image_display/image_display.grd": {
+    "META": {"sizes": {"includes": [250]}},
+    "includes": [59800]
   }
 }

@@ -17,6 +17,7 @@ import { IconWrapper, Placeholder, NetworkIcon } from './style'
 
 // Options
 import { makeNetworkAsset } from '../../../options/asset-options'
+import { UntrustedImage } from '../untrusted-image/untrusted-image'
 
 interface Props {
   network: BraveWallet.NetworkInfo
@@ -79,6 +80,18 @@ function CreateNetworkIcon (props: Props) {
       </IconWrapper>
     )
   }
+
+  if (isRemoteURL) {
+    <IconWrapper
+      marginRight={marginRight ?? 0}
+      isTestnet={SupportedTestNetworks.includes(network.chainId)}
+    >
+      <UntrustedImage
+        src={remoteImage}
+      />
+    </IconWrapper>
+  }
+
   return (
     <IconWrapper
       marginRight={marginRight ?? 0}

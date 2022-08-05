@@ -1,0 +1,105 @@
+<!-- Copyright (c) 2021 The Brave Authors. All rights reserved. -->
+<!-- This Source Code Form is subject to the terms of the Mozilla Public -->
+<!-- License, v. 2.0. If a copy of the MPL was not distributed with this file, -->
+<!-- You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Untrusted Image iframe</title>
+
+  <style>
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      padding: 0;
+      margin: 0;
+      overflow: hidden;
+    }
+
+    .container {
+      display: flex;
+      justify-content: center;
+    }
+
+    img {
+      width: 100%;
+      height: auto;
+    }
+
+    .loading-overlay {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      z-index: 10;
+    }
+
+    .hidden {
+      opacity: 0;
+      transform: scale(0);
+
+      /* fade-out spinner */
+      transition: opacity 0.2s, scale 0.2s;
+      transition-delay: 100ms;
+    }
+
+    .loader {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      height: 70px;
+      width: 70px;
+      opacity: .4;
+
+      /* theme.color.interactive08 */
+      color: #353DAB;
+    }
+
+    @media (prefers-color-scheme: dark) {
+      .loader {
+        color: #4C54D2;
+      }
+    }
+  </style>
+
+  <script defer src="image.bundle.js"></script>
+</head>
+
+<body>
+  <div class="container">
+
+    <!-- Hidden after image load -->
+    <div id="loader" class="loading-overlay">
+      <div class="loader">
+        <svg xmlns='http://www.w3.org/2000/svg' x='0px' y='0px' width='26px' height='20.5px' viewBox='0 0 32 32'>
+          <path
+            d='M6.5 23.5c-.7 0-1.4-.4-1.7-1C3.6 20.5 3 18.3 3 16 3 8.8 8.8 3 16 3s13 5.8 13 13c0 1.1-.9 2-2 2s-2-.9-2-2c0-5-4-9-9-9s-9 4-9 9c0 1.6.4 3.1 1.2 4.5.6 1 .2 2.2-.7 2.7-.4.2-.7.3-1 .3z'
+          >
+            <animateTransform
+              attributeType='xml'
+              attributeName='transform'
+              type='rotate'
+              from='0 16 16'
+              to='360 16 16'
+              dur='.5s'
+              repeatCount='indefinite'
+            />
+          </path>
+        </svg>
+      </div> 
+    </div>
+
+    <img id="untrusted-image" />
+
+  </div>
+</body>
+
+</html>
