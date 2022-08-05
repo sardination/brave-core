@@ -157,6 +157,9 @@ std::vector<std::string> GetImportableListFromChromeExtensionsList(
 
     if (!item.second.FindBoolKey("from_webstore").value_or(false))
       continue;
+    // `"state": 0` means disabled state
+    if (!item.second.FindIntKey("state").value_or(false))
+      continue;
 
     if (auto* manifest_value = item.second.FindDictKey("manifest")) {
       if (!manifest_value->is_dict())
