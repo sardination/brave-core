@@ -42,6 +42,10 @@ typedef C_DomainResolverCallback DomainResolverCallback;
 
 bool ADBLOCK_EXPORT SetDomainResolver(DomainResolverCallback resolver);
 
+#if BUILDFLAG(IS_IOS)
+char* ADBLOCK_EXPORT ConvertRulesToContentBlockingRules(const char* rules);
+#endif
+
 class ADBLOCK_EXPORT FilterList {
  public:
   FilterList(const std::string& uuid,

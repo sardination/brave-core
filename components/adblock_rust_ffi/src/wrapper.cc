@@ -16,6 +16,12 @@ bool SetDomainResolver(DomainResolverCallback resolver) {
   return set_domain_resolver(resolver);
 }
 
+#if BUILDFLAG(IS_IOS)
+char* ConvertRulesToContentBlockingRules(const char* rules) {
+  return convert_rules_to_content_blocking(rules);
+}
+#endif
+
 std::vector<FilterList> FilterList::default_list;
 std::vector<FilterList> FilterList::regional_list;
 
