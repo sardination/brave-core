@@ -34,6 +34,7 @@
 #include "bat/ads/inline_content_ad_info.h"
 #include "bat/ads/notification_ad_info.h"
 #include "bat/ads/pref_names.h"
+#include "bat/ads/public/interfaces/ads.mojom.h"
 #import "brave/build/ios/mojom/cpp_transformations.h"
 #include "brave/components/brave_rewards/common/rewards_flags.h"
 #import "brave/ios/browser/api/common/common_operations.h"
@@ -42,6 +43,7 @@
 #import "inline_content_ad_ios.h"
 #include "net/base/mac/url_conversions.h"
 #import "notification_ad_ios.h"
+#include "third_party/abseil-cpp/absl/types/optional.h"
 #include "url/gurl.h"
 
 #if !defined(__has_feature) || !__has_feature(objc_arc)
