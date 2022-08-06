@@ -107,7 +107,7 @@ class BatAdsImpl :
       const ads::mojom::PromotedContentAdEventType event_type) override;
 
   void TriggerSearchResultAdEvent(
-      ads::mojom::SearchResultAdPtr ad_mojom,
+      ads::mojom::SearchResultAdInfoPtr ad_mojom,
       const ads::mojom::SearchResultAdEventType event_type,
       TriggerSearchResultAdEventCallback callback) override;
 
