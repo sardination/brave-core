@@ -61,7 +61,7 @@ base::Value::Dict AdPreferencesInfo::ToValue() const {
   return dict;
 }
 
-bool AdPreferencesInfo::FromValue(const base::Value::Dict& root) {
+void AdPreferencesInfo::FromValue(const base::Value::Dict& root) {
   if (const auto* value = root.FindList("filtered_advertisers")) {
     for (const auto& item : *value) {
       if (!item.is_dict()) {
@@ -133,8 +133,6 @@ bool AdPreferencesInfo::FromValue(const base::Value::Dict& root) {
       flagged_ads.push_back(flagged_ad);
     }
   }
-
-  return true;
 }
 
 std::string AdPreferencesInfo::ToJson() const {
@@ -152,7 +150,9 @@ bool AdPreferencesInfo::FromJson(const std::string& json) {
     return false;
   }
 
-  return FromValue(document->GetDict());
+  FromValue(document->GetDict());
+
+  return true;
 }
 
 }  // namespace ads
