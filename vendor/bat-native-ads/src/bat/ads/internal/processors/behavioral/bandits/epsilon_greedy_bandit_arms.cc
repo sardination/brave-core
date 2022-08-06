@@ -47,10 +47,9 @@ EpsilonGreedyBanditArmMap GetArmsFromDictionary(const base::Value::Dict& dict) {
       found_errors = true;
       continue;
     }
-    const base::Value::Dict& arm_dict = value.GetDict();
 
     EpsilonGreedyBanditArmInfo arm;
-    if (!GetArmFromDictionary(arm_dict, &arm)) {
+    if (!GetArmFromDictionary(value.GetDict(), &arm)) {
       found_errors = true;
       continue;
     }
@@ -72,15 +71,12 @@ EpsilonGreedyBanditArms::~EpsilonGreedyBanditArms() = default;
 
 EpsilonGreedyBanditArmMap EpsilonGreedyBanditArms::FromJson(
     const std::string& json) {
-  EpsilonGreedyBanditArmMap arms;
-  absl::optional<base::Value> value = base::JSONReader::Read(json);
-  if (!value || !value->is_dict()) {
-    return arms;
+  const absl::optional<base::Value> root = base::JSONReader::Read(json);
+  if (!root || !root->is_dict()) {
+    return {};
   }
-  const base::Value::Dict& arm_dict = value->GetDict();
 
-  arms = GetArmsFromDictionary(arm_dict);
-  return arms;
+  return GetArmsFromDictionary(root->GetDict());
 }
 
 std::string EpsilonGreedyBanditArms::ToJson(
