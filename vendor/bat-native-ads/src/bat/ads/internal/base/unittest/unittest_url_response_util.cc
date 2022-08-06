@@ -142,15 +142,13 @@ base::FilePath GetFilePath(const std::string& body) {
 absl::optional<mojom::UrlResponseInfo> GetNextUrlResponse(
     const mojom::UrlRequestInfoPtr& url_request,
     const URLEndpointMap& endpoints) {
-  const absl::optional<URLEndpointResponsePair> url_endpoint_response_optional =
+  const absl::optional<URLEndpointResponsePair> url_endpoint_response =
       GetNextUrlEndpointResponse(url_request->url, endpoints);
-  if (!url_endpoint_response_optional) {
+  if (!url_endpoint_response) {
     return absl::nullopt;
   }
-  const URLEndpointResponsePair& url_endpoint_response =
-      url_endpoint_response_optional.value();
 
-  std::string body = url_endpoint_response.second;
+  std::string body = url_endpoint_response->second;
   if (ShouldReadBodyFromFile(body)) {
     const base::FilePath file_path = GetFilePath(body);
     if (!base::ReadFileToString(file_path, &body)) {
@@ -163,7 +161,7 @@ absl::optional<mojom::UrlResponseInfo> GetNextUrlResponse(
 
   mojom::UrlResponseInfo url_response;
   url_response.url = url_request->url;
-  url_response.status_code = url_endpoint_response.first;
+  url_response.status_code = url_endpoint_response->first;
   url_response.body = body;
   url_response.headers = UrlResponseHeadersToMap(url_request->headers);
   return url_response;

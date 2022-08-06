@@ -47,15 +47,14 @@ absl::optional<std::string> ReadFileFromTestPathToString(
 
 absl::optional<std::string> ReadFileFromTestPathAndParseTagsToString(
     const std::string& name) {
-  absl::optional<std::string> content_optional =
-      ReadFileFromTestPathToString(name);
-  if (!content_optional.has_value()) {
+  absl::optional<std::string> content = ReadFileFromTestPathToString(name);
+  if (!content) {
     return absl::nullopt;
   }
 
-  ParseAndReplaceTagsForText(&content_optional.value());
+  ParseAndReplaceTagsForText(&content.value());
 
-  return content_optional.value();
+  return content;
 }
 
 base::FilePath GetFileResourcePath() {

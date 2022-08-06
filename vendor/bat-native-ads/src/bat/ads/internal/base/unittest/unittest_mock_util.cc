@@ -329,13 +329,13 @@ void MockLoadFileResource(const std::unique_ptr<AdsClientMock>& mock) {
 void MockLoadDataResource(const std::unique_ptr<AdsClientMock>& mock) {
   ON_CALL(*mock, LoadDataResource(_))
       .WillByDefault(Invoke([](const std::string& name) -> std::string {
-        const absl::optional<std::string>& content_optional =
+        const absl::optional<std::string> content =
             ReadFileFromDataResourcePathToString(name);
-        if (!content_optional.has_value()) {
+        if (!content) {
           return "";
         }
 
-        return content_optional.value();
+        return *content;
       }));
 }
 
