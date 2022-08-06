@@ -18,6 +18,7 @@
 #include "bat/ads/inline_content_ad_info.h"
 #include "bat/ads/new_tab_page_ad_info.h"
 #include "bat/ads/notification_ad_info.h"
+#include "bat/ads/public/interfaces/ads.mojom-forward.h"
 #include "brave/components/services/bat_ads/bat_ads_client_mojo_bridge.h"
 #include "url/gurl.h"
 
@@ -141,6 +142,15 @@ void BatAdsImpl::GetNotificationAd(const std::string& placement_id,
   ads::NotificationAdInfo notification_ad;
   ads_->GetNotificationAd(placement_id, &notification_ad);
   std::move(callback).Run(notification_ad.ToJson());
+}
+
+void BatAdsImpl::GetStatementOfAccounts(
+    GetStatementOfAccountsCallback callback) {
+  auto* holder = new CallbackHolder<GetStatementOfAccountsCallback>(
+      AsWeakPtr(), std::move(callback));
+
+  ads_->GetStatementOfAccounts(std::bind(BatAdsImpl::OnGetStatementOfAccounts,
+                                         holder, std::placeholders::_1));
 }
 
 void BatAdsImpl::TriggerNotificationAdEvent(
@@ -379,11 +389,9 @@ void BatAdsImpl::OnRemoveAllHistory(
 
 void BatAdsImpl::OnGetStatementOfAccounts(
     CallbackHolder<GetStatementOfAccountsCallback>* holder,
-    const bool success,
-    const ads::StatementInfo& statement) {
+    ads::mojom::StatementInfoPtr statement) {
   if (holder->is_valid()) {
-    const std::string json = statement.ToJson();
-    std::move(holder->get()).Run(success, json);
+    std::move(holder->get()).Run(std::move(statement));
   }
 
   delete holder;

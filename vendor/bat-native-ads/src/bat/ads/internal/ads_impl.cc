@@ -267,6 +267,17 @@ void AdsImpl::OnWalletUpdated(const std::string& id, const std::string& seed) {
   account_->SetWallet(id, seed);
 }
 
+void AdsImpl::GetStatementOfAccounts(GetStatementOfAccountsCallback callback) {
+  if (!IsInitialized()) {
+    callback(/* statement */ nullptr);
+    return;
+  }
+
+  account_->GetStatement([callback](mojom::StatementInfoPtr statement) {
+    callback(std::move(statement));
+  });
+}
+
 bool AdsImpl::GetNotificationAd(const std::string& placement_id,
                                 NotificationAdInfo* notification) {
   return NotificationAdManager::GetInstance()->GetForPlacementId(placement_id,
@@ -360,18 +371,6 @@ HistoryInfo AdsImpl::GetHistory(const HistoryFilterType filter_type,
 
   return HistoryManager::GetInstance()->Get(filter_type, sort_type, from_time,
                                             to_time);
-}
-
-void AdsImpl::GetStatementOfAccounts(GetStatementOfAccountsCallback callback) {
-  if (!IsInitialized()) {
-    callback(/* success */ false, {});
-    return;
-  }
-
-  account_->GetStatement(
-      [callback](const bool success, const StatementInfo& statement) {
-        callback(success, statement);
-      });
 }
 
 void AdsImpl::RemoveAllHistory(RemoveAllHistoryCallback callback) {
