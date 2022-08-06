@@ -181,7 +181,7 @@ class AdsServiceImpl : public AdsService,
   void NotificationAdTimedOut(const std::string& placement_id);
 
   void PrefetchNewTabPageAd() override;
-  void OnPrefetchNewTabPageAd(bool success, const std::string& json);
+  void OnPrefetchNewTabPageAd(absl::optional<base::Value::Dict> dict);
 
   void OnTriggerSearchResultAdEvent(
       TriggerSearchResultAdEventCallback callback,

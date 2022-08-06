@@ -1891,15 +1891,16 @@ void AdsServiceImpl::PrefetchNewTabPageAd() {
   }
 }
 
-void AdsServiceImpl::OnPrefetchNewTabPageAd(bool success,
-                                            const std::string& json) {
-  if (!success) {
+void AdsServiceImpl::OnPrefetchNewTabPageAd(
+    absl::optional<base::Value::Dict> dict) {
+  if (!dict) {
+    VLOG(0) << "Failed to prefetch new tab page ad";
     return;
   }
 
-  ads::NewTabPageAdInfo ad_info;
-  ad_info.FromJson(json);
-  prefetched_new_tab_page_ad_info_ = ad_info;
+  ads::NewTabPageAdInfo ad;
+  ad.FromValue(*dict);
+  prefetched_new_tab_page_ad_info_ = ad;
 }
 
 void AdsServiceImpl::OnURLRequest(
