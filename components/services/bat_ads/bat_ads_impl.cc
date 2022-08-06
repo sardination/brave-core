@@ -137,13 +137,6 @@ void BatAdsImpl::OnTabClosed(
   ads_->OnTabClosed(tab_id);
 }
 
-void BatAdsImpl::GetNotificationAd(const std::string& placement_id,
-                                   GetNotificationAdCallback callback) {
-  ads::NotificationAdInfo notification_ad;
-  ads_->GetNotificationAd(placement_id, &notification_ad);
-  std::move(callback).Run(notification_ad.ToJson());
-}
-
 void BatAdsImpl::GetStatementOfAccounts(
     GetStatementOfAccountsCallback callback) {
   auto* holder = new CallbackHolder<GetStatementOfAccountsCallback>(
@@ -190,6 +183,25 @@ void BatAdsImpl::TriggerNewTabPageAdEvent(
     const ads::mojom::NewTabPageAdEventType event_type) {
   ads_->TriggerNewTabPageAdEvent(placement_id, creative_instance_id,
                                  event_type);
+}
+
+void BatAdsImpl::GetNotificationAd(const std::string& placement_id,
+                                   GetNotificationAdCallback callback) {
+  const absl::optional<ads::NotificationAdInfo> ad =
+      ads_->GetNotificationAd(placement_id);
+  if (!ad) {
+    std::move(callback).Run(absl::nullopt);
+    return;
+  }
+
+  absl::optional<base::Value::Dict> dict = ad->ToValue();
+  std::move(callback).Run(std::move(dict));
+}
+
+void BatAdsImpl::TriggerNotificationAdEvent(
+    const std::string& placement_id,
+    const ads::mojom::NotificationAdEventType event_type) {
+  ads_->TriggerNotificationAdEvent(placement_id, event_type);
 }
 
 void BatAdsImpl::TriggerPromotedContentAdEvent(
