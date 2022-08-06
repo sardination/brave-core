@@ -13,23 +13,23 @@ namespace ads {
 namespace JSONReader {
 
 SegmentList ReadSegments(const std::string& json) {
-  absl::optional<base::Value> value = base::JSONReader::Read(json);
-  if (!value) {
+  const absl::optional<base::Value> root = base::JSONReader::Read(json);
+  if (!root) {
     return {};
   }
 
-  base::ListValue* list = nullptr;
-  if (!value->GetAsList(&list)) {
+  const base::Value::List* list = root->GetIfList();
+  if (!list) {
     return {};
   }
 
   SegmentList segments;
-  for (const auto& element : list->GetList()) {
-    if (!element.is_string()) {
+  for (const auto& item : *list) {
+    if (!item.is_string()) {
       return {};
     }
 
-    const std::string segment = element.GetString();
+    const std::string& segment = item.GetString();
     if (segment.empty()) {
       return {};
     }
