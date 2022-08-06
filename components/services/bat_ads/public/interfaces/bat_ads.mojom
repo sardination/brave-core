@@ -106,12 +106,16 @@ interface BatAds {
   Initialize() => (bool success);
   Shutdown() => (bool success);
 
+  // Diagnostics
   GetDiagnostics() => (mojo_base.mojom.ListValue? value);
 
+  // Locale
   OnChangeLocale(string locale);
 
+  // Preferences
   OnPrefChanged(string path);
 
+  // Resources
   OnResourceComponentUpdated(string id);
 
   // User Interaction
