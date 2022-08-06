@@ -171,11 +171,9 @@ TEST_F(BatAdsIssuersUtilTest, GetIssuersForType) {
                     {"bPE1QE65mkIgytffeu7STOfly+x10BXCGuk5pVlOHQU=", 0.1}});
 
   // Act
-  const absl::optional<IssuerInfo>& issuer_optional =
+  const absl::optional<IssuerInfo> issuer =
       GetIssuerForType(issuers, IssuerType::kPayments);
-  ASSERT_NE(absl::nullopt, issuer_optional);
-
-  const IssuerInfo& issuer = issuer_optional.value();
+  ASSERT_TRUE(issuer);
 
   // Assert
   IssuerInfo expected_issuer;
@@ -184,7 +182,7 @@ TEST_F(BatAdsIssuersUtilTest, GetIssuersForType) {
       {"JiwFR2EU/Adf1lgox+xqOVPuc6a/rxdy/LguFG5eaXg=", 0.0},
       {"bPE1QE65mkIgytffeu7STOfly+x10BXCGuk5pVlOHQU=", 0.1}};
 
-  EXPECT_EQ(expected_issuer, issuer);
+  EXPECT_EQ(expected_issuer, *issuer);
 }
 
 TEST_F(BatAdsIssuersUtilTest, DoNotGetIssuersForMissingType) {
@@ -196,7 +194,7 @@ TEST_F(BatAdsIssuersUtilTest, DoNotGetIssuersForMissingType) {
                    {});
 
   // Act
-  const absl::optional<IssuerInfo>& issuer =
+  const absl::optional<IssuerInfo> issuer =
       GetIssuerForType(issuers, IssuerType::kPayments);
 
   // Assert
@@ -213,14 +211,12 @@ TEST_F(BatAdsIssuersUtilTest, IsIssuerValid) {
                     {"bPE1QE65mkIgytffeu7STOfly+x10BXCGuk5pVlOHQU=", 0.1},
                     {"XovQyvVWM8ez0mAzTtfqgPIbSpH5/idv8w0KJxhirwA=", 0.1}});
 
-  const absl::optional<IssuerInfo>& issuer_optional =
+  const absl::optional<IssuerInfo> issuer =
       GetIssuerForType(issuers, IssuerType::kPayments);
-  ASSERT_NE(absl::nullopt, issuer_optional);
-
-  const IssuerInfo& issuer = issuer_optional.value();
+  ASSERT_TRUE(issuer);
 
   // Act
-  const bool is_valid = IsIssuerValid(issuer);
+  const bool is_valid = IsIssuerValid(*issuer);
 
   // Assert
   EXPECT_TRUE(is_valid);
@@ -238,14 +234,12 @@ TEST_F(BatAdsIssuersUtilTest, IsIssuerInvalid) {
                     {"wAcnJtb34Asykf+2jrTWrjFiaTqilklZ6bxLyR3LyFo=", 0.1},
                     {"ZvzeYOT1geUQXfOsYXBxZj/H26IfiBUVodHl51j68xI=", 0.1}});
 
-  const absl::optional<IssuerInfo>& issuer_optional =
+  const absl::optional<IssuerInfo> issuer =
       GetIssuerForType(issuers, IssuerType::kPayments);
-  ASSERT_NE(absl::nullopt, issuer_optional);
-
-  const IssuerInfo& issuer = issuer_optional.value();
+  ASSERT_TRUE(issuer);
 
   // Act
-  const bool is_valid = IsIssuerValid(issuer);
+  const bool is_valid = IsIssuerValid(*issuer);
 
   // Assert
   EXPECT_FALSE(is_valid);

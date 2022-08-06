@@ -65,26 +65,25 @@ absl::optional<IssuerType> ParseIssuerType(const base::Value::Dict& value) {
 }
 
 absl::optional<PublicKeyMap> ParsePublicKeys(const base::Value::Dict& value) {
-  const base::Value::List* const public_keys_value =
-      value.FindList(kPublicKeysKey);
-  if (!public_keys_value) {
+  const base::Value::List* const list = value.FindList(kPublicKeysKey);
+  if (!list) {
     return absl::nullopt;
   }
 
   PublicKeyMap public_keys;
-  for (const auto& public_key_value : *public_keys_value) {
-    if (!public_key_value.is_dict()) {
+  for (const auto& item : *list) {
+    const base::Value::Dict* dict = item.GetIfDict();
+    if (!dict) {
       return absl::nullopt;
     }
-    const base::Value::Dict& dict = public_key_value.GetDict();
 
-    const std::string* const public_key = dict.FindString(kPublicKeyKey);
+    const std::string* const public_key = dict->FindString(kPublicKeyKey);
     if (!public_key) {
       return absl::nullopt;
     }
 
     const std::string* const associated_value =
-        dict.FindString(kAssociatedValueKey);
+        dict->FindString(kAssociatedValueKey);
     if (!associated_value) {
       return absl::nullopt;
     }
@@ -103,7 +102,7 @@ base::Value::List IssuerListToValue(const IssuerList& issuers) {
   base::Value::List list;
 
   for (const auto& issuer : issuers) {
-    const absl::optional<std::string>& name = GetNameForIssuerType(issuer.type);
+    const absl::optional<std::string> name = GetNameForIssuerType(issuer.type);
     if (!name) {
       continue;
     }
@@ -134,23 +133,20 @@ absl::optional<IssuerList> ValueToIssuerList(const base::Value::List& value) {
     }
 
     const base::Value::Dict& dict = item.GetDict();
-    const absl::optional<IssuerType>& type_optional = ParseIssuerType(dict);
-    if (!type_optional) {
+    const absl::optional<IssuerType> issuer_type = ParseIssuerType(dict);
+    if (!issuer_type) {
       return absl::nullopt;
     }
-    const IssuerType& type = type_optional.value();
-    DCHECK_NE(IssuerType::kUndefined, type);
+    DCHECK_NE(IssuerType::kUndefined, *issuer_type);
 
-    const absl::optional<PublicKeyMap>& public_keys_optional =
-        ParsePublicKeys(dict);
-    if (!public_keys_optional) {
+    const absl::optional<PublicKeyMap> public_keys = ParsePublicKeys(dict);
+    if (!public_keys) {
       return absl::nullopt;
     }
-    const PublicKeyMap& public_keys = public_keys_optional.value();
 
     IssuerInfo issuer;
-    issuer.type = type;
-    issuer.public_keys = public_keys;
+    issuer.type = *issuer_type;
+    issuer.public_keys = *public_keys;
 
     issuers.push_back(issuer);
   }

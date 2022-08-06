@@ -27,13 +27,12 @@ absl::optional<IssuerList> ParseIssuers(const base::Value::Dict& value) {
     return absl::nullopt;
   }
 
-  const absl::optional<IssuerList>& issuers_optional =
-      ValueToIssuerList(*issuers_value);
-  if (!issuers_optional) {
+  const absl::optional<IssuerList> issuers = ValueToIssuerList(*issuers_value);
+  if (!issuers) {
     return absl::nullopt;
   }
 
-  return issuers_optional;
+  return issuers;
 }
 
 }  // namespace JSONReader

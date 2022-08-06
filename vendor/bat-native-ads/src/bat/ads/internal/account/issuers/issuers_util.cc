@@ -82,11 +82,8 @@ bool HasIssuersChanged(const IssuersInfo& issuers) {
 }
 
 bool IssuerExistsForType(const IssuerType issuer_type) {
-  const IssuersInfo& issuers = GetIssuers();
-
-  const absl::optional<IssuerInfo>& issuer_optional =
-      GetIssuerForType(issuers, issuer_type);
-  if (!issuer_optional) {
+  const IssuersInfo issuers = GetIssuers();
+  if (!GetIssuerForType(issuers, issuer_type)) {
     return false;
   }
 
@@ -108,16 +105,15 @@ absl::optional<IssuerInfo> GetIssuerForType(const IssuersInfo& issuers,
 
 bool PublicKeyExistsForIssuerType(const IssuerType issuer_type,
                                   const std::string& public_key) {
-  const IssuersInfo& issuers = GetIssuers();
+  const IssuersInfo issuers = GetIssuers();
 
-  const absl::optional<IssuerInfo>& issuer_optional =
+  const absl::optional<IssuerInfo> issuer =
       GetIssuerForType(issuers, issuer_type);
-  if (!issuer_optional) {
+  if (!issuer) {
     return false;
   }
-  const IssuerInfo& issuer = issuer_optional.value();
 
-  return PublicKeyExists(issuer, public_key);
+  return PublicKeyExists(*issuer, public_key);
 }
 
 }  // namespace ads
