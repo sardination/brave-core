@@ -32,7 +32,6 @@
 #include "bat/ads/database.h"
 #include "bat/ads/history_info.h"
 #include "bat/ads/history_item_info.h"
-#include "bat/ads/inline_content_ad_info.h"
 #include "bat/ads/new_tab_page_ad_info.h"
 #include "bat/ads/notification_ad_info.h"
 #include "bat/ads/pref_names.h"
@@ -1185,7 +1184,7 @@ void AdsServiceImpl::MaybeServeInlineContentAd(
     const std::string& dimensions,
     MaybeServeInlineContentAdCallback callback) {
   if (!IsBatAdsBound()) {
-    std::move(callback).Run(false, "", base::Value::Dict());
+    std::move(callback).Run(dimensions, absl::nullopt);
     return;
   }
 
@@ -1956,18 +1955,9 @@ void AdsServiceImpl::OnURLRequest(
 
 void AdsServiceImpl::OnMaybeServeInlineContentAd(
     MaybeServeInlineContentAdCallback callback,
-    const bool success,
     const std::string& dimensions,
-    const std::string& json) {
-  base::Value::Dict dict;
-
-  if (success) {
-    ads::InlineContentAdInfo ad;
-    ad.FromJson(json);
-    dict = ad.ToValue();
-  }
-
-  std::move(callback).Run(success, dimensions, dict);
+    absl::optional<base::Value::Dict> dict) {
+  std::move(callback).Run(dimensions, std::move(dict));
 }
 
 void AdsServiceImpl::OnTriggerSearchResultAdEvent(

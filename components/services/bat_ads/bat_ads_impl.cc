@@ -153,10 +153,25 @@ void BatAdsImpl::GetStatementOfAccounts(
                                          holder, std::placeholders::_1));
 }
 
-void BatAdsImpl::TriggerNotificationAdEvent(
+void BatAdsImpl::MaybeServeInlineContentAd(
+    const std::string& dimensions,
+    MaybeServeInlineContentAdCallback callback) {
+  auto* holder = new CallbackHolder<MaybeServeInlineContentAdCallback>(
+      AsWeakPtr(), std::move(callback));
+
+  auto maybe_serve_inline_content_ads_callback =
+      std::bind(BatAdsImpl::OnMaybeServeInlineContentAd, holder,
+                std::placeholders::_1, std::placeholders::_2);
+  ads_->MaybeServeInlineContentAd(dimensions,
+                                  maybe_serve_inline_content_ads_callback);
+}
+
+void BatAdsImpl::TriggerInlineContentAdEvent(
     const std::string& placement_id,
-    const ads::mojom::NotificationAdEventType event_type) {
-  ads_->TriggerNotificationAdEvent(placement_id, event_type);
+    const std::string& creative_instance_id,
+    const ads::mojom::InlineContentAdEventType event_type) {
+  ads_->TriggerInlineContentAdEvent(placement_id, creative_instance_id,
+                                    event_type);
 }
 
 void BatAdsImpl::MaybeServeNewTabPageAd(
@@ -183,26 +198,6 @@ void BatAdsImpl::TriggerPromotedContentAdEvent(
     const ads::mojom::PromotedContentAdEventType event_type) {
   ads_->TriggerPromotedContentAdEvent(placement_id, creative_instance_id,
                                       event_type);
-}
-
-void BatAdsImpl::MaybeServeInlineContentAd(
-    const std::string& dimensions,
-    MaybeServeInlineContentAdCallback callback) {
-  auto* holder = new CallbackHolder<MaybeServeInlineContentAdCallback>(
-      AsWeakPtr(), std::move(callback));
-
-  auto maybe_serve_inline_content_ads_callback =
-      std::bind(BatAdsImpl::OnMaybeServeInlineContentAd, holder, _1, _2, _3);
-  ads_->MaybeServeInlineContentAd(dimensions,
-                                  maybe_serve_inline_content_ads_callback);
-}
-
-void BatAdsImpl::TriggerInlineContentAdEvent(
-    const std::string& placement_id,
-    const std::string& creative_instance_id,
-    const ads::mojom::InlineContentAdEventType event_type) {
-  ads_->TriggerInlineContentAdEvent(placement_id, creative_instance_id,
-                                    event_type);
 }
 
 void BatAdsImpl::TriggerSearchResultAdEvent(
@@ -349,11 +344,15 @@ void BatAdsImpl::OnMaybeServeNewTabPageAd(
 
 void BatAdsImpl::OnMaybeServeInlineContentAd(
     CallbackHolder<MaybeServeInlineContentAdCallback>* holder,
-    const bool success,
     const std::string& dimensions,
-    const ads::InlineContentAdInfo& ad) {
+    const absl::optional<ads::InlineContentAdInfo>& ad) {
   if (holder->is_valid()) {
-    std::move(holder->get()).Run(success, dimensions, ad.ToJson());
+    absl::optional<base::Value::Dict> dict;
+    if (ad) {
+      dict = ad->ToValue();
+    }
+
+    std::move(holder->get()).Run(dimensions, std::move(dict));
   }
 
   delete holder;
