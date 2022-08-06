@@ -400,12 +400,11 @@ void BatAdsImpl::OnGetStatementOfAccounts(
 // static
 void BatAdsImpl::OnGetDiagnostics(
     CallbackHolder<GetDiagnosticsCallback>* holder,
-    const bool success,
-    const std::string& json) {
+    absl::optional<base::Value::List> value) {
   DCHECK(holder);
 
   if (holder->is_valid()) {
-    std::move(holder->get()).Run(success, json);
+    std::move(holder->get()).Run(std::move(value));
   }
 
   delete holder;
