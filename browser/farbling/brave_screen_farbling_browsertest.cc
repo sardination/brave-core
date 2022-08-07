@@ -126,22 +126,18 @@ class BraveScreenFarblingBrowserTest : public InProcessBrowserTest {
     return popup;
   }
 
-  virtual bool DisableFlag() const {
-    return false;
-  }
+  virtual bool DisableFlag() const { return false; }
 
   const GURL& farbling_url() { return farbling_url_; }
 
   void FarbleScreenSize() {
     for (bool allow_fingerprinting : {false, true}) {
-      allow_fingerprinting ? AllowFingerprinting()
-                           : SetFingerprintingDefault();
-      for (int j = 0; j < static_cast<int>(std::size(testWindowBounds));
-           ++j) {
+      allow_fingerprinting ? AllowFingerprinting() : SetFingerprintingDefault();
+      for (int j = 0; j < static_cast<int>(std::size(testWindowBounds)); ++j) {
         browser()->window()->SetBounds(testWindowBounds[j]);
         NavigateToURLUntilLoadStop(farbling_url());
-        for (int i = 0;
-             i < static_cast<int>(std::size(testScreenSizeScripts)); ++i) {
+        for (int i = 0; i < static_cast<int>(std::size(testScreenSizeScripts));
+             ++i) {
           std::string testScreenSizeScriptsAbs =
               std::string("Math.abs(") + testScreenSizeScripts[i] + ")";
           if (allow_fingerprinting || DisableFlag()) {
@@ -180,14 +176,13 @@ class BraveScreenFarblingBrowserTest : public InProcessBrowserTest {
 
   void FarbleScreenMediaQuery() {
     for (bool allow_fingerprinting : {false, true}) {
-      for (int j = 0; j < static_cast<int>(std::size(testWindowBounds));
-           ++j) {
+      for (int j = 0; j < static_cast<int>(std::size(testWindowBounds)); ++j) {
         browser()->window()->SetBounds(testWindowBounds[j]);
         allow_fingerprinting ? AllowFingerprinting()
-          : SetFingerprintingDefault();
+                             : SetFingerprintingDefault();
         NavigateToURLUntilLoadStop(farbling_url());
-        for (int i = 0;
-             i < static_cast<int>(std::size(mediaQueryTestScripts)); ++i) {
+        for (int i = 0; i < static_cast<int>(std::size(mediaQueryTestScripts));
+             ++i) {
           EXPECT_EQ(!DisableFlag() && !allow_fingerprinting,
                     EvalJs(contents(), mediaQueryTestScripts[i]));
         }
@@ -197,8 +192,8 @@ class BraveScreenFarblingBrowserTest : public InProcessBrowserTest {
 
   void FarbleScreenPopupPosition() {
     for (bool allow_fingerprinting : {false, true}) {
-      for (int j = 0;
-           j < static_cast<int>(std::size(popupParentWindowBounds)); ++j) {
+      for (int j = 0; j < static_cast<int>(std::size(popupParentWindowBounds));
+           ++j) {
         browser()->window()->SetBounds(testWindowBounds[j]);
         allow_fingerprinting ? AllowFingerprinting()
                              : SetFingerprintingDefault();
@@ -221,7 +216,7 @@ class BraveScreenFarblingBrowserTest : public InProcessBrowserTest {
     }
   }
 
-protected:
+ protected:
   base::test::ScopedFeatureList feature_list_;
 
  private:
@@ -239,9 +234,7 @@ class BraveScreenFarblingBrowserTest_DisableFlag
         blink::features::kBraveBlockScreenFingerprinting);
   }
 
-  bool DisableFlag() const override {
-    return true;
-  }
+  bool DisableFlag() const override { return true; }
 };
 
 IN_PROC_BROWSER_TEST_F(BraveScreenFarblingBrowserTest, FarbleScreenSize) {
