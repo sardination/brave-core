@@ -17,6 +17,7 @@
 #include "base/bind.h"
 #include "base/callback.h"
 #include "base/containers/flat_set.h"
+#include "base/guid.h"
 #include "base/location.h"
 #include "base/logging.h"
 #include "base/strings/string_util.h"
@@ -31,6 +32,7 @@
 #include "brave/components/brave_today/common/pref_names.h"
 #include "brave/components/brave_today/rust/lib.rs.h"
 #include "components/prefs/pref_service.h"
+#include "components/prefs/scoped_user_pref_update.h"
 #include "net/base/load_flags.h"
 #include "net/http/http_request_headers.h"
 #include "services/network/public/cpp/resource_request.h"
@@ -97,10 +99,46 @@ void ParseFeedDataOffMainThread(const GURL& feed_url,
 }  // namespace
 
 DirectFeedController::DirectFeedController(
+    PrefService* prefs,
     scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory)
-    : url_loader_factory_(url_loader_factory) {}
+    : prefs_(prefs), url_loader_factory_(url_loader_factory) {}
 
 DirectFeedController::~DirectFeedController() = default;
+
+bool DirectFeedController::AddDirectFeed(const GURL& feed_url,
+                                         const std::string& title,
+                                         const absl::optional<std::string>& id) {
+  // CHeck if feed url already exists
+  auto* existing_feeds = prefs_->GetDictionary(prefs::kBraveTodayDirectFeeds);
+  for (const auto kv : existing_feeds->DictItems()) {
+    // Non dict values will be flagged as an issue elsewhere.
+    if (!kv.second.is_dict())
+      continue;
+
+    auto existing_url = *kv.second.FindStringKey(prefs::kBraveTodayDirectFeeds);
+    if (GURL(existing_url) == feed_url.spec()) {
+      // It's a duplicate.
+      return false;
+    }
+  }
+
+  // Feed is valid, we can add the url now
+  // UUID for each entry as feed url might change via redirects etc
+  auto entry_id =
+      id.value_or(base::GUID::GenerateRandomV4().AsLowercaseString());
+  std::string entry_title = title.empty() ? feed_url.spec() : title;
+
+  // We use a dictionary pref, but that's to reserve space for more
+  // future customization on a feed. For now we just store a bool, and
+  // remove the entire entry if a user unsubscribes from a user feed.
+  DictionaryPrefUpdate update(prefs_, prefs::kBraveTodayDirectFeeds);
+  base::Value value = base::Value(base::Value::Type::DICTIONARY);
+  value.SetStringKey(prefs::kBraveTodayDirectFeedsKeySource, feed_url.spec());
+  value.SetStringKey(prefs::kBraveTodayDirectFeedsKeyTitle, entry_title);
+  update->SetPath(entry_id, std::move(value));
+
+  return true;
+}
 
 void DirectFeedController::FindFeeds(
     const GURL& possible_feed_or_site_url,

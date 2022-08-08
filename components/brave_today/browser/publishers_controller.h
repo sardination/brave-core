@@ -14,6 +14,7 @@
 #include "base/observer_list_types.h"
 #include "base/one_shot_event.h"
 #include "brave/components/api_request_helper/api_request_helper.h"
+#include "brave/components/brave_today/browser/unsupported_publisher_migrator.h"
 #include "brave/components/brave_today/common/brave_news.mojom.h"
 #include "components/prefs/pref_service.h"
 
@@ -26,6 +27,7 @@ class PublishersController {
  public:
   PublishersController(
       PrefService* prefs,
+      UnsupportedPublisherMigrator* unsupported_publisher_migrator,
       api_request_helper::APIRequestHelper* api_request_helper);
   ~PublishersController();
   PublishersController(const PublishersController&) = delete;
@@ -47,8 +49,9 @@ class PublishersController {
   void GetOrFetchPublishers(base::OnceClosure callback,
                             bool wait_for_current_update);
 
-  raw_ptr<PrefService> prefs_ = nullptr;
-  raw_ptr<api_request_helper::APIRequestHelper> api_request_helper_ = nullptr;
+  raw_ptr<PrefService> prefs_;
+  raw_ptr<UnsupportedPublisherMigrator> unsupported_publisher_migrator_;
+  raw_ptr<api_request_helper::APIRequestHelper> api_request_helper_;
 
   std::unique_ptr<base::OneShotEvent> on_current_update_complete_;
   base::ObserverList<Observer> observers_;

@@ -11,6 +11,7 @@
 #include <string>
 #include <vector>
 
+#include "absl/types/optional.h"
 #include "base/callback_forward.h"
 #include "base/memory/scoped_refptr.h"
 #include "brave/components/brave_today/common/brave_news.mojom-forward.h"
@@ -51,11 +52,15 @@ using IsValidCallback =
 class DirectFeedController {
  public:
   explicit DirectFeedController(
+      PrefService* prefs,
       scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory);
   ~DirectFeedController();
   DirectFeedController(const DirectFeedController&) = delete;
   DirectFeedController& operator=(const DirectFeedController&) = delete;
 
+  bool AddDirectFeed(const GURL& feed_url,
+                     const std::string& title,
+                     const absl::optional<std::string>& id = absl::nullopt);
   void VerifyFeedUrl(const GURL& feed_url, IsValidCallback callback);
   void DownloadAllContent(std::vector<mojom::PublisherPtr> publishers,
                           GetFeedItemsCallback callback);
@@ -74,6 +79,7 @@ class DirectFeedController {
                   const GURL& feed_url,
                   const std::unique_ptr<std::string> response_body);
 
+  raw_ptr<PrefService> prefs_;
   SimpleURLLoaderList url_loaders_;
   scoped_refptr<network::SharedURLLoaderFactory> url_loader_factory_;
 };

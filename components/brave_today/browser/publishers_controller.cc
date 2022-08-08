@@ -17,6 +17,7 @@
 #include "brave/components/brave_private_cdn/headers.h"
 #include "brave/components/brave_today/browser/direct_feed_controller.h"
 #include "brave/components/brave_today/browser/publishers_parsing.h"
+#include "brave/components/brave_today/browser/unsupported_publisher_migrator.h"
 #include "brave/components/brave_today/browser/urls.h"
 #include "brave/components/brave_today/common/brave_news.mojom.h"
 #include "brave/components/brave_today/common/pref_names.h"
@@ -25,8 +26,10 @@ namespace brave_news {
 
 PublishersController::PublishersController(
     PrefService* prefs,
+    UnsupportedPublisherMigrator* unsupported_publisher_migrator,
     api_request_helper::APIRequestHelper* api_request_helper)
     : prefs_(prefs),
+      unsupported_publisher_migrator_(unsupported_publisher_migrator),
       api_request_helper_(api_request_helper),
       on_current_update_complete_(new base::OneShotEvent()) {}
 
@@ -112,7 +115,9 @@ void PublishersController::EnsurePublishersIsUpdating() {
           } else {
             VLOG(1) << "Publisher list did not contain publisher found in"
                        "user prefs: "
-                    << publisher_id;
+                    << publisher_id
+                    << ". This could be because we've removed the publisher. "
+                       "Attempting to migrate to a direct feed.";
           }
         }
         // Add direct feeds
