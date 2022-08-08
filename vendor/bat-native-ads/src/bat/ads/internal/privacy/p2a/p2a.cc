@@ -5,7 +5,8 @@
 
 #include "bat/ads/internal/privacy/p2a/p2a.h"
 
-#include "base/json/json_writer.h"
+#include <utility>
+
 #include "base/values.h"
 #include "bat/ads/internal/ads_client_helper.h"
 
@@ -18,15 +19,12 @@ void RecordEvent(const std::string& name,
   DCHECK(!name.empty());
   DCHECK(!questions.empty());
 
-  base::Value list(base::Value::Type::LIST);
+  base::Value::List list;
   for (const auto& question : questions) {
     list.Append(question);
   }
 
-  std::string json;
-  base::JSONWriter::Write(list, &json);
-
-  AdsClientHelper::GetInstance()->RecordP2AEvent(name, json);
+  AdsClientHelper::GetInstance()->RecordP2AEvent(name, std::move(list));
 }
 
 }  // namespace p2a

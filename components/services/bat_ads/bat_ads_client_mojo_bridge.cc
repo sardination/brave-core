@@ -205,12 +205,12 @@ void BatAdsClientMojoBridge::GetBrowsingHistory(
 }
 
 void BatAdsClientMojoBridge::RecordP2AEvent(const std::string& name,
-                                            const std::string& value) {
+                                            base::Value::List value) {
   if (!connected()) {
     return;
   }
 
-  bat_ads_client_->RecordP2AEvent(name, value);
+  bat_ads_client_->RecordP2AEvent(name, std::move(value));
 }
 
 void BatAdsClientMojoBridge::LogTrainingInstance(
