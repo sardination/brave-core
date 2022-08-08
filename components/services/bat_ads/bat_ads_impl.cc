@@ -127,9 +127,15 @@ void BatAdsImpl::OnTabClosed(
 
 void BatAdsImpl::GetNotificationAd(const std::string& placement_id,
                                    GetNotificationAdCallback callback) {
-  ads::NotificationAdInfo notification_ad;
-  ads_->GetNotificationAd(placement_id, &notification_ad);
-  std::move(callback).Run(notification_ad.ToJson());
+  const absl::optional<ads::NotificationAdInfo> ad =
+      ads_->GetNotificationAd(placement_id);
+  if (!ad) {
+    std::move(callback).Run(/* ad */ absl::nullopt);
+    return;
+  }
+
+  absl::optional<base::Value::Dict> dict = ad->ToValue();
+  std::move(callback).Run(std::move(dict));
 }
 
 void BatAdsImpl::TriggerNotificationAdEvent(

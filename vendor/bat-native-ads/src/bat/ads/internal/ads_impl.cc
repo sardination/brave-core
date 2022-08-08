@@ -263,10 +263,9 @@ void AdsImpl::OnResourceComponentUpdated(const std::string& id) {
   ResourceManager::GetInstance()->UpdateResource(id);
 }
 
-bool AdsImpl::GetNotificationAd(const std::string& placement_id,
-                                NotificationAdInfo* notification) {
-  return NotificationAdManager::GetInstance()->GetForPlacementId(placement_id,
-                                                                 notification);
+absl::optional<NotificationAdInfo> AdsImpl::GetNotificationAd(
+    const std::string& placement_id) {
+  return NotificationAdManager::GetInstance()->GetForPlacementId(placement_id);
 }
 
 void AdsImpl::TriggerNotificationAdEvent(
