@@ -16,8 +16,6 @@
 #include "bat/ledger/mojom_structs.h"
 #include "net/http/http_status_code.h"
 
-using std::placeholders::_1;
-
 namespace {
 
 std::string GetPath(const std::string& payment_id) {
@@ -30,13 +28,14 @@ namespace ledger {
 namespace endpoint {
 namespace promotion {
 
-PostClaimBitflyer::PostClaimBitflyer(LedgerImpl* ledger) : ledger_(ledger) {
-  DCHECK(ledger_);
-}
+ClaimBitflyer::ClaimBitflyer(LedgerImpl* ledger,
+                             const std::string& linking_info)
+    : Endpoint<type::UrlMethod::POST, ClaimBitflyer>(ledger),
+      linking_info_(linking_info) {}
 
-PostClaimBitflyer::~PostClaimBitflyer() = default;
+ClaimBitflyer::~ClaimBitflyer() = default;
 
-std::string PostClaimBitflyer::GetUrl() {
+std::string ClaimBitflyer::Url() {
   const auto wallet = ledger_->wallet()->GetWallet();
   if (!wallet) {
     BLOG(0, "Wallet is null");
@@ -48,8 +47,24 @@ std::string PostClaimBitflyer::GetUrl() {
   return GetServerUrl(path);
 }
 
-std::string PostClaimBitflyer::GeneratePayload(
-    const std::string& linking_info) {
+std::string ClaimBitflyer::Content() {
+  return GeneratePayload(linking_info_);
+}
+
+std::vector<std::string> ClaimBitflyer::Headers() {
+  const auto wallet = ledger_->wallet()->GetWallet();
+  if (!wallet) {
+    BLOG(0, "Wallet is null");
+    //std::move(callback).Run(type::Result::LEDGER_ERROR);
+    return {};
+  }
+
+  return util::BuildSignHeaders(
+      base::StringPrintf("post %s", GetPath(wallet->payment_id).c_str()),
+      Content(), wallet->payment_id, wallet->recovery_seed);
+}
+
+std::string ClaimBitflyer::GeneratePayload(const std::string& linking_info) {
   base::Value::Dict payload;
   payload.Set("linkingInfo", linking_info);
   std::string json;
@@ -58,8 +73,7 @@ std::string PostClaimBitflyer::GeneratePayload(
   return json;
 }
 
-type::Result PostClaimBitflyer::ProcessResponse(
-    const type::UrlResponse& response) const {
+type::Result ClaimBitflyer::ProcessResponse(const type::UrlResponse& response) {
   const auto status_code = response.status_code;
 
   if (status_code == net::HTTP_BAD_REQUEST) {
@@ -95,7 +109,7 @@ type::Result PostClaimBitflyer::ProcessResponse(
   return type::Result::LEDGER_OK;
 }
 
-type::Result PostClaimBitflyer::ParseBody(const std::string& body) const {
+type::Result ClaimBitflyer::ParseBody(const std::string& body) {
   auto value = base::JSONReader::Read(body);
   if (!value || !value->is_dict()) {
     BLOG(0, "Invalid body!");
@@ -125,37 +139,10 @@ type::Result PostClaimBitflyer::ParseBody(const std::string& body) const {
   }
 }
 
-void PostClaimBitflyer::Request(const std::string& linking_info,
-                                PostClaimBitflyerCallback callback) {
-  auto url_callback =
-      std::bind(&PostClaimBitflyer::OnRequest, this, _1, callback);
-  const std::string payload = GeneratePayload(linking_info);
-
-  const auto wallet = ledger_->wallet()->GetWallet();
-  if (!wallet) {
-    BLOG(0, "Wallet is null");
-    callback(type::Result::LEDGER_ERROR);
-    return;
-  }
-
-  const auto sign_url =
-      base::StringPrintf("post %s", GetPath(wallet->payment_id).c_str());
-  auto headers = util::BuildSignHeaders(sign_url, payload, wallet->payment_id,
-                                        wallet->recovery_seed);
-
-  auto request = type::UrlRequest::New();
-  request->url = GetUrl();
-  request->content = payload;
-  request->headers = headers;
-  request->content_type = "application/json; charset=utf-8";
-  request->method = type::UrlMethod::POST;
-  ledger_->LoadURL(std::move(request), url_callback);
-}
-
-void PostClaimBitflyer::OnRequest(const type::UrlResponse& response,
-                                  PostClaimBitflyerCallback callback) {
+void ClaimBitflyer::OnLoadURL(Callback callback,
+                              const type::UrlResponse& response) {
   ledger::LogUrlResponse(__func__, response);
-  callback(ProcessResponse(response));
+  std::move(callback).Run(ProcessResponse(response));
 }
 
 }  // namespace promotion

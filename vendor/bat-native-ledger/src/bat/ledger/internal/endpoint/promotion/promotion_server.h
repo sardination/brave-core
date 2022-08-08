@@ -58,8 +58,6 @@ class PromotionServer {
 
   promotion::GetRecoverWallet* get_recover_wallet() const;
 
-  promotion::PostClaimBitflyer* post_claim_bitflyer() const;
-
   promotion::PostClaimGemini* post_claim_gemini() const;
 
   promotion::PostClaimUphold* post_claim_uphold() const;
@@ -101,7 +99,6 @@ class PromotionServer {
   std::unique_ptr<promotion::PostBatLoss> post_bat_loss_;
   std::unique_ptr<promotion::PostWalletBrave> post_wallet_brave_;
   std::unique_ptr<promotion::GetRecoverWallet> get_recover_wallet_;
-  std::unique_ptr<promotion::PostClaimBitflyer> post_claim_bitflyer_;
   std::unique_ptr<promotion::PostClaimGemini> post_claim_gemini_;
   std::unique_ptr<promotion::PostClaimUphold> post_claim_uphold_;
   std::unique_ptr<promotion::GetWallet> get_wallet_;

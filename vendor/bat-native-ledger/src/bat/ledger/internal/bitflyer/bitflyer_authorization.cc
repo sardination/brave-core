@@ -170,18 +170,18 @@ void BitflyerAuthorization::OnAuthorize(
     return;
   }
 
-  auto url_callback = std::bind(&BitflyerAuthorization::OnClaimWallet, this, _1,
+  auto url_callback = base::BindOnce(&BitflyerAuthorization::OnClaimWallet, base::Unretained(this),
                                 token, address, linking_info, callback);
 
-  promotion_server_->post_claim_bitflyer()->Request(linking_info, url_callback);
+  ledger::endpoint::promotion::ClaimBitflyer(ledger_, linking_info).Request(std::move(url_callback));
 }
 
 void BitflyerAuthorization::OnClaimWallet(
-    const type::Result result,
     const std::string& token,
     const std::string& address,
     const std::string& linking_info,
-    ledger::ExternalWalletAuthorizationCallback callback) {
+    ledger::ExternalWalletAuthorizationCallback callback,
+    const type::Result result) {
   auto wallet_ptr = ledger_->bitflyer()->GetWallet();
   if (!wallet_ptr) {
     BLOG(0, "bitFlyer wallet is null!");

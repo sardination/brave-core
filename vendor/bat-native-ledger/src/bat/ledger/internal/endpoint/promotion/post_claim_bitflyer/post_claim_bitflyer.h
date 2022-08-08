@@ -8,7 +8,7 @@
 
 #include <string>
 
-#include "bat/ledger/ledger.h"
+#include "bat/ledger/internal/endpoint/endpoint.h"
 
 // POST /v3/wallet/bitflyer/{payment_id}/claim
 //
@@ -35,30 +35,30 @@ class LedgerImpl;
 namespace endpoint {
 namespace promotion {
 
-using PostClaimBitflyerCallback =
-    std::function<void(const type::Result result)>;
+class ClaimBitflyer : public Endpoint<type::UrlMethod::POST, ClaimBitflyer> {
+  friend Endpoint<type::UrlMethod::POST, ClaimBitflyer>;
 
-class PostClaimBitflyer {
  public:
-  explicit PostClaimBitflyer(LedgerImpl* ledger);
-  ~PostClaimBitflyer();
+  using Callback = base::OnceCallback<void(type::Result)>;
 
-  void Request(const std::string& linking_info,
-               PostClaimBitflyerCallback callback);
+  explicit ClaimBitflyer(LedgerImpl* ledger, const std::string& linking_info);
+  ~ClaimBitflyer() override;
 
  private:
-  std::string GetUrl();
+  std::string Url() override;
+  std::string Content() override;
+  std::vector<std::string> Headers() override;
 
   std::string GeneratePayload(const std::string& linking_info);
 
-  type::Result ProcessResponse(const type::UrlResponse& response) const;
+  static type::Result ProcessResponse(const type::UrlResponse& response);
 
-  type::Result ParseBody(const std::string& body) const;
+  static type::Result ParseBody(const std::string& body);
 
-  void OnRequest(const type::UrlResponse& response,
-                 PostClaimBitflyerCallback callback);
+  static void OnLoadURL(Callback callback,
+                        const type::UrlResponse& response);
 
-  LedgerImpl* ledger_;  // NOT OWNED
+  std::string linking_info_;
 };
 
 }  // namespace promotion
