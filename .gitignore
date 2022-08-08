@@ -3,6 +3,7 @@
 !/vendor/bat-native-ads
 .DS_Store
 .tags*
+.gclient_*
 /.idea/
 /components/brave_new_tab_ui/data/LICENSE
 /components/brave_webtorrent/extension/out/
